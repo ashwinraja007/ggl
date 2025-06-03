@@ -24,6 +24,7 @@ const Contact = () => {
       <Header />
 
       <main className="flex-grow">
+        {/* Hero Section */}
         <motion.section 
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -36,18 +37,18 @@ const Contact = () => {
             transition={{ delay: 0.2, duration: 0.8 }}
             className="text-center px-4 relative z-10"
           >
-            <h1 className="text-4xl md:text-5xl font-bold text-white mb-5">
-              Get in Touch
-            </h1>
+            <h1 className="text-4xl md:text-5xl font-bold text-white mb-5">Get in Touch</h1>
             <p className="text-lg text-white/90 max-w-2xl mx-auto font-light">
               We're here to help and answer any questions you might have.
             </p>
           </motion.div>
         </motion.section>
 
+        {/* Contact Info + Form */}
         <section className="py-16">
           <div className="container mx-auto px-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-10 mb-10">
+              {/* Office Info */}
               <motion.div 
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
@@ -55,7 +56,6 @@ const Contact = () => {
                 className="bg-white p-8 rounded-xl shadow-lg"
               >
                 <h2 className="text-2xl font-bold mb-6">Contact Information</h2>
-
                 <div className="space-y-8">
                   <div className="space-y-6">
                     <h3 className="text-lg font-semibold">Australia Office</h3>
@@ -124,11 +124,10 @@ const Contact = () => {
                 )}
 
                 <form
-                  action="https://formsubmit.co/karthiktrendsandtactics@gmail.com" // Replace with your email
+                  action="https://formsubmit.co/karthiktrendsandtactics@gmail.com"
                   method="POST"
                   className="space-y-5"
                 >
-                  {/* Redirect to same page with ?submitted=true */}
                   <input type="hidden" name="_next" value="https://yourdomain.com/contact?submitted=true" />
                   <input type="hidden" name="_captcha" value="false" />
 
