@@ -4,18 +4,11 @@ import { Footer } from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { useForm } from "react-hook-form";
 import { motion } from 'framer-motion';
 import { FaLinkedin, FaFacebookF } from 'react-icons/fa';
 import { Phone, Mail, MapPin, Send } from 'lucide-react';
 
 const Contact = () => {
-  const { register, handleSubmit } = useForm();
-
-  const onSubmit = (data: any) => {
-    console.log(data);
-  };
-
   return (
     <div className="min-h-screen flex flex-col relative">
       <Header />
@@ -45,6 +38,7 @@ const Contact = () => {
         <section className="py-16">
           <div className="container mx-auto px-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-10 mb-10">
+              {/* Contact Info */}
               <motion.div 
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
@@ -52,11 +46,9 @@ const Contact = () => {
                 className="bg-white p-8 rounded-xl shadow-lg"
               >
                 <h2 className="text-2xl font-bold mb-6">Contact Information</h2>
-                
                 <div className="space-y-8">
                   <div className="space-y-6">
                     <h3 className="text-lg font-semibold">Australia Office</h3>
-                    
                     <motion.div whileHover={{ x: 10 }} className="flex items-start gap-4 group">
                       <Phone className="mt-1 text-blue-600 group-hover:scale-110 transition-transform" />
                       <div>
@@ -65,7 +57,6 @@ const Contact = () => {
                         <p className="text-gray-600">Tel: +61 388205157</p>
                       </div>
                     </motion.div>
-                    
                     <motion.div whileHover={{ x: 10 }} className="flex items-start gap-4 group">
                       <MapPin className="mt-1 text-blue-600 group-hover:scale-110 transition-transform" />
                       <div>
@@ -76,7 +67,6 @@ const Contact = () => {
                       </div>
                     </motion.div>
                   </div>
-
                   {/* Social Links */}
                   <div className="pt-6 border-t">
                     <p className="font-medium mb-4">Connect With Us</p>
@@ -88,7 +78,6 @@ const Contact = () => {
                       >
                         <FaLinkedin size={18} />
                       </motion.a>
-
                       <motion.a
                         href="https://www.facebook.com/gglusa" 
                         whileHover={{ y: -5 }}
@@ -110,22 +99,31 @@ const Contact = () => {
               >
                 <h2 className="text-2xl font-bold mb-4">Send us a Message</h2>
                 <p className="text-gray-600 mb-6">Fill in the form below and we'll get back to you as soon as possible.</p>
-                
-                <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+
+                <form
+                  action="https://formsubmit.co/YOUR_EMAIL@example.com"
+                  method="POST"
+                  className="space-y-5"
+                >
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <Input placeholder="First Name" {...register("firstName")} className="border-gray-200 focus:ring-blue-500" />
-                    <Input placeholder="Last Name" {...register("lastName")} className="border-gray-200 focus:ring-blue-500" />
+                    <Input name="firstName" placeholder="First Name" className="border-gray-200 focus:ring-blue-500" required />
+                    <Input name="lastName" placeholder="Last Name" className="border-gray-200 focus:ring-blue-500" required />
                   </div>
-                  
+
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <Input placeholder="Email" type="email" {...register("email")} className="border-gray-200 focus:ring-blue-500" />
-                    <Input placeholder="Phone" {...register("phone")} className="border-gray-200 focus:ring-blue-500" />
+                    <Input name="email" type="email" placeholder="Email" className="border-gray-200 focus:ring-blue-500" required />
+                    <Input name="phone" placeholder="Phone" className="border-gray-200 focus:ring-blue-500" />
                   </div>
-                  
-                  <Input placeholder="Organization/Company" {...register("organization")} className="border-gray-200 focus:ring-blue-500" />
-                  
-                  <Textarea placeholder="Your Message" className="min-h-[120px] border-gray-200 focus:ring-blue-500" {...register("message")} />
-                  
+
+                  <Input name="organization" placeholder="Organization/Company" className="border-gray-200 focus:ring-blue-500" />
+
+                  <Textarea name="message" placeholder="Your Message" className="min-h-[120px] border-gray-200 focus:ring-blue-500" required />
+
+                  {/* Hidden Fields */}
+                  <input type="hidden" name="_captcha" value="false" />
+                  <input type="hidden" name="_next" value="https://yourdomain.com/thank-you" />
+                  <input type="hidden" name="_subject" value="New Contact Form Submission" />
+
                   <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                     <Button 
                       type="submit" 
@@ -151,9 +149,9 @@ const Contact = () => {
               viewport={{ once: true }}
               className="relative h-[400px] md:h-[500px] rounded-xl shadow-lg overflow-hidden border border-gray-200"
             >
-             <iframe 
+              <iframe 
                 src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3148.583489498719!2d144.8464884754868!3d-37.70139647207317!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x6ad6579f3b24534d%3A0x7501633196ff14b!2s7-9+Mallett+Rd%2C+Tullamarine+VIC+3043%2C+Australia!5e0!3m2!1sen!2sus!4v1712665730878!5m2!1sen!2sus"
-                width="100%" height="100%" style={{ border: 0 }} 
+                width="100%" height="100%" style={{ border: 0 }}
                 allowFullScreen loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
               />
