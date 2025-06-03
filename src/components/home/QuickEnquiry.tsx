@@ -1,4 +1,3 @@
-
 import { useForm } from "react-hook-form";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -20,28 +19,44 @@ interface EnquiryForm {
 export const QuickEnquiry = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
-  
+
   const {
     register,
     handleSubmit,
     formState: { errors },
     reset
   } = useForm<EnquiryForm>();
-  
+
   const onSubmit = async (data: EnquiryForm) => {
     setIsSubmitting(true);
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      console.log(data);
-      setSubmitStatus('success');
+      const response = await fetch("https://formsubmit.co/karthikjungleemara@gmail.com", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify({
+          fullName: data.fullName,
+          phone: data.phone,
+          email: data.email,
+          purpose: data.purpose,
+          comment: data.comment,
+          _subject: "New Quick Enquiry Submission",
+          _template: "table"
+        }),
+      });
+
+      if (!response.ok) throw new Error("Form submission failed");
+
+      setSubmitStatus("success");
       reset();
     } catch (error) {
-      setSubmitStatus('error');
+      console.error(error);
+      setSubmitStatus("error");
     } finally {
       setIsSubmitting(false);
-      // Reset status after 3 seconds
-      setTimeout(() => setSubmitStatus('idle'), 3000);
+      setTimeout(() => setSubmitStatus("idle"), 3000);
     }
   };
 
@@ -206,10 +221,7 @@ export const QuickEnquiry = () => {
               {errors.comment && <p className="text-red-500 text-sm mt-1">{errors.comment.message}</p>}
             </div>
 
-            <motion.div
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-            >
+            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
               <Button 
                 type="submit" 
                 disabled={isSubmitting} 
