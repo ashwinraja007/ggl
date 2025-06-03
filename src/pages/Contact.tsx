@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
@@ -6,13 +6,23 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { motion } from 'framer-motion';
 import { FaLinkedin, FaFacebookF } from 'react-icons/fa';
-import { Phone, Mail, MapPin, Send } from 'lucide-react';
+import { Phone, Mail, MapPin, Send, CheckCircle } from 'lucide-react';
 
 const Contact = () => {
+  const [submitted, setSubmitted] = useState(false);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("submitted") === "true") {
+      setSubmitted(true);
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+  }, []);
+
   return (
     <div className="min-h-screen flex flex-col relative">
       <Header />
-      
+
       <main className="flex-grow">
         <motion.section 
           initial={{ opacity: 0 }}
@@ -38,7 +48,6 @@ const Contact = () => {
         <section className="py-16">
           <div className="container mx-auto px-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-10 mb-10">
-              {/* Contact Info */}
               <motion.div 
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
@@ -46,9 +55,11 @@ const Contact = () => {
                 className="bg-white p-8 rounded-xl shadow-lg"
               >
                 <h2 className="text-2xl font-bold mb-6">Contact Information</h2>
+
                 <div className="space-y-8">
                   <div className="space-y-6">
                     <h3 className="text-lg font-semibold">Australia Office</h3>
+
                     <motion.div whileHover={{ x: 10 }} className="flex items-start gap-4 group">
                       <Phone className="mt-1 text-blue-600 group-hover:scale-110 transition-transform" />
                       <div>
@@ -57,6 +68,7 @@ const Contact = () => {
                         <p className="text-gray-600">Tel: +61 388205157</p>
                       </div>
                     </motion.div>
+
                     <motion.div whileHover={{ x: 10 }} className="flex items-start gap-4 group">
                       <MapPin className="mt-1 text-blue-600 group-hover:scale-110 transition-transform" />
                       <div>
@@ -67,7 +79,7 @@ const Contact = () => {
                       </div>
                     </motion.div>
                   </div>
-                  {/* Social Links */}
+
                   <div className="pt-6 border-t">
                     <p className="font-medium mb-4">Connect With Us</p>
                     <div className="flex gap-4">
@@ -78,6 +90,7 @@ const Contact = () => {
                       >
                         <FaLinkedin size={18} />
                       </motion.a>
+
                       <motion.a
                         href="https://www.facebook.com/gglusa" 
                         whileHover={{ y: -5 }}
@@ -100,29 +113,38 @@ const Contact = () => {
                 <h2 className="text-2xl font-bold mb-4">Send us a Message</h2>
                 <p className="text-gray-600 mb-6">Fill in the form below and we'll get back to you as soon as possible.</p>
 
+                {submitted && (
+                  <div className="bg-green-100 text-green-800 p-4 rounded-md mb-6 flex items-start gap-3">
+                    <CheckCircle size={22} className="mt-1 text-green-600" />
+                    <div>
+                      <p className="font-semibold">Message Sent!</p>
+                      <p>Thank you for contacting us. We’ll get back to you soon.</p>
+                    </div>
+                  </div>
+                )}
+
                 <form
-                  action="https://formsubmit.co/YOUR_EMAIL@example.com"
+                  action="https://formsubmit.co/your@email.com" // Replace with your email
                   method="POST"
                   className="space-y-5"
                 >
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <Input name="firstName" placeholder="First Name" className="border-gray-200 focus:ring-blue-500" required />
-                    <Input name="lastName" placeholder="Last Name" className="border-gray-200 focus:ring-blue-500" required />
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <Input name="email" type="email" placeholder="Email" className="border-gray-200 focus:ring-blue-500" required />
-                    <Input name="phone" placeholder="Phone" className="border-gray-200 focus:ring-blue-500" />
-                  </div>
-
-                  <Input name="organization" placeholder="Organization/Company" className="border-gray-200 focus:ring-blue-500" />
-
-                  <Textarea name="message" placeholder="Your Message" className="min-h-[120px] border-gray-200 focus:ring-blue-500" required />
-
-                  {/* Hidden Fields */}
+                  {/* Redirect to same page with ?submitted=true */}
+                  <input type="hidden" name="_next" value="https://yourdomain.com/contact?submitted=true" />
                   <input type="hidden" name="_captcha" value="false" />
-                  <input type="hidden" name="_next" value="https://yourdomain.com/thank-you" />
-                  <input type="hidden" name="_subject" value="New Contact Form Submission" />
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <Input name="firstName" placeholder="First Name" required />
+                    <Input name="lastName" placeholder="Last Name" required />
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <Input name="email" placeholder="Email" type="email" required />
+                    <Input name="phone" placeholder="Phone" />
+                  </div>
+
+                  <Input name="organization" placeholder="Organization/Company" />
+
+                  <Textarea name="message" placeholder="Your Message" className="min-h-[120px]" required />
 
                   <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                     <Button 
@@ -151,7 +173,7 @@ const Contact = () => {
             >
               <iframe 
                 src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3148.583489498719!2d144.8464884754868!3d-37.70139647207317!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x6ad6579f3b24534d%3A0x7501633196ff14b!2s7-9+Mallett+Rd%2C+Tullamarine+VIC+3043%2C+Australia!5e0!3m2!1sen!2sus!4v1712665730878!5m2!1sen!2sus"
-                width="100%" height="100%" style={{ border: 0 }}
+                width="100%" height="100%" style={{ border: 0 }} 
                 allowFullScreen loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
               />
