@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
+import { useForm } from "react-hook-form";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
@@ -8,16 +9,41 @@ import { motion } from 'framer-motion';
 import { FaLinkedin, FaFacebookF } from 'react-icons/fa';
 import { Phone, Mail, MapPin, Send, CheckCircle } from 'lucide-react';
 
+type FormData = {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone?: string;
+  organization?: string;
+  message: string;
+};
+
 const Contact = () => {
   const [submitted, setSubmitted] = useState(false);
+  const { register, handleSubmit, reset } = useForm<FormData>();
 
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    if (params.get("submitted") === "true") {
-      setSubmitted(true);
-      window.history.replaceState({}, document.title, window.location.pathname);
+  const onSubmit = async (data: FormData) => {
+    try {
+      const response = await fetch("https://formsubmit.co/ajax/karthiktrendsandtactics@gmail.com", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (response.ok) {
+        setSubmitted(true);
+        reset(); // Clear the form
+      } else {
+        alert("Failed to send message. Please try again later.");
+      }
+    } catch (error) {
+      console.error("Error submitting form", error);
+      alert("An error occurred. Please try again.");
     }
-  }, []);
+  };
 
   return (
     <div className="min-h-screen flex flex-col relative">
@@ -25,13 +51,13 @@ const Contact = () => {
 
       <main className="flex-grow">
         {/* Hero Section */}
-        <motion.section 
+        <motion.section
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           className="relative h-[40vh] flex items-center justify-center bg-blue-600 overflow-hidden"
         >
           <div className="absolute inset-0 bg-gradient-to-r from-blue-600/50 to-blue-800/50" />
-          <motion.div 
+          <motion.div
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.2, duration: 0.8 }}
@@ -49,7 +75,7 @@ const Contact = () => {
           <div className="container mx-auto px-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-10 mb-10">
               {/* Office Info */}
-              <motion.div 
+              <motion.div
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.8 }}
@@ -84,7 +110,7 @@ const Contact = () => {
                     <p className="font-medium mb-4">Connect With Us</p>
                     <div className="flex gap-4">
                       <motion.a
-                        href="https://www.linkedin.com/company/gglus/" 
+                        href="https://www.linkedin.com/company/gglus/"
                         whileHover={{ y: -5 }}
                         className="bg-gray-100 p-3 rounded-full text-gray-600 hover:bg-blue-600 hover:text-white transition-colors"
                       >
@@ -92,7 +118,7 @@ const Contact = () => {
                       </motion.a>
 
                       <motion.a
-                        href="https://www.facebook.com/gglusa" 
+                        href="https://www.facebook.com/gglusa"
                         whileHover={{ y: -5 }}
                         className="bg-gray-100 p-3 rounded-full text-gray-600 hover:bg-blue-600 hover:text-white transition-colors"
                       >
@@ -104,7 +130,7 @@ const Contact = () => {
               </motion.div>
 
               {/* Contact Form */}
-              <motion.div 
+              <motion.div
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.8 }}
@@ -123,31 +149,23 @@ const Contact = () => {
                   </div>
                 )}
 
-                <form
-                  action="https://formsubmit.co/karthiktrendsandtactics@gmail.com"
-                  method="POST"
-                  className="space-y-5"
-                >
-                  <input type="hidden" name="_next" value="https://yourdomain.com/contact?submitted=true" />
-                  <input type="hidden" name="_captcha" value="false" />
-
+                <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <Input name="firstName" placeholder="First Name" required />
-                    <Input name="lastName" placeholder="Last Name" required />
+                    <Input {...register("firstName")} placeholder="First Name" required />
+                    <Input {...register("lastName")} placeholder="Last Name" required />
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <Input name="email" placeholder="Email" type="email" required />
-                    <Input name="phone" placeholder="Phone" />
+                    <Input {...register("email")} placeholder="Email" type="email" required />
+                    <Input {...register("phone")} placeholder="Phone" />
                   </div>
 
-                  <Input name="organization" placeholder="Organization/Company" />
-
-                  <Textarea name="message" placeholder="Your Message" className="min-h-[120px]" required />
+                  <Input {...register("organization")} placeholder="Organization/Company" />
+                  <Textarea {...register("message")} placeholder="Your Message" className="min-h-[120px]" required />
 
                   <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                    <Button 
-                      type="submit" 
+                    <Button
+                      type="submit"
                       className="w-full bg-blue-600 hover:bg-blue-700 text-white py-6 flex items-center justify-center gap-2"
                     >
                       Send Message
@@ -163,17 +181,20 @@ const Contact = () => {
         {/* Google Maps */}
         <section className="py-10 bg-white">
           <div className="container mx-auto px-4">
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
               transition={{ duration: 1 }}
               viewport={{ once: true }}
               className="relative h-[400px] md:h-[500px] rounded-xl shadow-lg overflow-hidden border border-gray-200"
             >
-              <iframe 
+              <iframe
                 src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3148.583489498719!2d144.8464884754868!3d-37.70139647207317!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x6ad6579f3b24534d%3A0x7501633196ff14b!2s7-9+Mallett+Rd%2C+Tullamarine+VIC+3043%2C+Australia!5e0!3m2!1sen!2sus!4v1712665730878!5m2!1sen!2sus"
-                width="100%" height="100%" style={{ border: 0 }} 
-                allowFullScreen loading="lazy"
+                width="100%"
+                height="100%"
+                style={{ border: 0 }}
+                allowFullScreen
+                loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
               />
             </motion.div>
