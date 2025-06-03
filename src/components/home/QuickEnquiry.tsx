@@ -28,34 +28,34 @@ export const QuickEnquiry = () => {
   } = useForm<EnquiryForm>();
 
   const onSubmit = async (data: EnquiryForm) => {
-    setIsSubmitting(true);
-    try {
-      const formData = new FormData();
-      formData.append("fullName", data.fullName);
-      formData.append("phone", data.phone);
-      formData.append("email", data.email);
-      formData.append("purpose", data.purpose);
-      formData.append("comment", data.comment);
-      formData.append("_subject", "New Quick Enquiry Submission");
-      formData.append("_template", "table");
+  setIsSubmitting(true);
+  try {
+    const formData = new FormData();
+    formData.append("name", data.fullName);       // changed from "fullName"
+    formData.append("phone", data.phone);         // OK
+    formData.append("email", data.email);         // OK
+    formData.append("subject", data.purpose);     // changed from "purpose"
+    formData.append("message", data.comment);     // changed from "comment"
+    formData.append("_subject", "New Quick Enquiry Submission");
+    formData.append("_template", "table");
 
-      const response = await fetch("https://formsubmit.co/karthiktrendsandtactics@gmail.com", {
-        method: "POST",
-        body: formData,
-      });
+    const response = await fetch("https://formsubmit.co/karthiktrendsandtactics@gmail.com", {
+      method: "POST",
+      body: formData,
+    });
 
-      if (!response.ok) throw new Error("Form submission failed");
+    if (!response.ok) throw new Error("Form submission failed");
 
-      setSubmitStatus("success");
-      reset();
-    } catch (error) {
-      console.error(error);
-      setSubmitStatus("error");
-    } finally {
-      setIsSubmitting(false);
-      setTimeout(() => setSubmitStatus("idle"), 3000);
-    }
-  };
+    setSubmitStatus("success");
+    reset();
+  } catch (error) {
+    console.error(error);
+    setSubmitStatus("error");
+  } finally {
+    setIsSubmitting(false);
+    setTimeout(() => setSubmitStatus("idle"), 3000);
+  }
+};
 
   return (
     <section className="py-16 bg-gradient-to-b from-white via-slate-50 to-gray-100">
