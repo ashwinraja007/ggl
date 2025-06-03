@@ -30,21 +30,18 @@ export const QuickEnquiry = () => {
   const onSubmit = async (data: EnquiryForm) => {
     setIsSubmitting(true);
     try {
+      const formData = new FormData();
+      formData.append("fullName", data.fullName);
+      formData.append("phone", data.phone);
+      formData.append("email", data.email);
+      formData.append("purpose", data.purpose);
+      formData.append("comment", data.comment);
+      formData.append("_subject", "New Quick Enquiry Submission");
+      formData.append("_template", "table");
+
       const response = await fetch("https://formsubmit.co/karthikjungleemara@gmail.com", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-        body: JSON.stringify({
-          fullName: data.fullName,
-          phone: data.phone,
-          email: data.email,
-          purpose: data.purpose,
-          comment: data.comment,
-          _subject: "New Quick Enquiry Submission",
-          _template: "table"
-        }),
+        body: formData,
       });
 
       if (!response.ok) throw new Error("Form submission failed");
@@ -110,7 +107,7 @@ export const QuickEnquiry = () => {
             </Alert>
           </motion.div>
         )}
-        
+
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -128,34 +125,28 @@ export const QuickEnquiry = () => {
                   Full Name*
                 </Label>
                 <Input 
-                  id="fullName" 
-                  className={`bg-white/80 focus:ring-2 focus:ring-brand-gold/30 transition-all ${errors.fullName ? "border-red-300 focus:border-red-500" : "border-gray-300 focus:border-brand-gold"}`}
+                  id="fullName"
                   {...register("fullName", {
                     required: "Full name is required",
-                    minLength: {
-                      value: 2,
-                      message: "Name must be at least 2 characters"
-                    }
+                    minLength: { value: 2, message: "Name must be at least 2 characters" }
                   })}
+                  className={`bg-white/80 focus:ring-2 focus:ring-brand-gold/30 transition-all ${errors.fullName ? "border-red-300 focus:border-red-500" : "border-gray-300 focus:border-brand-gold"}`}
                 />
                 {errors.fullName && <p className="text-red-500 text-sm mt-1">{errors.fullName.message}</p>}
               </div>
-              
+
               <div className="space-y-2">
                 <Label htmlFor="phone" className="text-gray-700 flex items-center gap-2">
                   <Phone className="h-4 w-4 text-brand-gold" />
                   Phone Number*
                 </Label>
                 <Input 
-                  id="phone" 
-                  className={`bg-white/80 focus:ring-2 focus:ring-brand-gold/30 transition-all ${errors.phone ? "border-red-300 focus:border-red-500" : "border-gray-300 focus:border-brand-gold"}`}
+                  id="phone"
                   {...register("phone", {
                     required: "Phone number is required",
-                    pattern: {
-                      value: /^[0-9+-]+$/,
-                      message: "Please enter a valid phone number"
-                    }
+                    pattern: { value: /^[0-9+-]+$/, message: "Please enter a valid phone number" }
                   })}
+                  className={`bg-white/80 focus:ring-2 focus:ring-brand-gold/30 transition-all ${errors.phone ? "border-red-300 focus:border-red-500" : "border-gray-300 focus:border-brand-gold"}`}
                 />
                 {errors.phone && <p className="text-red-500 text-sm mt-1">{errors.phone.message}</p>}
               </div>
@@ -168,35 +159,29 @@ export const QuickEnquiry = () => {
                   Email*
                 </Label>
                 <Input 
-                  id="email" 
-                  type="email" 
-                  className={`bg-white/80 focus:ring-2 focus:ring-brand-gold/30 transition-all ${errors.email ? "border-red-300 focus:border-red-500" : "border-gray-300 focus:border-brand-gold"}`}
+                  id="email"
+                  type="email"
                   {...register("email", {
                     required: "Email is required",
-                    pattern: {
-                      value: /^\S+@\S+$/i,
-                      message: "Please enter a valid email"
-                    }
+                    pattern: { value: /^\S+@\S+$/i, message: "Please enter a valid email" }
                   })}
+                  className={`bg-white/80 focus:ring-2 focus:ring-brand-gold/30 transition-all ${errors.email ? "border-red-300 focus:border-red-500" : "border-gray-300 focus:border-brand-gold"}`}
                 />
                 {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>}
               </div>
-              
+
               <div className="space-y-2">
                 <Label htmlFor="purpose" className="text-gray-700 flex items-center gap-2">
                   <FileText className="h-4 w-4 text-brand-gold" />
                   Purpose*
                 </Label>
                 <Input 
-                  id="purpose" 
-                  className={`bg-white/80 focus:ring-2 focus:ring-brand-gold/30 transition-all ${errors.purpose ? "border-red-300 focus:border-red-500" : "border-gray-300 focus:border-brand-gold"}`}
+                  id="purpose"
                   {...register("purpose", {
                     required: "Purpose is required",
-                    minLength: {
-                      value: 3,
-                      message: "Purpose must be at least 3 characters"
-                    }
+                    minLength: { value: 3, message: "Purpose must be at least 3 characters" }
                   })}
+                  className={`bg-white/80 focus:ring-2 focus:ring-brand-gold/30 transition-all ${errors.purpose ? "border-red-300 focus:border-red-500" : "border-gray-300 focus:border-brand-gold"}`}
                 />
                 {errors.purpose && <p className="text-red-500 text-sm mt-1">{errors.purpose.message}</p>}
               </div>
@@ -208,15 +193,12 @@ export const QuickEnquiry = () => {
                 Comment*
               </Label>
               <Textarea 
-                id="comment" 
-                className={`bg-white/80 focus:ring-2 focus:ring-brand-gold/30 transition-all min-h-[120px] ${errors.comment ? "border-red-300 focus:border-red-500" : "border-gray-300 focus:border-brand-gold"}`}
+                id="comment"
                 {...register("comment", {
                   required: "Comment is required",
-                  minLength: {
-                    value: 10,
-                    message: "Comment must be at least 10 characters"
-                  }
+                  minLength: { value: 10, message: "Comment must be at least 10 characters" }
                 })}
+                className={`bg-white/80 focus:ring-2 focus:ring-brand-gold/30 transition-all min-h-[120px] ${errors.comment ? "border-red-300 focus:border-red-500" : "border-gray-300 focus:border-brand-gold"}`}
               />
               {errors.comment && <p className="text-red-500 text-sm mt-1">{errors.comment.message}</p>}
             </div>
