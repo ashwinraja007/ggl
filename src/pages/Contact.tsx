@@ -7,7 +7,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { motion } from 'framer-motion';
 import { FaLinkedin, FaFacebookF } from 'react-icons/fa';
 import { Phone, Mail, MapPin, Send, CheckCircle } from 'lucide-react';
-import { Toaster, toast } from 'react-hot-toast';
 
 const Contact = () => {
   const [submitted, setSubmitted] = useState(false);
@@ -16,17 +15,12 @@ const Contact = () => {
     const params = new URLSearchParams(window.location.search);
     if (params.get("submitted") === "true") {
       setSubmitted(true);
-      toast.success("Message sent successfully!", {
-        position: "bottom-center",
-        duration: 5000,
-      });
       window.history.replaceState({}, document.title, window.location.pathname);
     }
   }, []);
 
   return (
     <div className="min-h-screen flex flex-col relative">
-      <Toaster /> {/* Toast provider */}
       <Header />
 
       <main className="flex-grow">
@@ -61,9 +55,11 @@ const Contact = () => {
                 className="bg-white p-8 rounded-xl shadow-lg"
               >
                 <h2 className="text-2xl font-bold mb-6">Contact Information</h2>
+
                 <div className="space-y-8">
                   <div className="space-y-6">
                     <h3 className="text-lg font-semibold">Australia Office</h3>
+
                     <motion.div whileHover={{ x: 10 }} className="flex items-start gap-4 group">
                       <Phone className="mt-1 text-blue-600 group-hover:scale-110 transition-transform" />
                       <div>
@@ -128,12 +124,12 @@ const Contact = () => {
                 )}
 
                 <form
-                  action="https://formsubmit.co/karthiktrendsandtactics@gmail.com"
+                  action="https://formsubmit.co/karthiktrendsandtactics@gmail.com" // Replace with your email
                   method="POST"
                   className="space-y-5"
                 >
                   {/* Redirect to same page with ?submitted=true */}
-                  <input type="hidden" name="_next" value="https://gglaustrail.com/?submitted=true" />
+                  <input type="hidden" name="_next" value="https://yourdomain.com/contact?submitted=true" />
                   <input type="hidden" name="_captcha" value="false" />
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -147,6 +143,7 @@ const Contact = () => {
                   </div>
 
                   <Input name="organization" placeholder="Organization/Company" />
+
                   <Textarea name="message" placeholder="Your Message" className="min-h-[120px]" required />
 
                   <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
