@@ -39,7 +39,7 @@ export const QuickEnquiry = () => {
     formData.append("_subject", "New Quick Enquiry Submission");
     formData.append("_template", "table");
 
-    const response = await fetch("https://formsubmit.co/karthiktrendsandtactics@gmail.com", {
+    const response = await fetch("https://formsubmit.co/ajax/karthiktrendsandtactics@gmail.com",{
       method: "POST",
       body: formData,
     });
