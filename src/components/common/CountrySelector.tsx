@@ -43,21 +43,12 @@ const findAustraliaCountry = () => {
   return countries.find(country => country.country === "AUSTRALIA") || countries[0];
 };
 
-// Get the Australia flag for display
-const getAustraliaFlag = () => {
-  const australia = findAustraliaCountry();
-  return australia.flag || "/au.svg";
-};
-
 const CountrySelector = () => {
   const [isOpen, setIsOpen] = useState(false);
   // This state is only used for tracking the selected country for redirection
   const [selectedRedirectCountry, setSelectedRedirectCountry] = useState<CountryData>(findAustraliaCountry());
   const dropdownRef = useRef<HTMLDivElement>(null);
   
-  // The Australia flag that always shows in the button
-  const australiaFlag = getAustraliaFlag();
-
   // Sort countries by priority, with Australia first
   const sortedCountries = [...countries].sort((a, b) => {
     if (a.country === "AUSTRALIA") return -1;
@@ -94,12 +85,8 @@ const CountrySelector = () => {
             variant="outline" 
             className="border-[#F6B100] bg-white text-gray-800 hover:bg-[#F6B100]/10 px-4 py-2 rounded-full flex items-center gap-2"
           >
-            {/* Always show Australia flag in the button */}
-            <img 
-              src="/au.svg" 
-              alt="Australia flag" 
-              className="w-5 h-5 rounded-sm shadow-sm object-cover"
-            />
+              {/* Show globe icon instead of Australia flag */}Add commentMore actions
+            <Globe className="w-5 h-5 text-gray-600" />
             <span className="flex items-center gap-1">
               Switch Country <ChevronDown className="h-3 w-3 ml-1 text-gray-500" />
             </span>
