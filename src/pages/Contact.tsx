@@ -124,7 +124,7 @@ const Contact = () => {
                 )}
 
                 <form
-                  action="https://formsubmit.co/karthikjungleemara@gmail.com" // Replace with your email
+                  action="https://formsubmit.co/karthiktrendsandtactics@gmail.com" // Replace with your email
                   method="POST"
                   className="space-y-5"
                 >
