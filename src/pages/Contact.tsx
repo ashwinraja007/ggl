@@ -6,8 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { motion } from 'framer-motion';
 import { FaLinkedin, FaFacebookF } from 'react-icons/fa';
-import { Phone, Mail, MapPin, Send } from 'lucide-react';
-import toast, { Toaster } from 'react-hot-toast';
+import { Phone, Mail, MapPin, Send, CheckCircle } from 'lucide-react';
 
 const Contact = () => {
   const [submitted, setSubmitted] = useState(false);
@@ -16,14 +15,12 @@ const Contact = () => {
     const params = new URLSearchParams(window.location.search);
     if (params.get("submitted") === "true") {
       setSubmitted(true);
-      toast.success("Message sent successfully!");
       window.history.replaceState({}, document.title, window.location.pathname);
     }
   }, []);
 
   return (
     <div className="min-h-screen flex flex-col relative">
-      <Toaster position="top-right" />
       <Header />
 
       <main className="flex-grow">
@@ -58,9 +55,11 @@ const Contact = () => {
                 className="bg-white p-8 rounded-xl shadow-lg"
               >
                 <h2 className="text-2xl font-bold mb-6">Contact Information</h2>
+
                 <div className="space-y-8">
                   <div className="space-y-6">
                     <h3 className="text-lg font-semibold">Australia Office</h3>
+
                     <motion.div whileHover={{ x: 10 }} className="flex items-start gap-4 group">
                       <Phone className="mt-1 text-blue-600 group-hover:scale-110 transition-transform" />
                       <div>
@@ -91,6 +90,7 @@ const Contact = () => {
                       >
                         <FaLinkedin size={18} />
                       </motion.a>
+
                       <motion.a
                         href="https://www.facebook.com/gglusa" 
                         whileHover={{ y: -5 }}
@@ -113,11 +113,22 @@ const Contact = () => {
                 <h2 className="text-2xl font-bold mb-4">Send us a Message</h2>
                 <p className="text-gray-600 mb-6">Fill in the form below and we'll get back to you as soon as possible.</p>
 
+                {submitted && (
+                  <div className="bg-green-100 text-green-800 p-4 rounded-md mb-6 flex items-start gap-3">
+                    <CheckCircle size={22} className="mt-1 text-green-600" />
+                    <div>
+                      <p className="font-semibold">Message Sent!</p>
+                      <p>Thank you for contacting us. We’ll get back to you soon.</p>
+                    </div>
+                  </div>
+                )}
+
                 <form
-                  action="https://formsubmit.co/karthiktrendsandtactics@gmail.com"
+                  action="https://formsubmit.co/karthiktrendsandtactics@gmail.com" // Replace with your email
                   method="POST"
                   className="space-y-5"
                 >
+                  {/* Redirect to same page with ?submitted=true */}
                   <input type="hidden" name="_next" value="https://yourdomain.com/contact?submitted=true" />
                   <input type="hidden" name="_captcha" value="false" />
 
@@ -132,6 +143,7 @@ const Contact = () => {
                   </div>
 
                   <Input name="organization" placeholder="Organization/Company" />
+
                   <Textarea name="message" placeholder="Your Message" className="min-h-[120px]" required />
 
                   <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
