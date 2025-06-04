@@ -86,7 +86,7 @@ const CountrySelector = () => {
             className="border-[#F6B100] bg-white text-gray-800 hover:bg-[#F6B100]/10 px-4 py-2 rounded-full flex items-center gap-2"
           >
               {/* Show globe icon instead of Australia flag */}
-            <Globe className="w-5 h-5 text-gray-600" />
+            <Globe className="w-6 h-6 text-[#F6B100]" />
             <span className="flex items-center gap-1">
               Switch Country <ChevronDown className="h-3 w-3 ml-1 text-gray-500" />
             </span>
@@ -121,7 +121,7 @@ const CountrySelector = () => {
                         />
                       ) : (
                         <div className="w-6 h-6 bg-gray-200 rounded-sm flex items-center justify-center">
-                          <Globe className="w-4 h-4 text-gray-500" />
+                         <Globe className="w-6 h-6 text-[#F6B100]" />
                         </div>
                       )}
                     </div>
