@@ -122,7 +122,7 @@ const About = () => {
             }} className="rounded-2xl shadow-lg p-8 md:p-12 bg-neutral-50">
                 <div className="flex flex-col items-center space-y-6">
                   <div className="w-full max-w-md">
-                    <img src="/lovable-uploads/58aa8fa6-b206-4aaa-a5af-edbe74e67df1.png" alt="Freight & Trade Alliance" className="w-full h-20 object-contain" />
+                    <img src="/ftaLogo.png" alt="Freight & Trade Alliance" className="w-full h-20 object-contain" />
                   </div>
                   
                   <div className="text-center space-y-4">
