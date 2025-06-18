@@ -138,7 +138,7 @@ const About = () => {
         </motion.section>
 
         {/* Call to Action */}
-        <section className="brand-navy text-white py-16 my-6">
+        <section className="bg-brand-navy text-white py-16 my-6">
           <div className="container mx-auto px-4">
             <motion.div initial={{
             opacity: 0
