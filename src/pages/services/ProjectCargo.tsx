@@ -60,7 +60,7 @@ const ProjectCargo = () => {
               }} transition={{
                 duration: 0.5
               }} className="rounded-xl overflow-hidden shadow-xl">
-                  <img alt="Project Cargo Service" className="w-full h-auto object-cover" src="/lovable-uploads/f06a44a6-0386-4dc9-841d-459b274bf96f.png" />
+                  <img alt="Project Cargo Service" className="w-full h-auto object-cover" src="/projectcargo3.png" />
                 </motion.div>
               </div>
             </div>
