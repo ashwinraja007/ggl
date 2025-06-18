@@ -166,10 +166,10 @@ export const Services = () => {
         <motion.div
           variants={itemVariants}
           transition={{ duration: 0.6, delay: 0.4 }}
-          className="flex justify-center mt-8"
+          className="flex justify-center mt-10"
         >
           <Link to="/services" onClick={() => window.scrollTo(0, 0)}>
-            <Button variant="navy" className="group transition-all duration-300 text-sm flex items-center gap-2 navy-glow">
+            <button className="bg-[#0a1f44] hover:bg-[#0a1f44]/90 text-white px-6 py-3 rounded-lg flex items-center gap-2 shadow-md transition-all duration-300 text-sm font-semibold">
               Explore All Services
               <motion.span
                 animate={{ x: [0, 5, 0] }}
@@ -177,7 +177,7 @@ export const Services = () => {
               >
                 <ArrowRight className="h-4 w-4" />
               </motion.span>
-            </Button>
+            </button>
           </Link>
         </motion.div>
       </div>
