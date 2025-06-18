@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Truck, Package, Anchor, Droplets } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
@@ -6,16 +5,15 @@ import { motion } from 'framer-motion';
 import { useEffect } from "react";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 
-const EnhancedServiceCard = ({ image, title, description, icon, link }: { 
-  image: string; 
-  title: string; 
-  description: string; 
-  icon: JSX.Element; 
+const EnhancedServiceCard = ({ image, title, description, icon, link }: {
+  image: string;
+  title: string;
+  description: string;
+  icon: JSX.Element;
   link: string;
 }) => {
-  // Choose the appropriate image based on service title
   const getServiceImage = () => {
-    switch(title) {
+    switch (title) {
       case "Air Freight":
         return "/airfreight2.jpg";
       case "Ocean Freight":
@@ -34,33 +32,33 @@ const EnhancedServiceCard = ({ image, title, description, icon, link }: {
       whileHover={{ y: -5 }}
       whileTap={{ scale: 0.98 }}
       transition={{ type: "spring", stiffness: 300 }}
-      className="group relative overflow-hidden rounded-xl bg-white shadow-lg transition-all duration-300 hover:shadow-xl border border-gray-100"
+      className="group relative flex flex-col justify-between overflow-hidden rounded-xl bg-white shadow-lg transition-all duration-300 hover:shadow-xl border border-gray-100 h-full"
     >
-      <Link to={link} className="block h-full" onClick={() => window.scrollTo(0, 0)}> 
+      <Link to={link} className="block h-full" onClick={() => window.scrollTo(0, 0)}>
         <div className="h-44 sm:h-48 md:h-40 overflow-hidden">
-          <AspectRatio ratio={16/9} className="h-full">
-            <img 
-              src={getServiceImage()} 
-              alt={title} 
+          <AspectRatio ratio={16 / 9} className="h-full">
+            <img
+              src={getServiceImage()}
+              alt={title}
               className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
             />
           </AspectRatio>
         </div>
-        <div className="p-5">
-          <div className="flex items-center space-x-3 mb-3">
-            <div className="w-10 h-10 rounded-full flex items-center justify-center text-brand-navy bg-[#f6b100]">
-              {icon}
+        <div className="p-5 flex flex-col justify-between h-full">
+          <div>
+            <div className="flex items-center space-x-3 mb-3">
+              <div className="w-10 h-10 rounded-full flex items-center justify-center text-brand-navy bg-[#f6b100]">
+                {icon}
+              </div>
+              <h3 className="text-lg font-bold text-brand-navy">{title}</h3>
             </div>
-            <h3 className="text-lg font-bold text-brand-navy">{title}</h3>
+            <p className="text-sm text-gray-600 mb-4 line-clamp-2 min-h-[48px]">
+              {description}
+            </p>
           </div>
-          
-          <p className="text-sm text-gray-600 mb-4 line-clamp-2">
-            {description}
-          </p>
-          
-          <div className="inline-flex items-center text-brand-gold font-medium text-sm group">
+          <div className="inline-flex items-center text-brand-gold font-medium text-sm group mt-auto">
             Learn More
-            <motion.span 
+            <motion.span
               className="ml-1"
               animate={{ x: [0, 5, 0] }}
               transition={{ duration: 1.5, repeat: Infinity, repeatType: "mirror" }}
@@ -103,7 +101,8 @@ export const Services = () => {
       description: "Specialized solutions for transporting liquids safely and efficiently, utilizing ISO tanks, flexitanks, and specialized tankers managed by expert teams.",
       icon: <Droplets size={20} />,
       link: "/services/liquid-transportation"
-    }, {
+    },
+    {
       image: "/projectcargo3.png",
       title: "Project Cargo",
       description:
@@ -115,9 +114,9 @@ export const Services = () => {
 
   const containerVariants = {
     hidden: { opacity: 0 },
-    visible: { 
-      opacity: 1, 
-      transition: { staggerChildren: 0.1 } 
+    visible: {
+      opacity: 1,
+      transition: { staggerChildren: 0.1 }
     }
   };
 
@@ -126,14 +125,13 @@ export const Services = () => {
     visible: { opacity: 1, y: 0 }
   };
 
-  // ✅ Scroll to top when the route changes
   const location = useLocation();
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [location.pathname]);
 
   return (
-    <motion.section 
+    <motion.section
       initial="hidden"
       whileInView="visible"
       viewport={{ once: true, amount: 0.1 }}
@@ -150,27 +148,31 @@ export const Services = () => {
             Discover our comprehensive range of logistics solutions designed to meet your global shipping needs.
           </p>
         </motion.div>
-        
+
         <motion.div variants={containerVariants} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
           {services.map((service, index) => (
-            <motion.div key={index} variants={itemVariants} transition={{ duration: 0.5, delay: index * 0.1 }}>
-              <EnhancedServiceCard 
-                image={service.image} 
-                title={service.title} 
-                description={service.description} 
-                icon={service.icon} 
-                link={service.link} 
+            <motion.div key={index} variants={itemVariants} transition={{ duration: 0.5, delay: index * 0.1 }} className="h-full">
+              <EnhancedServiceCard
+                image={service.image}
+                title={service.title}
+                description={service.description}
+                icon={service.icon}
+                link={service.link}
               />
             </motion.div>
           ))}
         </motion.div>
-        
-        <motion.div variants={itemVariants} transition={{ duration: 0.6, delay: 0.4 }} className="flex justify-center mt-8">
+
+        <motion.div
+          variants={itemVariants}
+          transition={{ duration: 0.6, delay: 0.4 }}
+          className="flex justify-center mt-8"
+        >
           <Link to="/services" onClick={() => window.scrollTo(0, 0)}>
             <Button variant="navy" className="group transition-all duration-300 text-sm flex items-center gap-2 navy-glow">
               Explore All Services
-              <motion.span 
-                animate={{ x: [0, 5, 0] }} 
+              <motion.span
+                animate={{ x: [0, 5, 0] }}
                 transition={{ duration: 1.5, repeat: Infinity, repeatType: "mirror" }}
               >
                 <ArrowRight className="h-4 w-4" />
