@@ -280,7 +280,7 @@ const ProjectCargo = () => {
             duration: 0.5
           }} viewport={{
             once: true
-          }} className="bg-gradient-to-r from-blue-600 to-blue-700 rounded-xl text-white p-8 text-center">
+          }} className="bg-gradient-to-r from-brand-navy to-brand-navy rounded-xl text-white p-8 text-center">
               <h3 className="text-2xl md:text-3xl font-bold mb-4 text-slate-50">LET GGL MOVE YOUR PROJECT FORWARD</h3>
               <p className="mb-6 text-blue-50 max-w-3xl mx-auto">
                 From the first mile to the final lift, GGL is your strategic partner in project cargo and international logistics. Our team of project specialists will work closely with you to plan every detail, ensure compliance, and execute a seamless delivery.
