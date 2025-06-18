@@ -3,7 +3,7 @@ import { useLocation, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
-import { Plane, Ship, FileText, Droplets } from "lucide-react";
+import { Plane, Ship, FileText, Droplets, Warehouse } from "lucide-react";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { useIsMobile } from "@/hooks/use-mobile";
 
@@ -114,7 +114,14 @@ const Services = () => {
     image: "/lovable-uploads/liquid.jpg",
     description: "Safe and efficient transport solutions for liquid cargo.",
     link: "/services/liquid-transportation"
-  }
+  },  {
+      id: 5,
+      icon: <Warehouse className="w-5 h-5" />,
+      title: "Project Cargo",
+      image: "/projectcargo3.png",
+      description: "We specialize in delivering end-to-end logistics solutions for complex, heavy, and oversized shipments—commonly known as project cargo.",
+      link: "/services/project-cargo"
+    }
 ];
   
   return (
