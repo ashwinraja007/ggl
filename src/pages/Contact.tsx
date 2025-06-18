@@ -56,7 +56,7 @@ const Contact = () => {
           animate={{ opacity: 1 }}
           className="relative h-[40vh] flex items-center justify-center bg-blue-600 overflow-hidden"
         >
-          <div className="absolute inset-0 bg-gradient-to-r from-brand-navy to-brand-navy/90" />
+          <div className="absolute inset-0 bg-gradient-to-r from-blue-600/50 to-blue-800/50" />
           <motion.div
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
@@ -164,7 +164,9 @@ const Contact = () => {
                   <Textarea {...register("message")} placeholder="Your Message" className="min-h-[120px]" required />
 
                   <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                      <Button type="submit" className="w-full text-white py-6 flex items-center justify-center gap-2 bg-[_brand-navy] bg-brand-navy">
+                    <Button
+                      type="submit"
+                      className="w-full bg-blue-600 hover:bg-blue-700 text-white py-6 flex items-center justify-center gap-2"
                     >
                       Send Message
                       <Send size={18} />
