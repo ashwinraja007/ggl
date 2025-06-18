@@ -10,6 +10,7 @@ import About from "./pages/About";
 import Services from "./pages/Services";
 import NotFound from "./pages/NotFound";
 import LiquidTransportation from "./pages/services/LiquidTransportation";
+import ProjectCargo from "./pages/services/ProjectCargo";
 import AirFreight from "./pages/services/AirFreight";
 import OceanFreight from "./pages/services/OceanFreight";
 import CustomsClearance from "./pages/services/CustomsClearance";
@@ -35,6 +36,7 @@ function App() {
             {/* Service specific pages */}
             <Route path="/services/liquid-transportation" element={<LiquidTransportation />} />
             <Route path="/services/air-freight" element={<AirFreight />} />
+            <Route path="/services/project-cargo" element={<ProjectCargo />} />
             <Route path="/services/ocean-freight" element={<OceanFreight />} />
             <Route path="/services/customs-clearance" element={<CustomsClearance />} />
             <Route path="*" element={<NotFound />} />
