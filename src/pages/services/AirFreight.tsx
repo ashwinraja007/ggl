@@ -177,7 +177,7 @@ const AirFreight = () => {
             duration: 0.5
           }} viewport={{
             once: true
-          }} className="bg-gradient-to-r from-brand-navy to-blue-700 rounded-xl text-white p-8 text-center">
+          }} className="bg-gradient-to-r from-brand-navy to-brand-navy rounded-xl text-white p-8 text-center">
               <h3 className="text-2xl font-bold mb-4 text-slate-50">Ready to Ship with Us?</h3>
               <p className="mb-6 text-blue-50">
                 Contact our team today for tailored air freight solutions.
