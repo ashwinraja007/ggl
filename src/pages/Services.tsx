@@ -153,7 +153,7 @@ const Services = () => {
         {/* Services Grid */}
         <section className="py-8 md:py-12">
           <div className="container mx-auto px-4 max-w-5xl">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-6">
               {services.map(service => <ServiceCard key={service.id} {...service} />)}
             </div>
           </div>
