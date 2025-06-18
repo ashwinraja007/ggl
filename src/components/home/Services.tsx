@@ -5,15 +5,15 @@ import { motion } from 'framer-motion';
 import { useEffect } from "react";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 
-const EnhancedServiceCard = ({ image, title, description, icon, link }: {
-  image: string;
-  title: string;
-  description: string;
-  icon: JSX.Element;
+const EnhancedServiceCard = ({ image, title, description, icon, link }: { 
+  image: string; 
+  title: string; 
+  description: string; 
+  icon: JSX.Element; 
   link: string;
 }) => {
   const getServiceImage = () => {
-    switch (title) {
+    switch(title) {
       case "Air Freight":
         return "/airfreight2.jpg";
       case "Ocean Freight":
@@ -32,19 +32,20 @@ const EnhancedServiceCard = ({ image, title, description, icon, link }: {
       whileHover={{ y: -5 }}
       whileTap={{ scale: 0.98 }}
       transition={{ type: "spring", stiffness: 300 }}
-      className="group relative flex flex-col justify-between overflow-hidden rounded-xl bg-white shadow-lg transition-all duration-300 hover:shadow-xl border border-gray-100 h-full"
+      className="group flex flex-col justify-between h-full overflow-hidden rounded-xl bg-white shadow-lg transition-all duration-300 hover:shadow-xl border border-gray-100"
     >
-      <Link to={link} className="block h-full" onClick={() => window.scrollTo(0, 0)}>
-        <div className="h-44 sm:h-48 md:h-40 overflow-hidden">
-          <AspectRatio ratio={16 / 9} className="h-full">
-            <img
-              src={getServiceImage()}
-              alt={title}
+      <Link to={link} className="flex flex-col h-full" onClick={() => window.scrollTo(0, 0)}> 
+        <div className="h-44 sm:h-48 md:h-44 overflow-hidden">
+          <AspectRatio ratio={16/9} className="h-full">
+            <img 
+              src={getServiceImage()} 
+              alt={title} 
               className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
             />
           </AspectRatio>
         </div>
-        <div className="p-5 flex flex-col justify-between h-full">
+
+        <div className="flex flex-col justify-between flex-1 p-5">
           <div>
             <div className="flex items-center space-x-3 mb-3">
               <div className="w-10 h-10 rounded-full flex items-center justify-center text-brand-navy bg-[#f6b100]">
@@ -52,13 +53,15 @@ const EnhancedServiceCard = ({ image, title, description, icon, link }: {
               </div>
               <h3 className="text-lg font-bold text-brand-navy">{title}</h3>
             </div>
-            <p className="text-sm text-gray-600 mb-4 line-clamp-2 min-h-[48px]">
+
+            <p className="text-sm text-gray-600 mb-4">
               {description}
             </p>
           </div>
-          <div className="inline-flex items-center text-brand-gold font-medium text-sm group mt-auto">
+
+          <div className="inline-flex items-center text-brand-gold font-medium text-sm mt-auto">
             Learn More
-            <motion.span
+            <motion.span 
               className="ml-1"
               animate={{ x: [0, 5, 0] }}
               transition={{ duration: 1.5, repeat: Infinity, repeatType: "mirror" }}
@@ -78,7 +81,7 @@ export const Services = () => {
       image: "/lovable-uploads/airfreight.jpg",
       title: "Air Freight",
       description: "Tailored Air Freight Solutions to Meet Your Unique Requirements. We offer flexible air freight solutions for time-sensitive documents or large-scale cargo.",
-      icon: <Package size={10} />,
+      icon: <Package size={18} />,
       link: "/services/air-freight"
     },
     {
@@ -105,19 +108,15 @@ export const Services = () => {
     {
       image: "/projectcargo3.png",
       title: "Project Cargo",
-      description:
-        "Project cargo refers to the specialized transportation of large, heavy, high-value, or complex equipment, often associated with large-scale infrastructure or construction projects.",
-      icon: <Package />,
+      description: "Project cargo refers to the specialized transportation of large, heavy, high-value, or complex equipment, often associated with large-scale infrastructure or construction projects.",
+      icon: <Package size={20} />,
       link: "/services/project-cargo"
     }
   ];
 
   const containerVariants = {
     hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: { staggerChildren: 0.1 }
-    }
+    visible: { opacity: 1, transition: { staggerChildren: 0.1 } }
   };
 
   const itemVariants = {
@@ -131,7 +130,7 @@ export const Services = () => {
   }, [location.pathname]);
 
   return (
-    <motion.section
+    <motion.section 
       initial="hidden"
       whileInView="visible"
       viewport={{ once: true, amount: 0.1 }}
@@ -148,36 +147,32 @@ export const Services = () => {
             Discover our comprehensive range of logistics solutions designed to meet your global shipping needs.
           </p>
         </motion.div>
-
+        
         <motion.div variants={containerVariants} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
           {services.map((service, index) => (
-            <motion.div key={index} variants={itemVariants} transition={{ duration: 0.5, delay: index * 0.1 }} className="h-full">
-              <EnhancedServiceCard
-                image={service.image}
-                title={service.title}
-                description={service.description}
-                icon={service.icon}
-                link={service.link}
+            <motion.div key={index} variants={itemVariants} transition={{ duration: 0.5, delay: index * 0.1 }}>
+              <EnhancedServiceCard 
+                image={service.image} 
+                title={service.title} 
+                description={service.description} 
+                icon={service.icon} 
+                link={service.link} 
               />
             </motion.div>
           ))}
         </motion.div>
 
-        <motion.div
-          variants={itemVariants}
-          transition={{ duration: 0.6, delay: 0.4 }}
-          className="flex justify-center mt-10"
-        >
+        <motion.div variants={itemVariants} transition={{ duration: 0.6, delay: 0.4 }} className="flex justify-center mt-10">
           <Link to="/services" onClick={() => window.scrollTo(0, 0)}>
-            <button className="bg-[#0a1f44] hover:bg-[#0a1f44]/90 text-white px-6 py-3 rounded-lg flex items-center gap-2 shadow-md transition-all duration-300 text-sm font-semibold">
+            <Button variant="navy" className="group transition-all duration-300 text-sm flex items-center gap-2">
               Explore All Services
-              <motion.span
-                animate={{ x: [0, 5, 0] }}
+              <motion.span 
+                animate={{ x: [0, 5, 0] }} 
                 transition={{ duration: 1.5, repeat: Infinity, repeatType: "mirror" }}
               >
                 <ArrowRight className="h-4 w-4" />
               </motion.span>
-            </button>
+            </Button>
           </Link>
         </motion.div>
       </div>
