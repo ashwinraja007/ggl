@@ -103,6 +103,13 @@ export const Services = () => {
       description: "Specialized solutions for transporting liquids safely and efficiently, utilizing ISO tanks, flexitanks, and specialized tankers managed by expert teams.",
       icon: <Droplets size={20} />,
       link: "/services/liquid-transportation"
+    }, {
+      image: "/projectcargo3.png",
+      title: "Project Cargo",
+      description:
+        "Project cargo refers to the specialized transportation of large, heavy, high-value, or complex equipment, often associated with large-scale infrastructure or construction projects.",
+      icon: <Package />,
+      link: "/services/project-cargo"
     }
   ];
 
@@ -144,7 +151,7 @@ export const Services = () => {
           </p>
         </motion.div>
         
-        <motion.div variants={containerVariants} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <motion.div variants={containerVariants} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
           {services.map((service, index) => (
             <motion.div key={index} variants={itemVariants} transition={{ duration: 0.5, delay: index * 0.1 }}>
               <EnhancedServiceCard 
