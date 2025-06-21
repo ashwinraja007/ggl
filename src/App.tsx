@@ -8,6 +8,8 @@ import Index from "./pages/Index";
 import Contact from "./pages/Contact";
 import About from "./pages/About";
 import Services from "./pages/Services";
+import TermsOfUse from "./pages/TermsOfUse";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
 import NotFound from "./pages/NotFound";
 import LiquidTransportation from "./pages/services/LiquidTransportation";
 import ProjectCargo from "./pages/services/ProjectCargo";
@@ -32,6 +34,8 @@ function App() {
             <Route path="/contact" element={<Contact />} />
             <Route path="/about" element={<About />} />
             <Route path="/services" element={<Services />} />
+            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+            <Route path="/terms-and-conditions" element={<TermsOfUse />} />
             <Route path="/global-presence" element={<GlobalPresence />} />
             {/* Service specific pages */}
             <Route path="/services/liquid-transportation" element={<LiquidTransportation />} />
