@@ -20,34 +20,34 @@ const PrivacyPolicyPage: React.FC = () => {
   }, []);
   const sections: Section[] = [{
     title: "Introduction",
-    content: "Welcome to GGL (India) Ltd [“GGL (India)”, “we”, “our”, “us”]. We are committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our website and use our services.We urge you to carefully read the following to comprehend how we collect, utilize, and safeguard your personal information. The policy also outlines your options concerning the use, accessibility, and correction of your personal information."
+    content: "Welcome to GGL (Australia) Ltd [“GGL (Australia)”, “we”, “our”, “us”]. We are committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our website and use our services.We urge you to carefully read the following to comprehend how we collect, utilize, and safeguard your personal information. The policy also outlines your options concerning the use, accessibility, and correction of your personal information."
   }, {
     title: "Our Commitment to Privacy",
     subsections: [{
       title: "Limited Data Collection",
-      content: "At GGL (India), we adhere to strict privacy principles by collecting only the essential information necessary for efficient communication. This streamlined approach simplifies user interactions and minimizes the exposure of personal details. Our commitment to minimal data collection reflects our dedication to user privacy and ensures robust security measures."
+      content: "At GGL (Australia), we adhere to strict privacy principles by collecting only the essential information necessary for efficient communication. This streamlined approach simplifies user interactions and minimizes the exposure of personal details. Our commitment to minimal data collection reflects our dedication to user privacy and ensures robust security measures."
     }, {
       title: "Voluntary Disclosure",
-      content: "Users at GGL (India) have full control over the information they choose to share. Our policy emphasizes voluntary data submission, empowering users to determine the extent of their engagement. We respect individual privacy preferences, acknowledging that each user may have distinct comfort levels regarding information disclosure."
+      content: "Users at GGL (Australia) have full control over the information they choose to share. Our policy emphasizes voluntary data submission, empowering users to determine the extent of their engagement. We respect individual privacy preferences, acknowledging that each user may have distinct comfort levels regarding information disclosure."
     }, {
       title: "Purposeful Communication",
       content: "The information we collect serves a specific and essential purpose—facilitating effective communication. Whether responding to inquiries, providing relevant updates, or maintaining ongoing connections, user data is used exclusively for communication-related activities. This targeted approach ensures that personal information remains dedicated to its intended use, reinforcing our commitment to transparent and purpose-driven data management."
     }, {
       title: "User Empowerment",
-      content: "At GGL (India), we prioritize user control over their personal information. Beyond allowing users to choose what information to share, we empower them to manage their privacy settings and preferences. This approach enables individuals to tailor their interactions with GGL (India) according to their preferences, fostering trust and transparency in digital interactions."
+      content: "At GGL (Australia), we prioritize user control over their personal information. Beyond allowing users to choose what information to share, we empower them to manage their privacy settings and preferences. This approach enables individuals to tailor their interactions with GGL (Australia) according to their preferences, fostering trust and transparency in digital interactions."
     }]
   }, {
     title: "What Constitutes Personal Information?",
     subsections: [{
       title: "Personal Information",
-      content: 'At GGL (India), "Personal Information" refers to any data related to an identified or identifiable natural person. This includes details that can directly or indirectly identify an individual, such as their name, address, contact information (telephone number, mobile number, email address), identification numbers, location data, online identifiers, and specific characteristics related to their physical, physiological, genetic, mental, economic, cultural, or social identity. Additionally, this encompasses any information collected through our services, such as user preferences and behavioural data, that can be linked to an individual.'
+      content: 'At GGL (Australia), "Personal Information" refers to any data related to an identified or identifiable natural person. This includes details that can directly or indirectly identify an individual, such as their name, address, contact information (telephone number, mobile number, email address), identification numbers, location data, online identifiers, and specific characteristics related to their physical, physiological, genetic, mental, economic, cultural, or social identity. Additionally, this encompasses any information collected through our services, such as user preferences and behavioural data, that can be linked to an individual.'
     }, {
       title: "Other Information",
       content: 'In contrast, "Other Information" encompasses data that does not fall within the scope of Personal Information. This includes anonymized or aggregated data that cannot be used to identify an individual and publicly available information that has not been combined with Personal Information. Examples of Other Information include statistical data on website usage, product performance metrics, and general market trends, which are used to improve our services without compromising individual privacy.'
     }]
   }, {
     title: "What Data Do We Gather and When?",
-    content: "At GGL (India), we prioritize minimal data collection to optimize user interactions and facilitate effective communication. The information we collect includes:",
+    content: "At GGL (Australia), we prioritize minimal data collection to optimize user interactions and facilitate effective communication. The information we collect includes:",
     subsections: [{
       title: "Name",
       content: "Users can voluntarily provide their names when they contact us through our website's contact form or other communication channels. This helps us personalize interactions, address individuals by their preferred titles, and enhance the quality of communication for a more customized user experience."
@@ -65,33 +65,33 @@ const PrivacyPolicyPage: React.FC = () => {
     title: "User Choice and Control",
     subsections: [{
       title: "Opt-In Engagement:",
-      content: "At GGL (India), we emphasize user consent through active opt-in processes, where users provide their names and email addresses. This ensures that all interactions with us are consensual and align with user preferences."
+      content: "At GGL (Australia), we emphasize user consent through active opt-in processes, where users provide their names and email addresses. This ensures that all interactions with us are consensual and align with user preferences."
     }, {
       title: "Communication Preferences:",
-      content: "Users at GGL (India) have complete control over their communication preferences. They can manage the frequency and type of messages they receive, allowing them to tailor their interactions according to their needs and preferences."
+      content: "Users at GGL (Australia) have complete control over their communication preferences. They can manage the frequency and type of messages they receive, allowing them to tailor their interactions according to their needs and preferences."
     }, {
       title: "Data Collection Practices:",
-      content: "GGL (India) is committed to respecting user privacy while enabling effective communication. We implement strict security measures to protect the limited information we collect, ensuring a secure and positive user experience."
+      content: "GGL (Australia) is committed to respecting user privacy while enabling effective communication. We implement strict security measures to protect the limited information we collect, ensuring a secure and positive user experience."
     }]
   }, {
     title: "Other Information Collection",
-    content: "When using our services, GGL (India) collects various types of Other Information about user activities and usage patterns, including",
+    content: "When using our services, GGL (Australia) collects various types of Other Information about user activities and usage patterns, including",
     subsections: [{
       title: "Logs:",
       content: "We track user interactions within our services, capturing details such as visited pages, features used, activity timestamps, URLs of previous and subsequent websites visited, device attributes, browser type and version, and approximate geographic location derived from IP addresses. This information, when combined with Personal Information, is treated confidentially and helps us enhance the user experience."
     }, {
       title: "Cookies:",
-      content: "GGL (India) uses cookies to identify users' login status and recognize repeat visitors. These cookies are essential for improving service quality. We utilize session cookies (which expire when the browser is closed) and persistent cookies (which remain until deleted). Users can manage or disable cookies through their browser settings, although this may affect certain service functionalities"
+      content: "GGL (Australia) uses cookies to identify users' login status and recognize repeat visitors. These cookies are essential for improving service quality. We utilize session cookies (which expire when the browser is closed) and persistent cookies (which remain until deleted). Users can manage or disable cookies through their browser settings, although this may affect certain service functionalities"
     }, {
       title: "Web Beacons:",
       content: "In our services and emails, we may employ web beacons (clear gifs or pixel tags) to track user engagement, such as email open rates, and to deliver personalized content. These electronic files help us understand user behavior and optimize service delivery."
     }, {
       title: "Local Storage:",
-      content: "GGL (India) may store information locally on user devices, including Personal Information, using mechanisms like browser web storage and application data caches. This enhances the user experience by storing preferences and settings locally."
+      content: "GGL (Australia) may store information locally on user devices, including Personal Information, using mechanisms like browser web storage and application data caches. This enhances the user experience by storing preferences and settings locally."
     }]
   }, {
     title: "How We Utilize the Collected Information",
-    content: "At GGL (India), we are committed to ensuring that the information we collect is used responsibly and transparently. The collected information is utilized in the following ways:",
+    content: "At GGL (Australia), we are committed to ensuring that the information we collect is used responsibly and transparently. The collected information is utilized in the following ways:",
     subsections: [{
       title: "Personalizing User Experience",
       content: "We use the information to personalize interactions and tailor our services to meet individual user preferences. This includes addressing users by name and providing customized content and recommendations based on their interests and past interactions."
@@ -122,13 +122,13 @@ const PrivacyPolicyPage: React.FC = () => {
     content: "We may share your information with third parties under specific circumstances and with appropriate safeguards to protect your privacy:",
     subsections: [{
       title: "Service Providers",
-      content: "We may share your information with trusted third-party service providers who perform functions on our behalf. These services include:\n\n• Payment Processing: Managing transactions and payment-related activities.\n• Shipping and Delivery: Facilitating the shipment and delivery of products.\n• Marketing Services: Conducting marketing campaigns and communications.\n• Customer Support: Providing customer service and support.\n• IT and Security Services: Ensuring the security and maintenance of our systems.\n\nThese providers are contractually obligated to use the information only for the purpose of providing services to GGL (India) and are required to maintain the confidentiality and security of your information."
+      content: "We may share your information with trusted third-party service providers who perform functions on our behalf. These services include:\n\n• Payment Processing: Managing transactions and payment-related activities.\n• Shipping and Delivery: Facilitating the shipment and delivery of products.\n• Marketing Services: Conducting marketing campaigns and communications.\n• Customer Support: Providing customer service and support.\n• IT and Security Services: Ensuring the security and maintenance of our systems.\n\nThese providers are contractually obligated to use the information only for the purpose of providing services to GGL (Australia) and are required to maintain the confidentiality and security of your information."
     }, {
       title: "Business Partners",
       content: "We may share information with our business partners to offer co-branded products, services, or promotions. These partners are required to adhere to privacy and data protection standards that are at least as stringent as our own."
     }, {
       title: "Legal Compliance",
-      content: "We may disclose your information to third parties if we believe such action is necessary to:\n\n• Comply with applicable laws, regulations, legal processes, or governmental requests.\n• Enforce our Terms of Use or other agreements and policies.\n• Protect the rights, property, or safety of GGL (India), our users, or others. This includes exchanging information with other companies and organizations for fraud protection and credit risk reduction."
+      content: "We may disclose your information to third parties if we believe such action is necessary to:\n\n• Comply with applicable laws, regulations, legal processes, or governmental requests.\n• Enforce our Terms of Use or other agreements and policies.\n• Protect the rights, property, or safety of GGL (Australia), our users, or others. This includes exchanging information with other companies and organizations for fraud protection and credit risk reduction."
     }, {
       title: "Corporate Transactions",
       content: "In the event of a merger, acquisition, reorganization, sale of assets, or bankruptcy, your information may be transferred as part of the transaction. We will ensure the acquiring entity follows this Privacy Policy or provides notice of any material changes."
@@ -150,7 +150,7 @@ const PrivacyPolicyPage: React.FC = () => {
     }]
   }, {
     title: "What Steps Do We Take to Protect Your Information?",
-    content: "At GGL (India), the security and confidentiality of your information are our highest priorities. We implement comprehensive measures to protect your personal data from unauthorized access, disclosure, alteration, or destruction. Here are the steps we take to safeguard your information:",
+    content: "At GGL (Australia), the security and confidentiality of your information are our highest priorities. We implement comprehensive measures to protect your personal data from unauthorized access, disclosure, alteration, or destruction. Here are the steps we take to safeguard your information:",
     subsections: [{
       title: "Data Encryption",
       content: "We use advanced encryption technologies to protect your data during transmission and storage. This ensures that your information is secure and confidential both when it is being sent to our servers and when it is stored on our systems."
