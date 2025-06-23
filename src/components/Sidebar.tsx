@@ -1,3 +1,4 @@
+
 import React, { useRef, useEffect, useState } from 'react';
 import { ScrollArea } from "@/components/ui/scroll-area";
 import InfoPanel from './InfoPanel';
@@ -19,14 +20,14 @@ const countries = [{
   lng: 78.6677,
   cities: [{
     name: "Mumbai",
-    lat: 19.0760,
-    lng: 72.8777,
+    lat: 17.3839,
+    lng: 78.4539,
     address: "407, mayuresh planet, plot no - 42 & 43, sector-15, cbd belapur, navi mumbai, maharashtra, 400614",
     contacts: ["Export customer service: +91 2245174102, +91 2245174109, +91 2245174118", "Export docs team: +91 2245174103, +91 2245174105", "Import docs team: +91 2245174104, +91 2245174106", "Import customer service: +91 2245174113, +91 2245174110, +91 2245174107, +91 2245174112"]
   }, {
     name: "Delhi",
-    lat: 28.6139,
-    lng: 77.2090,
+    lat: 25.6083,
+    lng: 85.1437,
     address: "JA 511, DLF Tower A, Jasola District Centre, New Delhi, 110025",
     contacts: ["+91 9999022030"]
   }, {
@@ -148,18 +149,18 @@ const countries = [{
 }, {
   code: "pk",
   name: "Pakistan",
-  lat: 30.3753,
-  lng: 69.3451,
+  lat: 32.4145,
+  lng: 64.9162,
   cities: [{
     name: "Karachi",
-    lat: 24.8607,
-    lng: 67.0011,
+    lat: 32.4145,
+    lng: 64.9162,
     address: "Suite No.301, 3rd Floor, Fortune Center, Shahrah-e-Faisal, Block 6, PECHS, Karachi, Pakistan",
     contacts: ["+92-300-8282511", "+92-21-34302281-5"]
   }, {
     name: "Lahore",
-    lat: 31.5204,
-    lng: 74.3587,
+    lat: 32.4145,
+    lng: 64.9162,
     address: "Office # 301, 3rd Floor, Gulberg Arcade Main Market, Gulberg 2, Lahore, Pakistan",
     contacts: ["+92 42-35782306/07/08"]
   }]
