@@ -50,7 +50,8 @@ const TermsOfUsePage: React.FC = () => {
 
         <h2 className="text-xl font-semibold mt-6 mb-2">Restrictions on Website Use</h2>
         <p>In addition to the limitations outlined in these Terms of Use, you agree to the following:</p>
-        <ul className="text-xl font-semibold mt-6 mb-2">
+        <p>
+        <ul className="list-disc ml-6 mt-2">
           <li>You must not conceal the origin of information transmitted through the Website.</li>
           <li>You shall refrain from placing false or misleading information on the Website.</li>
           <li>Usage or access of any service, information, application, or software available via the Website is restricted to methods expressly permitted by GGL (Australia).</li>
@@ -59,6 +60,7 @@ const TermsOfUsePage: React.FC = () => {
           <li>Using or accessing the Website, GGL (Australia) Systems, or Services in a manner that, in GGL (Australia)'s judgment, adversely affects performance or function, or interferes with authorized parties' access to the GGL (Australia) Systems, Services, or the Website, is not allowed.</li>
           <li>Framing or employing framing techniques to enclose any portion or aspect of the Content or Information without the express written consent of GGL (Australia) is prohibited.</li>
         </ul>
+        </p>
 
         <h2 className="text-xl font-semibold mt-6 mb-2">Outbound Links</h2>
         <p>
@@ -67,7 +69,8 @@ const TermsOfUsePage: React.FC = () => {
 
         <h2 className="text-xl font-semibold mt-6 mb-2">Inbound Links</h2>
         <p>Linking to any page of the Website other than the homepage through a plain text link is strictly prohibited without a separate linkage agreement with GGL (Australia). Websites or other entities linking to the homepage or any of its pages are prohibited from:</p>
-        <ul className="text-xl font-semibold mt-6 mb-2">
+        <p>
+        <ul className="list-disc ml-6 mt-2">
           <li>Duplicating Content.</li>
           <li>Using a frame or border around the Content.</li>
           <li>Implying endorsement by GGL (Australia) or its affiliates.</li>
@@ -75,15 +78,18 @@ const TermsOfUsePage: React.FC = () => {
           <li>Providing false information about GGL (Australia) products or services.</li>
           <li>Using any logo or mark of GGL (Australia) or its affiliates without express written permission from GGL (Australia).</li>
         </ul>
+        </p>
 
         <h2 className="text-xl font-semibold mt-6 mb-2">Termination</h2>
         <p>
           GGL (Australia) reserves the right to terminate or suspend your use of the Website, GGL (Australia) Systems, Information, Services, and Content at its sole discretion, without prior notice or reason. Even if access remains available to others, GGL (Australia) may suspend or terminate your access at any time. Upon termination or suspension, you must:
         </p>
-        <ul className="text-xl font-semibold mt-6 mb-2">
+        <p>
+        <ul className="list-disc ml-6 mt-2">
           <li>Immediately cease using the Website.</li>
           <li>Destroy any copies of the Content you have made.</li>
         </ul>
+        </p>
         <p className="mt-2">
           Continuing to access the Website, GGL (Australia) Systems, Information, or Services after termination, suspension, or discontinuation will be considered trespassing.
         </p>
