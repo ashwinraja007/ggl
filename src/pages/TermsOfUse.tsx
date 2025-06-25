@@ -7,127 +7,146 @@ const TermsOfUsePage: React.FC = () => {
     <>
       <Header />
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-12">
-        <h1 className="text-3xl font-bold mb-6 text-center">Terms of Use Agreement for the Website</h1>
+        <h1 className="text-3xl font-bold mb-6 text-center">Terms and Conditions of Trade</h1>
 
-        <p>
-          Welcome to the <strong>GGL (Australia) Pte Ltd.</strong> website (hereinafter referred to as the <strong>"Website"</strong>).
-          Please review these terms of use carefully before engaging with the Website. Your access and utilization of the
-          Website are governed by these terms of use (hereinafter referred to as the <strong>"Terms of Use"</strong>). By accessing or using
-          the Website, you agree to be legally bound by these Terms of Use, representing both yourself and the entity you
-          are authorized to act on behalf of (hereinafter referred to as <strong>"you"</strong> or <strong>"your"</strong>). If you do not accept all the Terms
-          of Use, refrain from accessing or utilizing the Website.
-        </p>
+        <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-8">
+          <div className="flex">
+            <div className="ml-3">
+              <p className="text-sm text-yellow-700">
+                <strong>Important Notice:</strong> These contractual conditions apply to the Services provided by GGL AUSTRALIA LOGISTICS PTY LTD.
+                These Trading Conditions contain exclusions of liability and indemnities in favour of GGL AUSTRALIA LOGISTICS PTY LTD. 
+                You should read these Trading Conditions carefully.
+              </p>
+            </div>
+          </div>
+        </div>
 
-        <h2 className="text-xl font-semibold mt-6 mb-2">User Eligibility</h2>
-        <p>
-          GGL (Australia) provides the Website exclusively to entities and individuals who have reached the legal age of majority
-          and have the legal capacity to enter into binding agreements under the applicable law in Australia. If you do not meet these criteria, you are not authorized to use the Website.
-        </p>
+        <div className="bg-red-50 border border-red-200 rounded-lg p-6 mb-8">
+          <h3 className="text-lg font-semibold text-red-800 mb-3">Key Provisions - Please Pay Special Attention To:</h3>
+          <ul className="space-y-2 text-red-700">
+            <li><strong>Subcontracting:</strong> We may subcontract the performance of the services and our subcontractors will have the benefit of these terms and conditions. When subcontracting we will select the liability level that produces the lowest rates.</li>
+            <li><strong>Liability Exclusions - Carriage of Goods:</strong> In respect of international carriage of goods, under clause 10 liability is limited to the maximum extent permitted under international conventions. It is likely that if goods are damaged, the liability limits will not fully cover the loss. It is strongly recommended that you obtain insurance to cover loss or damage to the goods.</li>
+            <li><strong>Time limit for claims:</strong> Clauses 10.11 – 10.12 set out strict time limits on making claims against us. You should notify us immediately if you wish to make a claim against us.</li>
+            <li><strong>Lien:</strong> Clause 13 gives us the right to hold your goods and sell them if you do not pay our fees.</li>
+          </ul>
+        </div>
 
-        <h2 className="text-xl font-semibold mt-6 mb-2">Scope of Terms of Use</h2>
-        <p>
-          These Terms of Use govern your use of the Website and all related applications, software, and services, collectively referred to as "Services," except where a separate agreement applies. Specific terms or agreements, known as "Service Agreements," may apply to certain Services or items provided through the Website. These Service Agreements will either accompany the relevant Services or be accessible via an associated hyperlink.
-        </p>
+        <h2 className="text-2xl font-semibold mt-8 mb-4">1. Definitions</h2>
+        <div className="space-y-3 text-sm">
+          <p><strong>Agreement</strong> means these Terms and Conditions, together with any Authority and Customer credit application.</p>
+          <p><strong>Authority</strong> means any authority by which the Customer appointed the Company to act on its behalf.</p>
+          <p><strong>Carriage</strong> means carriage by vehicles and conveyances of all kind including acts in furtherance of an act of carriage by another or a specific means, whether by air, sea or land transport, or any combination of such transport modes.</p>
+          <p><strong>Company</strong> means GGL AUSTRALIA LOGISTICS PTY LTD ABN 71 685 761 513 and its nominees, agents and employees.</p>
+          <p><strong>Customer</strong> means where there is an Authority, the customer named in the Authority, including its employees, officers, agents and contractors, or where there is no Authority, the entity instructing the Company to provide the Services.</p>
+          <p><strong>Dangerous Goods</strong> means any Goods which are, or may become, hazardous, volatile, explosive, flammable, radioactive, likely to harbour or encourage vermin or pests, or capable of posing a risk or causing damage to any person or property.</p>
+          <p><strong>Services</strong> means the work performed by the Company in relation to the Goods, whether as agent or principal, including facilitating the import, export, transport, or storage of the Goods; and any ancillary acts for those purposes.</p>
+        </div>
 
-        <h2 className="text-xl font-semibold mt-6 mb-2">Modifications</h2>
-        <p>
-          GGL (Australia) reserves the right to modify these Terms of Use at any time. Your continued use of the Website after any changes signifies your acceptance of such modifications. GGL (Australia) may alter, supplement, delete, or update any aspect of the Website without notice and may adjust or introduce fees for products and services at its sole discretion. General practices and restrictions regarding other GGL (Australia) products and services may also be established or modified at any time, based on GGL (Australia)'s sole discretion.
-        </p>
+        <h2 className="text-2xl font-semibold mt-8 mb-4">2. General</h2>
+        <div className="space-y-3">
+          <p>2.1 The Company is not a common carrier. The Company will not be liable as a common carrier.</p>
+          <p>2.2 These Terms and Conditions take priority over and will prevail to the extent of any inconsistency with the Authority, any credit application made by the Customer, the Customer's terms and conditions or other document issued by the Customer.</p>
+          <p>2.3 The Agreement is governed by the laws of Victoria, Australia. The Company and the Customer submit to the jurisdiction of the courts of Victoria and of the Federal Court of Australia.</p>
+          <p>2.4 A variation of these Terms and Conditions will only be valid if in writing and signed by each party or signed by a person with the authority to bind each party.</p>
+        </div>
 
-        <h2 className="text-xl font-semibold mt-6 mb-2">GGL (Australia) Privacy Notice</h2>
-        <p>
-          By providing any individual's personal information to GGL (Australia), you affirm that you have obtained all necessary consents for the processing of such personal information as required by the Services.
-        </p>
+        <h2 className="text-2xl font-semibold mt-8 mb-4">3. Services</h2>
+        <div className="space-y-3">
+          <p>3.1 Services are provided by the Company subject to these Terms and Conditions.</p>
+          <p>3.2 By instructing the Company to provide the Services the Customer agrees to be bound by the Terms and Conditions.</p>
+          <p>3.3 The Goods are at the risk of the Customer at all times.</p>
+          <p>3.4 The Company may agree or refuse to provide Services at its reasonable discretion.</p>
+          <p>3.5 Quoted times and dates for the movement of Goods are always subject to equipment and vessel/aircraft space availability.</p>
+        </div>
 
-        <h2 className="text-xl font-semibold mt-6 mb-2">License and Ownership</h2>
-        <p>
-          All intellectual property rights ("Intellectual Property") related to the Website and its contents (the "Content") are the exclusive property of GGL (Australia), its affiliates, or third parties, and are protected by intellectual property laws in Australia and globally. Various elements of the Website are also protected by trade name, trade secret, unfair competition, and other laws, prohibiting any copying or imitation. All custom graphics, icons, and other items on the Website, referred to as trademarks, service marks, or trade names ("Marks"), are the property of GGL (Australia), its affiliates, or entities granting GGL (Australia) the right to use these Marks. Unauthorized use or interference with these Marks is strictly prohibited without express written consent from GGL (Australia). Unless expressly authorized by these Terms of Use, you may not copy, reproduce, modify, lease, loan, sell, create derivative works from, upload, transmit, or distribute GGL (Australia)'s Intellectual Property without prior written permission from GGL (Australia) or the appropriate third party.
-        </p>
-        
-        <p>
-          GGL (Australia) grants you a limited, personal, non-transferable, non-sublicensable, and revocable license to access and use the Website, Content, and Services ("GGL (Australia) Systems") as presented by GGL (Australia) and only as expressly permitted. Apart from this limited license, GGL (Australia) does not transfer any interest in the GGL (Australia) Systems, information or data available via the GGL (Australia) Systems (the "Information"), Content, Services, Website, or any other GGL (Australia) property by allowing access to the Website. Except where required by law or as expressly provided herein, none of the Content or Information may be reverse-engineered, modified, reproduced, republished, translated, retransmitted, resold, or redistributed without prior written consent from GGL (Australia). Unauthorized actions such as making, selling, offering for sale, modifying, reproducing, displaying, publicly performing, importing, distributing, retransmitting, or otherwise using the Content are strictly prohibited unless expressly permitted by GGL (Australia).
-        </p>
+        <h2 className="text-2xl font-semibold mt-8 mb-4">4. Customer Obligations</h2>
+        <div className="space-y-3">
+          <p>4.1 The Customer will provide the Company with all reasonable assistance, information and documentation necessary to enable the Company to provide the Services, and punctually comply with any Law or request from a Government Authority.</p>
+          <p>4.2 The Customer is under a continuing obligation to provide any information which may materially affect the capacity of the Customer or the Company to perform its obligations under the Agreement.</p>
+          <p>4.3 The Customer will keep confidential the Company's Fees or charges and any waiver, discount, release or indulgence provided by the Company in relation to the provision of the Services.</p>
+        </div>
 
-        <h2 className="text-xl font-semibold mt-6 mb-2">Restrictions on Website Use</h2>
-        <p>In addition to the limitations outlined in these Terms of Use, you agree to the following:</p>
-        <p>
-        <ul className="list-disc ml-6 mt-2">
-          <li>You must not conceal the origin of information transmitted through the Website.</li>
-          <li>You shall refrain from placing false or misleading information on the Website.</li>
-          <li>Usage or access of any service, information, application, or software available via the Website is restricted to methods expressly permitted by GGL (Australia).</li>
-          <li>Uploading information to the Website containing viruses, Trojan horses, worms, time bombs, or other computer programming routines intended to damage, interfere with, intercept, or expropriate any system, the Website, or Information, or that infringes on the Intellectual Property rights of others, is strictly prohibited.</li>
-          <li>Specific sections of the Website are exclusive to GGL (Australia) customers.</li>
-          <li>Using or accessing the Website, GGL (Australia) Systems, or Services in a manner that, in GGL (Australia)'s judgment, adversely affects performance or function, or interferes with authorized parties' access to the GGL (Australia) Systems, Services, or the Website, is not allowed.</li>
-          <li>Framing or employing framing techniques to enclose any portion or aspect of the Content or Information without the express written consent of GGL (Australia) is prohibited.</li>
-        </ul>
-        </p>
+        <h2 className="text-2xl font-semibold mt-8 mb-4">5. Instructions</h2>
+        <div className="space-y-3">
+          <p>5.1 Any instructions given by the Customer must be in writing in English and be legible.</p>
+          <p>5.2 The Company has the discretion to refuse to accept the Customer's instructions.</p>
+          <p>5.3 Sufficient notice of instructions must be given by the Customer to the Company to enable the Company to follow those instructions.</p>
+        </div>
 
-        <h2 className="text-xl font-semibold mt-6 mb-2">Outbound Links</h2>
-        <p>
-          The Website may contain links to third-party websites and resources ("Linked Sites"). These links are provided for your convenience and do not signify GGL (Australia)'s endorsement of their content. GGL (Australia) does not guarantee the accuracy, reliability, performance, or quality of any content, software, service, or application found on Linked Sites. GGL (Australia) is not responsible for the availability of Linked Sites or their content and activities. Access to Linked Sites is at your own risk and is governed by the terms, conditions, and privacy policies of those sites.
-        </p>
+        <h2 className="text-2xl font-semibold mt-8 mb-4">6. Fees</h2>
+        <div className="space-y-3">
+          <p>6.1 In respect of the Carriage of Goods, the Company's Fees are earned on the earlier of the commencement of the performance of the Services, or when the Goods are delivered to the Company or its subcontractors.</p>
+          <p>6.3 The Company's Fees must be paid within 7 days of an invoice or as otherwise agreed in writing. Time is of the essence in respect of the Customer's obligations to make any payment.</p>
+          <p>6.13 If the Fees are not paid in full within 7 days of the Due Date then the Company may charge interest on the late payment at the published business overdraft rate of the Commonwealth Bank of Australia.</p>
+        </div>
 
-        <h2 className="text-xl font-semibold mt-6 mb-2">Inbound Links</h2>
-        <p>Linking to any page of the Website other than the homepage through a plain text link is strictly prohibited without a separate linkage agreement with GGL (Australia). Websites or other entities linking to the homepage or any of its pages are prohibited from:</p>
-        <p>
-        <ul className="list-disc ml-6 mt-2">
-          <li>Duplicating Content.</li>
-          <li>Using a frame or border around the Content.</li>
-          <li>Implying endorsement by GGL (Australia) or its affiliates.</li>
-          <li>Misrepresenting any facts about the relationship with GGL (Australia) or its affiliates.</li>
-          <li>Providing false information about GGL (Australia) products or services.</li>
-          <li>Using any logo or mark of GGL (Australia) or its affiliates without express written permission from GGL (Australia).</li>
-        </ul>
-        </p>
+        <h2 className="text-2xl font-semibold mt-8 mb-4">10. Liability</h2>
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-6">
+          <div className="space-y-3">
+            <p>10.1 Despite any other clause in these Terms and Conditions, where the Services involve the international Carriage of Goods, the Company limits its liability in respect of loss or damage to Goods, or delay in the delivery of the Goods, to the maximum extent permitted under any Convention applying to relevant Carriage of the Goods.</p>
+            <p>10.3 Neither party is liable for Consequential Loss suffered by the other Party unless the Party had actual knowledge that such Consequential Loss would be incurred.</p>
+            <p>10.7 Where the liability of the Company is not limited or fully excluded by a Convention, the Agreement, Law or otherwise, the liability of the Company is limited to the lesser of:</p>
+            <ul className="list-disc ml-6 space-y-1">
+              <li>The actual loss or damage suffered by the Customer;</li>
+              <li>Australian $200,000;</li>
+              <li>The value of the Goods at the time the Goods were received by the Company.</li>
+            </ul>
+          </div>
+        </div>
 
-        <h2 className="text-xl font-semibold mt-6 mb-2">Termination</h2>
-        <p>
-          GGL (Australia) reserves the right to terminate or suspend your use of the Website, GGL (Australia) Systems, Information, Services, and Content at its sole discretion, without prior notice or reason. Even if access remains available to others, GGL (Australia) may suspend or terminate your access at any time. Upon termination or suspension, you must:
-        </p>
-        <p>
-        <ul className="list-disc ml-6 mt-2">
-          <li>Immediately cease using the Website.</li>
-          <li>Destroy any copies of the Content you have made.</li>
-        </ul>
-        </p>
-        <p className="mt-2">
-          Continuing to access the Website, GGL (Australia) Systems, Information, or Services after termination, suspension, or discontinuation will be considered trespassing.
-        </p>
-        <p>
-          GGL (Australia) is not liable to you or any third party for terminating or suspending your access to the Website, GGL (Australia) Systems, Information, and/or Services.
-        </p>
+        <h3 className="text-xl font-semibold mt-6 mb-3">Time Limits for Claims</h3>
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+          <p><strong>10.11</strong> A Party will be discharged from all liability in connection with:</p>
+          <ul className="list-disc ml-6 mt-2 space-y-2">
+            <li><strong>Damage to or non-delivery of the Goods:</strong> unless notice of any claim is received within 7 days of delivery (or expected delivery date) and suit is brought within 9 months.</li>
+            <li><strong>Other claims:</strong> unless suit is brought within 3 years of the event giving rise to the claim.</li>
+          </ul>
+        </div>
 
-        <h2 className="text-xl font-semibold mt-6 mb-2">Disclaimer of Warranties</h2>
-        <p>
-          GGL (Australia) makes no guarantees regarding the results you may achieve by using the Website, GGL (Australia) Systems, Services, Information, or Content. You use these elements at your own risk, and they are provided "as is." To the fullest extent permitted by law, GGL (Australia), along with its licensors and suppliers, disclaims all warranties, whether express, implied, statutory, or otherwise. This includes, but is not limited to, warranties of merchantability, non-infringement, and fitness for a particular purpose. GGL (Australia) and its affiliates, licensors, and suppliers do not guarantee the accuracy, completeness, security, or timeliness of the Content, Information, or Services provided on the Website or GGL (Australia) Systems. No information obtained from the Website creates any warranty that is not expressly stated in these Terms of Use.
-        </p>
+        <h2 className="text-2xl font-semibold mt-8 mb-4">11. Customer Indemnities</h2>
+        <div className="space-y-3">
+          <p>11.3 The Customer indemnifies the Company from and against all Loss arising directly or indirectly from or in connection with the Goods or the performance of the Services caused by an act or omission of the Customer or which was beyond the reasonable control of the Company.</p>
+          <p>11.4 Without limitation, the Customer indemnifies the Company from and against any Loss arising from:</p>
+          <ul className="list-disc ml-6 space-y-1">
+            <li>Failure to return Containers or transport equipment</li>
+            <li>Any claim by a person who claims to have an interest in the Goods</li>
+            <li>Breach of this Agreement</li>
+            <li>Government Authority inspections or treatments</li>
+            <li>All duty, GST, and other fees and taxes</li>
+            <li>Delays in loading, unloading, collecting or delivering Goods</li>
+          </ul>
+        </div>
 
-        <h2 className="text-xl font-semibold mt-6 mb-2">Limitation of Liability</h2>
-        <p>
-          To the extent permitted by law, GGL (Australia), its affiliates, licensors, suppliers, or any third parties mentioned on the Website are not liable for any incidental, direct, indirect, exemplary, punitive, and/or consequential damages, lost profits, or damages resulting from lost data or business interruption caused by the use or inability to use the Website, GGL (Australia) Systems, Information, Services, or Content. This limitation applies regardless of the legal theory on which the claim is based, whether warranty, contract, tort, delict, or any other, and even if GGL (Australia) has been advised of the possibility of such damages. To the extent allowed by law, the remedies provided to you in these Terms of Use are exclusive and limited to those expressly stated herein.
-        </p>
+        <h2 className="text-2xl font-semibold mt-8 mb-4">12. Insurance</h2>
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
+          <p><strong>12.1</strong> The Company will not arrange insurance in respect of the Goods. The Customer is responsible for arranging insurance in respect of the Goods.</p>
+        </div>
 
-        <h2 className="text-xl font-semibold mt-6 mb-2">Compliance with Laws, Including Export Control</h2>
-        <p>
-          You agree to use the GGL (Australia) Website in full compliance with all applicable laws, regulations, and rules. Your actions should not, as determined solely by GGL (Australia), harm GGL (Australia)'s goodwill or reputation. Additionally, you must not engage in any activities that could cause GGL (Australia) to violate any relevant laws, rules, or regulations applicable to GGL (Australia).
-        </p>
-        <p>
-          GGL (Australia) operates from Australia and manages the export of products and information. You agree to comply with all applicable restrictions and refrain from exporting or re-exporting any Content (including software or Services) to countries or individuals prohibited under Australia or other relevant export control laws or regulations. By accessing and downloading any Content (including software or Services) or Information, you confirm that you are not located in a country where such export is prohibited and are not a person or entity to whom such export is restricted. You are solely responsible for complying with the laws of your local jurisdiction and any other applicable laws concerning the import, export, or re-export of the Content (including software or Services).
-        </p>
+        <h2 className="text-2xl font-semibold mt-8 mb-4">13. Lien</h2>
+        <div className="space-y-3">
+          <p>13.1 The Company has a particular and general lien on all Goods and documents relating to the Goods and a right to sell those Goods and documents by public auction or private sale in respect of all sums due and owing from the Customer.</p>
+          <p>13.2 Before selling any Goods the Company will give the Customer at least 14 days' written notice of its intention to do so, except where the Goods may deteriorate or storage costs will exceed the likely sale price.</p>
+        </div>
 
-        <h2 className="text-xl font-semibold mt-6 mb-2">Governing Law and Jurisdiction</h2>
-        <p>
-          To the maximum extent permitted by law, these Terms of Use are governed by the internal laws of Australia, and the courts in Australia shall have sole and exclusive jurisdiction over any disputes arising from or related to these Terms of Use.
-        </p>
+        <h2 className="text-2xl font-semibold mt-8 mb-4">14. PPSA (Personal Property Securities Act)</h2>
+        <div className="space-y-3">
+          <p>14.2 From the time the Goods are in the possession of the Company or a Subcontractor, the Goods are subject to a continuing security interest in favour of the Company for the payment of all amounts due and owing by the Customer under the Agreement.</p>
+        </div>
 
-        <h2 className="text-xl font-semibold mt-6 mb-2">General</h2>
-        <p>
-          You may not transfer these Terms of Use or any of your rights, interests, or obligations under these Terms of Use. If any provision of these Terms of Use is found invalid by a court of competent jurisdiction, the invalidity of that provision shall not affect the validity of the remaining provisions, which shall remain in full force and effect. No waiver of any of these Terms of Use shall be considered a continuing waiver of that term or condition or any other term or condition. You may retain a written copy of these Terms of Use by printing them for your records, waiving any other requirement for these Terms of Use to be evidenced by a written document.
-        </p>
+        <h2 className="text-2xl font-semibold mt-8 mb-4">15. Uncollected Goods</h2>
+        <div className="space-y-3">
+          <p>15.1 The Company may sell or return Goods that cannot be delivered because they are insufficiently or incorrectly addressed, are not identifiable, are uncollected or not accepted after 21 days' notice to the Customer.</p>
+        </div>
 
-        <p className="mt-6">
-          We strive to respond to all inquiries promptly and provide you with the assistance you need. Thank you for choosing <strong>GGL (Australia) Pte Ltd</strong>.
-        </p>
+        <div className="bg-gray-100 border rounded-lg p-6 mt-8">
+          <h3 className="text-lg font-semibold mb-3">Contact Information</h3>
+          <p><strong>GGL AUSTRALIA LOGISTICS PTY LTD</strong></p>
+          <p>ABN 71 685 761 513</p>
+          <p className="mt-3 text-sm text-gray-600">
+            These terms and conditions are governed by the laws of Victoria, Australia. 
+            For any questions regarding these terms, please contact us directly.
+          </p>
+        </div>
       </main>
       <Footer />
     </>
