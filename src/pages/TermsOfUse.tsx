@@ -64,16 +64,20 @@ const TermsOfUsePage: React.FC = () => {
             <p><strong>Company</strong> means GGL AUSTRALIA LOGISTICS PTY LTD ABN 71 685 761 513 and its nominees, agents and employees.</p>
             <p><strong>Convention</strong> means any applicable international convention, including the national implementation of that convention, that applies to the international transport of goods including without limitation the provisions of the International Convention for the Unification of Certain Rules relating to Bills of Lading signed at Brussels on 25th August, 1924 (and includes the amendments by the Protocols signed at Brussels in 1968 and 1979, but only if the amendments are compulsorily applicable to this agreement and nothing in this agreement shall be construed as contractually applying those amendment), the Convention for the Unification of Certain Rules for International Carriage by Air, done at Montreal on 28 May 1999 and the Convention for the Unification of Certain Rules Relating to International Carriage by Air, signed at Warsaw, 12 October 1929; that Convention as amended at The Hague on 28 September 1955; that Convention as amended at The Hague 1955 and by Montreal Protocol No. 1, 2, or 4 (1975) as the case may be.</p>
             <p><strong>Consequential Loss</strong> means any loss or damage which:</p>
+            <p>
             <ul className="list-disc ml-6 space-y-1">
               <li>does not arise naturally or in the usual course of things; or</li>
               <li>constitutes, or arises from or in connection with, a loss in revenue, profit or opportunity or a loss of goodwill or business reputation, even if such loss or damage arises naturally or in the usual course of things.</li>
             </ul>
+            </p>
             <p><strong>Container</strong> means any container, flexitank, trailer, transportable tank, flat, pallet or any equipment used to carry or consolidate goods and any equipment of or connected thereto.</p>
             <p><strong>Customer</strong> means:</p>
+            <p>
             <ul className="list-disc ml-6 space-y-1">
               <li>Where there is an Authority, the customer named in the Authority, including its employees, officers, agents and contractors.</li>
               <li>Where there is no Authority, the entity instructing the Company to provide the Services.</li>
             </ul>
+            <p>
             <p><strong>Dangerous Goods</strong> means any Goods which are, or may become, hazardous, volatile, explosive, flammable, radioactive, likely to harbour or encourage vermin or pests, or capable of posing a risk or causing damage to any person or property.</p>
             <p><strong>Fees</strong> means the Company's fees for the Services as set out in any quotation, rates schedule, tariff or as otherwise notified to the Customer, disbursements, taxes and any other amounts payable under these Terms and Conditions.</p>
             <p><strong>Force Majeure Event</strong> means anything outside of the reasonable control of a party including, without limitation, fire, flood, drought, storm (or other adverse weather conditions), lightning, act of God, peril of sea or air, explosion, radioactive or chemical contamination, sabotage, accident, embargo or trade restriction, blockade, labour dispute, strike or shortage, civil commotion, curfew, act of war, actual or threatened act of terrorism, pressure waves caused by aircraft or other devices, meteorites, epidemic, pandemic, the act of an Authority or Law to contain a pandemic or epidemic, plague, quarantine.</p>
@@ -108,11 +112,13 @@ const TermsOfUsePage: React.FC = () => {
             <p><strong>2.10</strong> A Party is not bound by any waiver, discharge or release of a condition or any agreement which purports to change this Agreement, unless it is in writing and signed by or for that Party.</p>
             <p><strong>2.11</strong> A reference in this Agreement to any law includes any statutory modification, substitution or re-enactment of it.</p>
             <p><strong>2.12</strong> If the Customer is a trustee of a trust, the Customer:</p>
+            <p>
             <ul className="list-disc ml-6 space-y-1">
               <li>will provide the Company with a copy of the trust deed and any documents amending that trust deed;</li>
               <li>will notify the Company of any change in trustee of the trust;</li>
               <li>agrees that these Terms and Conditions apply to, and all requests for Services placed by the Customer with the Company are placed by, the Customer in its personal capacity and as trustee of the trust.</li>
             </ul>
+            </p>
             <p><strong>2.13</strong> Any party that enters this Agreement as a disclosed or undisclosed agent agrees to be joint and severally liable for the debts, liabilities and obligations of the principal under this Agreement.</p>
             <p><strong>2.14</strong> This Agreement constitutes the entire understanding and agreement between the Parties regarding the Services. Each Party agrees that it did not rely on any representation, promise, warranty or condition made by the other Party that is not expressly part of this Agreement or any associated quotation for Services.</p>
           </div>
@@ -129,11 +135,13 @@ const TermsOfUsePage: React.FC = () => {
             <p><strong>3.6</strong> The Company is authorised by the Customer to choose the method for performance of the Services at the Company's reasonable discretion.</p>
             <p><strong>3.7</strong> The Customer authorises the Company to open any package containing Goods and do any other thing in order to inspect or weigh the Goods as part of performing the Services.</p>
             <p><strong>3.8</strong> The Customer agrees that:</p>
+            <p>
             <ul className="list-disc ml-6 space-y-2">
               <li>the value of the Goods will not be declared or inserted into a Transport Document or contract for the purpose of extending a Carrier's liability unless the Customer provides express written instructions to the Company to do so, and if required, the Carrier agrees;</li>
               <li>where a Subcontractor's or Carrier's charges may be determined by the extent of liability assumed by the Subcontractor or Carrier, no declaration of value will be made for the purpose of extending the liability of the Subcontractor or Carrier, and the Goods will be dealt with at the Customer's risk for minimum charges, unless the Customer provides written instructions to the contrary to the Company;</li>
               <li>the Company reserves the right to not make any declaration or take any action in respect of the Customer's Goods unless the Customer has provided the Company with sufficient notice, written instructions and the documents necessary to take that action in relation to those Goods.</li>
             </ul>
+            </p>
             <p><strong>3.9</strong> The Company may deem that certain Goods are Dangerous Goods provided that there are reasonable grounds for doing so.</p>
             <p><strong>3.10</strong> If Dangerous Goods are undeclared, or even if declared, pose a risk to people or property, the Company may in its reasonable discretion unload, store, destroy or otherwise deal with any Goods, without notice or compensation to the Customer. Where reasonably possible the Company will contact the Customer and try to agree on the action to be taken in respect of the Dangerous Goods.</p>
             <p><strong>3.11</strong> The Company's delivery obligations are satisfied if the Company delivers the Goods to the delivery address instructed by the Customer and a person at that address provides a receipt or signs a delivery docket, or if authorised by the Customer, the Goods are left at the delivery address without obtaining a receipt or signed delivery docket. Where applicable, the Company will provide the Customer with notice of the non-delivery.</p>
@@ -193,17 +201,21 @@ const TermsOfUsePage: React.FC = () => {
           <h2 className="text-2xl font-semibold mb-4 text-gray-900">7. Subcontractors and agency</h2>
           <div className="space-y-3 text-sm leading-relaxed">
             <p><strong>7.1</strong> The Customer authorises the Company to:</p>
+            <p>
             <ul className="list-disc ml-6 space-y-1">
               <li>subcontract all or part of the Services to a Subcontractor; and / or</li>
               <li>as the agent of the Customer, contract with a third party service provider on behalf of the Customer on ordinary commercial terms, including terms that limit or exclude the liability of the third party service provider.</li>
             </ul>
+            </p>
             <p><strong>7.2</strong> The Customer authorises a Subcontractor to subcontract all or part of the Services.</p>
             <p><strong>7.3</strong> All exclusions or limitations on the liability of the Company in these Terms and Conditions extend to protect:</p>
+            <p>
             <ul className="list-disc ml-6 space-y-1">
               <li>all Subcontractors;</li>
               <li>the agents, employees and servants of any Subcontractor or the Company; and</li>
               <li>any person engaged to provide all or part of the Services.</li>
             </ul>
+            </p>
             <p><strong>7.4</strong> For the purpose of clauses 7.3 the Company acts as trustee on behalf of and for the benefit of any Subcontractor, and to this extent each Subcontractor is deemed to be a party to this Agreement.</p>
           </div>
         </section>
@@ -219,6 +231,7 @@ const TermsOfUsePage: React.FC = () => {
           <h2 className="text-2xl font-semibold mb-4 text-gray-900">9. Warranties</h2>
           <div className="space-y-3 text-sm leading-relaxed">
             <p><strong>9.1</strong> The Customer (on behalf of itself and the Owner) warrants to the Company that:</p>
+            <p>
             <ul className="list-disc ml-6 space-y-2">
               <li>it is the owner of the Goods, or is the authorised agent of the owner of the Goods and is authorised to complete and sign documentation related to the Goods and the Services;</li>
               <li>it enters into the Agreement on its own behalf, or in its capacity as the authorised agent of the owner of the Goods;</li>
@@ -231,6 +244,7 @@ const TermsOfUsePage: React.FC = () => {
               <li>all Goods are adequately and accurately marked, labelled or branded; and</li>
               <li>it will ensure, so far as is reasonably practicable, the safety of any road transport performed for or on behalf of the Customer and it will meet its obligations under the Heavy Vehicle National Law where the Customer is the consignor, consignee, packer or loader of the Goods.</li>
             </ul>
+            </p>
           </div>
         </section>
  
@@ -244,15 +258,18 @@ const TermsOfUsePage: React.FC = () => {
     <p><strong>10.5</strong> To the extent permitted by Law, the Company's liability for any breach of a Non-Excludable Condition is limited, at the Company's option, to supplying the particular Services again, or the cost of supplying the particular Services again.</p>
     <p><strong>10.6</strong> The Company will not be liable for omitting to inspect or take any other action in respect of Goods where Goods have been damaged or pillaged, unless the Customer provides the Company with written instructions to take that action in relation to those Goods and the Company accepts those instructions.</p>
     <p><strong>10.7</strong> Without limiting clause 10.1, where the liability of the Company is not limited or fully excluded by a Convention, the Agreement, Law or otherwise, the liability of the Company is limited to the lesser of:</p>
+    <p>
     <ul className="list-disc ml-6 space-y-1">
       <li>The actual loss or damage suffered by the Customer;</li>
       <li>Australian $200,000,</li>
       <li>The value of the Goods at the time the Goods were received by the Company.</li>
     </ul>
+    </p>
     <p><strong>10.8</strong> The liability limits in clause 10.7 do not apply to the extent that the Loss or damage results from any act or omission which constitutes fraud, wilful misconduct or gross negligence.</p>
     <p><strong>10.9</strong> The Company will not be in breach of any of its obligations to the Customer or liable for any Loss (excluding Loss caused by its negligence) suffered by the Customer arising from or connected with the Company's compliance with any Law, including without limitation disclosing confidential information to a Government Authority.</p>
     <p><strong>10.10</strong> Where a Convention or Law imposes a timeframe on the making of claims against the Company, the Company relies on and does not extend that timeframe.</p>
     <p><strong>10.11</strong> Without limitation to any other clause of the Agreement, a Party will be discharged from all liability in connection with:</p>
+    <p>
     <ul className="list-disc ml-6 space-y-1">
       <li>
         Damage to or non-delivery or late delivery of the Goods unless:
@@ -263,6 +280,7 @@ const TermsOfUsePage: React.FC = () => {
       </li>
       <li>Claims unrelated to damage to, non-delivery of or late delivery of the Goods unless suit is brought and written notice is received by the other Party within 3 years of the event giving rise to the claim.</li>
     </ul>
+    </p>
     <p><strong>10.12</strong> Clause 10.11 does not apply where the making of a claim or commencement of a proceeding outside of the stated timeframes does not prejudice the Company in any claim it may have against a third party in respect of, or in determining the cause of, the loss or damage to the Goods or delay in delivering the Goods.</p>
     <p><strong>10.13</strong> A Party will not be liable to the other Party for any delay or failure to perform an obligation under the Agreement or Loss suffered by the other Party to the extent caused by a Force Majeure Event.</p>
     <p><strong>10.14</strong> If a Force Majeure Event prevents or causes a delay in the performance of a Party’s obligation exceeding 28 days, either Party may terminate the provision of the Services by notice to the Other Party.</p>
@@ -277,6 +295,7 @@ const TermsOfUsePage: React.FC = () => {
     <p><strong>11.2</strong> When seeking to rely on an indemnity, the Company is under an obligation to act reasonably to minimise the Loss incurred.</p>
     <p><strong>11.3</strong> The Customer indemnifies the Company from and against (and must pay on demand for) all Loss arising directly or indirectly from or in connection with the Goods or the performance of the Services (including Consequential Loss) caused by an act or omission of the Customer or which was beyond the reasonable control of the Company.</p>
     <p><strong>11.4</strong> Without limitation to clause 11.3 the Customer indemnifies the Company from and against (and must pay on demand for) any Loss arising from:</p>
+    <p>
     <ul className="list-disc ml-6 space-y-1">
       <li>the Customer's or Owner's failure to return, return by the due date, return within the "free" period and/or return empty, clean, or undamaged any Container or transport equipment involved in the performance of the Services;</li>
       <li>any claim against the Company by a person who claims to have an interest in the Goods (other than the Customer);</li>
@@ -288,6 +307,7 @@ const TermsOfUsePage: React.FC = () => {
       <li>any costs or charges incurred as a result of any delay in loading or unloading, or collecting or delivering, the Goods;</li>
       <li>all costs payable to third parties in relation to the Carriage, storage, treatment or entry of the Goods other than costs that were known by the Company as expenses that would be incurred in respect of the Carriage or Goods at the time the Company provided a quote to the Customer and those costs were either not included in the Quote or were not of a nature which the Customer would have expected to be incurred.</li>
     </ul>
+    </p>
     <p><strong>11.5</strong> The indemnities in this clause 11 continue whether or not the Goods are pillaged, stolen, lost or destroyed. However, the payment of any amount by the Customer will not constitute a waiver of any rights held by the Customer.</p>
   </div>
 </section>
@@ -303,16 +323,20 @@ const TermsOfUsePage: React.FC = () => {
   <h2 className="text-2xl font-semibold mb-4 text-gray-900">13. Lien</h2>
   <div className="space-y-3 text-sm leading-relaxed">
     <p><strong>13.1</strong> The Company has:</p>
+    <p>
     <ul className="list-disc ml-6 space-y-1">
       <li>a particular and general lien on all Goods and documents relating to the Goods; and</li>
       <li>a right to sell those Goods and documents by public auction or private sale (at the Company's discretion) and apply the proceeds of sale;</li>
     </ul>
+    </p>
     <p>in respect of all sums due and owing from the Customer or a Related Company of the Customer.</p>
     <p><strong>13.2</strong> Before selling any Goods or documents the Company will give the Customer at least 14 days’ written notice of its intention to do so. However, lesser, or no, notice may be given where:</p>
+    <p>
     <ul className="list-disc ml-6 space-y-1">
       <li>the Goods or documents may materially deteriorate during any notice period; and/or</li>
       <li>the storage or other costs that will be incurred in respect of the Goods or documents during the notice period will exceed the likely net sale price of the Goods or documents.</li>
     </ul>
+    </p>
     <p><strong>13.3</strong> The lien will also cover the Company's costs and expenses relating to the exercise of its lien and right of sale, including the Company's reasonable legal fees.</p>
     <p><strong>13.4</strong> For the purposes of the lien, the Company will retain constructive possession of the Goods and the lien and rights granted by this clause will survive delivery of the Goods or the transfer of the Goods to a Subcontractor. The Company is entitled to retain the proceeds of sale of the Goods in respect of all sums due and owing from the Customer.</p>
   </div>
@@ -334,17 +358,21 @@ const TermsOfUsePage: React.FC = () => {
   <div className="space-y-3 text-sm leading-relaxed">
     <p><strong>15.1</strong> The Company may at its reasonable discretion sell or return Goods that cannot be delivered because they are insufficiently or incorrectly addressed, are not identifiable, are uncollected or not accepted after 21 days' notice to the Customer or where the Customer fails to pay any cost or do any action reasonably necessary for the Company to deliver the Goods.</p>
     <p><strong>15.2</strong> The notice period in clause 15.1 does not apply where either:</p>
+    <p>
     <ul className="list-disc ml-6 space-y-1">
       <li>the Goods will materially deteriorate or lose value during the notice period; or</li>
       <li>the costs of storing or maintaining the Goods during the notice period exceeds the likely net proceeds from the sale of the Goods.</li>
     </ul>
+    </p>
     <p><strong>15.3</strong> Where the Company sells Goods under clauses 13 or 15:</p>
+    <p>
     <ul className="list-disc ml-6 space-y-1">
       <li>it does so as principal, not as agent, and is not the trustee of the power of sale;</li>
       <li>the Customer must pay all reasonable costs, charges and expenses incurred by the Company in connection with the storage, sale or return of the Goods, which may be deducted from the proceeds of the sale of the Goods;</li>
       <li>the Company is entitled to recover any deficit from the Customer where the proceeds of sale of the Goods do not satisfy the amounts payable to the Company;</li>
       <li>any surplus proceeds will be paid to the Customer (provided that the Customer can be identified).</li>
     </ul>
+    </p>
   </div>
 </section>
 
@@ -352,19 +380,23 @@ const TermsOfUsePage: React.FC = () => {
   <h2 className="text-2xl font-semibold mb-4 text-gray-900">16. Modifications for Particular Contracts</h2>
   <div className="space-y-3 text-sm leading-relaxed">
     <p><strong>16.1</strong> This clause 16 applies where any of the following are met:</p>
-    <ul className="list-disc ml-6 space-y-1">
+   <p>
+ <ul className="list-disc ml-6 space-y-1">
       <li>this agreement is not a Consumer Contract or Small Business contract as defined in section 23 of schedule 1 of the Competition and Consumer Act 2010 (Cth);</li>
       <li>this agreement is not a Standard Form Agreement; or</li>
       <li>this agreement is a contract to which Part 2-3 of schedule 1 of the Competition and Consumer Act 2010 (Cth) does not apply.</li>
     </ul>
+   </p>
     <p><strong>16.2</strong> Where this clause 16 applies, this agreement is read as follows:</p>
-    <ul className="list-disc ml-6 space-y-1">
+  <p>  
+<ul className="list-disc ml-6 space-y-1">
       <li><strong>Clause 10.7</strong> is replaced with the following wording:<br />
         “10.7 In all cases where liability has not been limited or excluded by mandatory applicable statute, Convention or law, the liability of the Company is limited to, without limiting clause 10.1 above, the lesser of:
         <ul className="list-disc ml-6 mt-1 space-y-1">
           <li>the actual loss or damage suffered; or</li>
           <li>$1,000 per loss causing event and in the aggregate of all claims by the Customer against the Company during a calendar year.”</li>
         </ul>
+      </p>
       </li>
       <li><strong>Clause 11.1</strong> does not apply.</li>
     </ul>
