@@ -66,10 +66,11 @@ const TermsOfUsePage: React.FC = () => {
             <div>
   <strong>Consequential Loss</strong> means any loss or damage which:
   <ul className="space-y-3 text-sm leading-relaxed">
-    <li>does not arise naturally or in the usual course of things; or</li>
+    <li> <p>does not arise naturally or in the usual course of things; or </p></li>
     <li>
-      constitutes, or arises from or in connection with, a loss in revenue, profit or opportunity or a loss of goodwill or business reputation, even if such loss or damage arises naturally or in the usual course of things.
-    </li>
+       <p>constitutes, or arises from or in connection with, a loss in revenue, profit or opportunity or a loss of goodwill or business reputation, even if such loss or damage arises naturally or in the usual course of things.
+       </p>  
+</li>
   </ul>
 </div>
             <p><strong>Container</strong> means any container, flexitank, trailer, transportable tank, flat, pallet or any equipment used to carry or consolidate goods and any equipment of or connected thereto.</p>
