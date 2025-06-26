@@ -109,7 +109,7 @@ const TermsOfUsePage: React.FC = () => {
             <p><strong>2.11</strong> A reference in this Agreement to any law includes any statutory modification, substitution or re-enactment of it.</p>
             <p><strong>2.12</strong> If the Customer is a trustee of a trust, the Customer:</p>
             <ul className="list-disc ml-6 space-y-1">
-              <li><p></p>will provide the Company with a copy of the trust deed and any documents amending that trust deed;</p></li>
+              <li><p>will provide the Company with a copy of the trust deed and any documents amending that trust deed;</p></li>
               <li><p>will notify the Company of any change in trustee of the trust;</p></li>
               <li><p>agrees that these Terms and Conditions apply to, and all requests for Services placed by the Customer with the Company are placed by, the Customer in its personal capacity and as trustee of the trust.</p></li>
             </ul>
