@@ -224,7 +224,7 @@ const TermsOfUsePage: React.FC = () => {
               <li><p>it enters into the Agreement on its own behalf, or in its capacity as the authorised agent of the owner of the Goods;</p></li>
               <li><p>it has complied with all Laws relating to the Goods, including the nature, condition, packaging, handling, storage and Carriage of the Goods;</p></li>
               <li><p>in engaging the Services from the Company, it will not procure the Company to perform any act in breach of any Laws including any trade sanctions;</p></li>
-              <li><p>it will observe all Laws and requirements of Government Authorities;</li>
+              <li><p>it will observe all Laws and requirements of Government Authorities;</p></li>
               <li><p>all information and documentation provided by or on behalf of the Customer to the Company is accurate and complete, and it has not omitted to provide any requested or material information;</p></li>
               <li><p>other than where the Company is responsible for packing the Goods, the Goods are packed to endure the ordinary risks of handling, storage and the Services, having regard to the nature of the Goods including without limitation, that in respect of temperature controlled goods, the Container has been properly pre-cooled or pre-heated and the Container's thermostatic controls have been correctly set;</p></li>
               <li><p>the Goods are not Dangerous Goods, unless the Company has agreed in writing to provide the Services in respect of those particular Dangerous Goods, and in which case, warrants that it has made full disclosure of Dangerous Goods and such Goods are distinctly marked; and</p></li>
