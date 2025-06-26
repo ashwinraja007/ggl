@@ -37,6 +37,12 @@ const countries = [{
     address: "Old No G1, New G3, KAIZEN 2nd & 3rd Floor Plot No, 565Q, G Block, Annanagar East, Chennai, Tamil Nadu 600102",
     contacts: ["+91 9123523496"]
   }, {
+    name: "Kochi",
+    lat: 10.0276,
+    lng: 76.3152,
+    address: "C.V.M Arcade, 1st & 2nd Floor , Club Junction Pukkattupady Road, Edappally - 682024",
+    contacts: ["+91 9769310808"]
+  },{
     name: "Bangalore",
     lat: 12.9716,
     lng: 77.5946,
