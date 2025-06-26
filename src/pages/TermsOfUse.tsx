@@ -359,14 +359,15 @@ const TermsOfUsePage: React.FC = () => {
     </ul>
     <p><strong>16.2</strong> Where this clause 16 applies, this agreement is read as follows:</p>
     <ul className="list-disc ml-6 space-y-1">
-      <li><strong>Clause 10.7</strong> is replaced with the following wording:<br />
+      <li><p><strong>Clause 10.7</strong> is replaced with the following wording:<br />
         “10.7 In all cases where liability has not been limited or excluded by mandatory applicable statute, Convention or law, the liability of the Company is limited to, without limiting clause 10.1 above, the lesser of:
-        <ul className="list-disc ml-6 mt-1 space-y-1">
+      </p> 
+ <ul className="list-disc ml-6 mt-1 space-y-1">
           <li><p>the actual loss or damage suffered; or</p></li>
           <li><p>$1,000 per loss causing event and in the aggregate of all claims by the Customer against the Company during a calendar year.”</p></li>
         </ul>
       </li>
-      <li><strong>Clause 11.1</strong> does not apply.</li>
+      <li><p><strong>Clause 11.1</strong> does not apply.</p></li>
     </ul>
   </div>
 </section>
