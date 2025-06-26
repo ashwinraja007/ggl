@@ -63,9 +63,8 @@ const TermsOfUsePage: React.FC = () => {
             <p><strong>Carrier</strong> means any party involved in the Carriage of Goods whether by airfreight, sea freight or land transport</p>
             <p><strong>Company</strong> means GGL AUSTRALIA LOGISTICS PTY LTD ABN 71 685 761 513 and its nominees, agents and employees.</p>
             <p><strong>Convention</strong> means any applicable international convention, including the national implementation of that convention, that applies to the international transport of goods including without limitation the provisions of the International Convention for the Unification of Certain Rules relating to Bills of Lading signed at Brussels on 25th August, 1924 (and includes the amendments by the Protocols signed at Brussels in 1968 and 1979, but only if the amendments are compulsorily applicable to this agreement and nothing in this agreement shall be construed as contractually applying those amendment), the Convention for the Unification of Certain Rules for International Carriage by Air, done at Montreal on 28 May 1999 and the Convention for the Unification of Certain Rules Relating to International Carriage by Air, signed at Warsaw, 12 October 1929; that Convention as amended at The Hague on 28 September 1955; that Convention as amended at The Hague 1955 and by Montreal Protocol No. 1, 2, or 4 (1975) as the case may be.</p>
-         
+  <div>       
  <p> <strong>Consequential Loss</strong> means any loss or damage which:</p>
- <div>
   <ul className="space-y-3 text-sm leading-relaxed">
     <li> <p>does not arise naturally or in the usual course of things; or </p></li>
     <li>
