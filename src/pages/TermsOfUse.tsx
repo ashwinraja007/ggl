@@ -76,8 +76,8 @@ const TermsOfUsePage: React.FC = () => {
             <p><strong>Container</strong> means any container, flexitank, trailer, transportable tank, flat, pallet or any equipment used to carry or consolidate goods and any equipment of or connected thereto.</p>
             <p><strong>Customer</strong> means:</p>
             <ul className="list-disc ml-6 space-y-1">
-              <li>Where there is an Authority, the customer named in the Authority, including its employees, officers, agents and contractors.</li>
-              <li>Where there is no Authority, the entity instructing the Company to provide the Services.</li>
+              <li><p>Where there is an Authority, the customer named in the Authority, including its employees, officers, agents and contractors.</p></li>
+              <li><p>Where there is no Authority, the entity instructing the Company to provide the Services.</p></li>
             </ul>
             <p><strong>Dangerous Goods</strong> means any Goods which are, or may become, hazardous, volatile, explosive, flammable, radioactive, likely to harbour or encourage vermin or pests, or capable of posing a risk or causing damage to any person or property.</p>
             <p><strong>Fees</strong> means the Company's fees for the Services as set out in any quotation, rates schedule, tariff or as otherwise notified to the Customer, disbursements, taxes and any other amounts payable under these Terms and Conditions.</p>
