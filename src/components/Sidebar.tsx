@@ -1,9 +1,7 @@
-
 import React, { useRef, useEffect, useState } from 'react';
 import { ScrollArea } from "@/components/ui/scroll-area";
-import InfoPanel from './InfoPanel';
 import { Button } from "@/components/ui/button";
-import { X, MapPin, Globe, ExternalLink, Phone, Mail, Home, ChevronRight, ChevronDown } from 'lucide-react';
+import { X, MapPin, Globe, ExternalLink, Phone, Mail, Home, ChevronRight } from 'lucide-react';
 import { cn } from "@/lib/utils";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -16,18 +14,18 @@ interface SidebarProps {
 const countries = [{
   code: "in",
   name: "India",
-  lat: 22.3511,
-  lng: 78.6677,
+  lat: 19.00745,
+  lng: 73.03271,
   cities: [{
     name: "Mumbai",
-    lat: 17.3839,
-    lng: 78.4539,
+    lat: 19.00745,
+    lng: 73.03271,
     address: "407, mayuresh planet, plot no - 42 & 43, sector-15, cbd belapur, navi mumbai, maharashtra, 400614",
     contacts: ["Export customer service: +91 2245174102, +91 2245174109, +91 2245174118", "Export docs team: +91 2245174103, +91 2245174105", "Import docs team: +91 2245174104, +91 2245174106", "Import customer service: +91 2245174113, +91 2245174110, +91 2245174107, +91 2245174112"]
   }, {
     name: "Delhi",
-    lat: 25.6083,
-    lng: 85.1437,
+    lat: 28.53837,
+    lng: 77.29022,
     address: "JA 511, DLF Tower A, Jasola District Centre, New Delhi, 110025",
     contacts: ["+91 9999022030"]
   }, {
@@ -37,12 +35,6 @@ const countries = [{
     address: "Old No G1, New G3, KAIZEN 2nd & 3rd Floor Plot No, 565Q, G Block, Annanagar East, Chennai, Tamil Nadu 600102",
     contacts: ["+91 9123523496"]
   }, {
-    name: "Kochi",
-    lat: 10.0276,
-    lng: 76.3152,
-    address: "C.V.M Arcade, 1st & 2nd Floor , Club Junction Pukkattupady Road, Edappally - 682024",
-    contacts: ["+91 9769310808"]
-  },{
     name: "Bangalore",
     lat: 12.9716,
     lng: 77.5946,
@@ -58,8 +50,8 @@ const countries = [{
 }, {
   code: "my",
   name: "Malaysia",
-  lat: 4.2105,
-  lng: 101.9758,
+  lat: 1.4720,
+  lng: 103.9027,
   cities: [{
     name: "PASIRGUDANG",
     lat: 1.4720,
@@ -89,8 +81,8 @@ const countries = [{
 }, {
   code: "id",
   name: "Indonesia",
-  lat: -0.7893,
-  lng: 113.9213,
+    lat: -6.2088,
+    lng: 106.8456,
   cities: [{
     name: "Jakarta",
     lat: -6.2088,
@@ -107,8 +99,8 @@ const countries = [{
 }, {
   code: "lk",
   name: "Sri Lanka",
-  lat: 7.8731,
-  lng: 80.7718,
+    lat: 6.9271,
+    lng: 79.8612,
   cities: [{
     name: "Colombo",
     lat: 6.9271,
@@ -119,8 +111,8 @@ const countries = [{
 }, {
   code: "th",
   name: "Thailand",
-  lat: 15.8700,
-  lng: 100.9925,
+    lat: 13.7563,
+    lng: 100.5018,
   cities: [{
     name: "Bangkok",
     lat: 13.7563,
@@ -131,8 +123,8 @@ const countries = [{
 }, {
   code: "mm",
   name: "Myanmar",
-  lat: 21.9162,
-  lng: 95.9560,
+    lat: 16.8409,
+    lng: 96.1735,
   cities: [{
     name: "Yangon",
     lat: 16.8409,
@@ -143,8 +135,8 @@ const countries = [{
 }, {
   code: "bd",
   name: "Bangladesh",
-  lat: 23.6850,
-  lng: 90.3563,
+    lat: 23.8103,
+    lng: 90.4125,
   cities: [{
     name: "Dhaka",
     lat: 23.8103,
@@ -155,26 +147,26 @@ const countries = [{
 }, {
   code: "pk",
   name: "Pakistan",
-  lat: 32.4145,
-  lng: 64.9162,
+    lat: 24.86149,
+    lng: 67.06616,
   cities: [{
     name: "Karachi",
-    lat: 32.4145,
-    lng: 64.9162,
+    lat: 24.86149,
+    lng: 67.06616,
     address: "Suite No.301, 3rd Floor, Fortune Center, Shahrah-e-Faisal, Block 6, PECHS, Karachi, Pakistan",
     contacts: ["+92-300-8282511", "+92-21-34302281-5"]
   }, {
     name: "Lahore",
-    lat: 32.4145,
-    lng: 64.9162,
+    lat: 31.52945,
+    lng: 74.35887,
     address: "Office # 301, 3rd Floor, Gulberg Arcade Main Market, Gulberg 2, Lahore, Pakistan",
     contacts: ["+92 42-35782306/07/08"]
   }]
 }, {
   code: "ae",
   name: "United Arab Emirates (UAE)",
-  lat: 23.4241,
-  lng: 53.8478,
+    lat: 25.2048,
+    lng: 55.2708,
   cities: [{
     name: "Dubai",
     lat: 25.2048,
@@ -197,8 +189,8 @@ const countries = [{
 }, {
   code: "qa",
   name: "Qatar",
-  lat: 25.276987,
-  lng: 51.520008,
+    lat: 25.276987,
+    lng: 51.520008,
   cities: [{
     name: "Doha",
     lat: 25.276987,
@@ -209,8 +201,8 @@ const countries = [{
 }, {
   code: "sa",
   name: "Saudi Arabia",
-  lat: 23.8859,
-  lng: 45.0792,
+  lat: 26.4207,
+    lng: 50.0888,
   cities: [{
     name: "Dammam",
     lat: 26.4207,
@@ -233,15 +225,14 @@ const countries = [{
 }, {
   code: "us",
   name: "United States (USA)",
-  lat: 37.0902,
-  lng: -95.7129,
+    lat: 41.8781,
+    lng: -87.6298,
   cities: [{
     name: "Chicago",
     lat: 41.8781,
     lng: -87.6298,
-    address: "New Jersey Branch, 33 Wood Avenue South,Suite 600, Iselin, NJ 08830",
-    contacts: ["+1 732 456 6780"],
-    email: "info@gglusa.us"
+    address: "939 W. North Avenue, Suite 750, Chicago, IL 60642",
+    contacts: ["+1 847 254 7320"]
   }, {
     name: "New York",
     lat: 40.7128,
@@ -260,8 +251,8 @@ const countries = [{
 }, {
   code: "gb",
   name: "United Kingdom (UK)",
-  lat: 55.3781,
-  lng: -3.4360,
+    lat: 51.5074,
+    lng: -0.1278,
   cities: [{
     name: "London",
     lat: 51.5074,
@@ -272,8 +263,8 @@ const countries = [{
 }, {
   code: "au",
   name: "Australia",
-  lat: -37.8136,
-  lng: 144.9631,
+    lat: -37.8136,
+    lng: 144.9631,
   cities: [{
     name: "Melbourne",
     lat: -37.8136,
@@ -286,10 +277,7 @@ const countries = [{
 // Sort countries alphabetically by name
 const sortedCountries = [...countries].sort((a, b) => a.name.localeCompare(b.name));
 
-const Sidebar: React.FC<SidebarProps> = ({
-  isOpen,
-  onClose
-}) => {
+const Sidebar: React.FC<ContactSidebarProps> = ({ isOpen, onClose }) => {
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
   const [expandedCountry, setExpandedCountry] = useState<string | null>(null);
   const [selectedLocation, setSelectedLocation] = useState<any | null>(null);
@@ -321,10 +309,15 @@ const Sidebar: React.FC<SidebarProps> = ({
   }, []);
 
   const navigateToLocation = (lat: number, lng: number, city: any = null) => {
-    if (iframeRef.current) {
+    // Find the iframe in the ContactMapContainer
+    const iframe = document.querySelector('iframe[title="Interactive Map"]') as HTMLIFrameElement;
+    if (iframe) {
       try {
-        const newSrc = iframeRef.current.src.split('&z=')[0] + `&z=6&ll=${lat},${lng}`;
-        iframeRef.current.src = newSrc;
+        // Use higher zoom level for city-specific locations
+        const zoomLevel = city ? 10 : 10;
+        const baseUrl = "https://www.google.com/maps/d/u/0/embed?mid=1d5jZQlEjnKqnsGHvdJWR5wB_-fcQ_Zk&ehbc=2E312F";
+        const newSrc = `${baseUrl}&z=${zoomLevel}&ll=${lat},${lng}&hl=en&ehbc=2E312F&output=embed`;
+        iframe.src = newSrc;
         if (city) {
           setSelectedLocation(city);
         }
@@ -372,8 +365,6 @@ const Sidebar: React.FC<SidebarProps> = ({
         {/* Content area */}
         <ScrollArea className={`h-[calc(100vh-10rem)] md:h-[calc(100vh-8rem)] bg-white rounded-b-xl shadow-md`}>
           <div className="p-4">
-            <InfoPanel />
-            
             <div className="mt-4 space-y-3">
               <Accordion type="single" collapsible value={expandedCountry || ""} className="w-full space-y-3">
                 {sortedCountries.map(country => {
@@ -381,7 +372,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                     <AccordionItem 
                       key={country.name} 
                       value={country.name} 
-                      className="border border-amber-100 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all bg-white"
+                      className="border border-red-100 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all bg-white"
                     >
                       <AccordionTrigger 
                         onClick={() => {
@@ -400,7 +391,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                         </div>
                       </AccordionTrigger>
                       
-                      <AccordionContent className="bg-gradient-to-b from-amber-50/30 to-white px-3 py-2">
+                      <AccordionContent className="bg-gradient-to-b from-red-50/30 to-white px-3 py-2">
                         <div className="space-y-2">
                           {/* All cities displayed as buttons */}
                           <div className="space-y-2">
@@ -411,8 +402,8 @@ const Sidebar: React.FC<SidebarProps> = ({
                                   className={cn(
                                     "w-full justify-start text-sm p-2 h-auto rounded-md border transition-all shadow-sm",
                                     isSelectedCity(country.name, index) 
-                                      ? "bg-amber-100 hover:bg-amber-150 border-amber-300 text-amber-800" 
-                                      : "bg-white hover:bg-amber-50 border-gray-100 hover:border-amber-200"
+                                      ? "bg-red-100 hover:bg-red-150 border-red-300 text-red-800" 
+                                      : "bg-white hover:bg-red-50 border-gray-100 hover:border-red-200"
                                   )}
                                   onClick={() => {
                                     handleCitySelection(country, index);
@@ -421,26 +412,26 @@ const Sidebar: React.FC<SidebarProps> = ({
                                     }
                                   }}
                                 >
-                                  <MapPin className="w-4 h-4 mr-2 text-amber-600 flex-shrink-0" />
+                                  <MapPin className="w-4 h-4 mr-2 text-red-600 flex-shrink-0" />
                                   <span className="font-medium truncate">{city.name}</span>
-                                  <ChevronRight className="w-4 h-4 ml-auto text-amber-300" />
+                                  <ChevronRight className="w-4 h-4 ml-auto text-red-300" />
                                 </Button>
                                 
                                 {/* Show address details for selected city */}
                                 {isSelectedCity(country.name, index) && city.address && (
-                                  <div className="mt-2 p-3 bg-gradient-to-br from-amber-50 to-white rounded-lg border border-amber-200 shadow text-sm animate-in fade-in duration-300 w-full">
-                                    <h4 className="font-semibold text-amber-700 mb-2 pb-1 border-b border-amber-100 flex items-center">
-                                      <span className="bg-gradient-to-r from-amber-600 to-amber-400 bg-clip-text text-transparent">{city.name} Office</span>
+                                  <div className="mt-2 p-3 bg-gradient-to-br from-red-50 to-white rounded-lg border border-red-200 shadow text-sm animate-in fade-in duration-300 w-full">
+                                    <h4 className="font-semibold text-red-700 mb-2 pb-1 border-b border-red-100 flex items-center">
+                                      <span className="bg-gradient-to-r from-red-600 to-red-400 bg-clip-text text-transparent">{city.name} Office</span>
                                     </h4>
                                     
-                                    <div className="flex items-start mb-2 group hover:bg-amber-50/50 p-2 rounded-md transition-colors w-full">
-                                      <Home className="w-4 h-4 mr-2 text-amber-500 mt-1 flex-shrink-0 group-hover:text-amber-600 transition-colors" />
+                                    <div className="flex items-start mb-2 group hover:bg-red-50/50 p-2 rounded-md transition-colors w-full">
+                                      <Home className="w-4 h-4 mr-2 text-red-500 mt-1 flex-shrink-0 group-hover:text-red-600 transition-colors" />
                                       <p className="text-gray-700 group-hover:text-gray-900 transition-colors text-sm break-words w-full overflow-hidden">{city.address}</p>
                                     </div>
                                     
                                     {city.contacts && city.contacts.length > 0 && (
-                                      <div className="flex items-start mb-2 group hover:bg-amber-50/50 p-2 rounded-md transition-colors w-full">
-                                        <Phone className="w-4 h-4 mr-2 text-amber-500 mt-1 flex-shrink-0 group-hover:text-amber-600 transition-colors" />
+                                      <div className="flex items-start mb-2 group hover:bg-red-50/50 p-2 rounded-md transition-colors w-full">
+                                        <Phone className="w-4 h-4 mr-2 text-red-500 mt-1 flex-shrink-0 group-hover:text-red-600 transition-colors" />
                                         <div className="space-y-1 w-full overflow-hidden">
                                           {city.contacts.map((contact: string, idx: number) => (
                                             <p key={idx} className="text-gray-700 group-hover:text-gray-900 transition-colors text-sm break-words">{contact}</p>
@@ -450,11 +441,11 @@ const Sidebar: React.FC<SidebarProps> = ({
                                     )}
                                     
                                     {city.email && (
-                                      <div className="flex items-start group hover:bg-amber-50/50 p-2 rounded-md transition-colors w-full">
-                                        <Mail className="w-4 h-4 mr-2 text-amber-500 mt-1 flex-shrink-0 group-hover:text-amber-600 transition-colors" />
+                                      <div className="flex items-start group hover:bg-red-50/50 p-2 rounded-md transition-colors w-full">
+                                        <Mail className="w-4 h-4 mr-2 text-red-500 mt-1 flex-shrink-0 group-hover:text-red-600 transition-colors" />
                                         <a 
                                           href={`mailto:${city.email}`} 
-                                          className="text-amber-600 hover:text-amber-800 hover:underline flex items-center text-sm break-words w-full overflow-hidden"
+                                          className="text-red-600 hover:text-red-800 hover:underline flex items-center text-sm break-words w-full overflow-hidden"
                                         >
                                           {city.email}
                                           <ExternalLink className="ml-1 h-3 w-3" />
