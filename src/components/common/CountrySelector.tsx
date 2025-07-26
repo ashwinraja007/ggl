@@ -9,6 +9,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { motion } from 'framer-motion';
+import { useLocation } from 'react-router-dom';
+import { getCurrentCountryFromPath } from '@/services/countryDetection';
 
 interface CountryData {
   country: string;
@@ -16,7 +18,9 @@ interface CountryData {
   website: string;
   priority: number;
   flag?: string;
+  route?: string;
 }
+
 
 const countries: CountryData[] = [
   { country: "SINGAPORE", company: "GGL", website: "https://ggl.sg/", priority: 1, flag: "/sg.svg" },
@@ -37,24 +41,32 @@ const countries: CountryData[] = [
   { country: "UK", company: "MOLTECH", website: "https://moltech.uk/", priority: 16, flag: "/gb.svg" }
 ];
 
-const findAustraliaCountry = () => {
-  return countries.find(country => country.country === "AUSTRALIA") || countries[0];
-};
-
 const CountrySelector = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [selectedRedirectCountry, setSelectedRedirectCountry] = useState<CountryData>(findAustraliaCountry());
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const location = useLocation();
+  const currentCountry = getCurrentCountryFromPath(location.pathname);
 
-  const sortedCountries = [...countries].sort((a, b) => {
-    if (a.country === "AUSTRALIA") return -1;
-    if (b.country === "AUSTRALIA") return 1;
-    return a.priority - b.priority;
+  const availableCountries = countries.filter((country) => {
+    const current = currentCountry.name.toUpperCase();
+    if (current === "INDIA" && country.country === "PAKISTAN") return false;
+    return country.country !== current;
   });
 
+  const sortedCountries = [...availableCountries].sort((a, b) => a.priority - b.priority);
+
   const handleCountrySelect = (country: CountryData) => {
-    setSelectedRedirectCountry(country);
-    window.open(country.website, '_blank', 'noopener,noreferrer');
+    const currentPath = location.pathname;
+    const prefix = country.country === 'SINGAPORE' ? '' : `/${country.country.toLowerCase()}`;
+
+    if (currentPath.includes('/about-us')) {
+      window.location.href = `${prefix}/about-us`;
+    } else if (currentPath.includes('/contact')) {
+      window.location.href = `${prefix}/contact`;
+    } else {
+      window.open(country.website, '_blank', 'noopener,noreferrer');
+    }
+
     setIsOpen(false);
   };
 
@@ -75,8 +87,8 @@ const CountrySelector = () => {
     <div ref={dropdownRef} className="relative z-50">
       <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
         <DropdownMenuTrigger asChild>
-          <Button 
-            variant="outline" 
+          <Button
+            variant="outline"
             className="border-[#F6B100] bg-white text-gray-800 hover:bg-[#F6B100]/10 px-4 py-2 rounded-full flex items-center gap-2"
           >
             <Globe className="w-6 h-6 text-[#F6B100]" />
@@ -85,26 +97,23 @@ const CountrySelector = () => {
             </span>
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent 
-          align="center" 
-          className="w-[280px] border border-amber-100 bg-white p-2 rounded-lg shadow-lg"
-          onPointerDownOutside={(e) => e.preventDefault()}
+
+        <DropdownMenuContent
+          align="center"
+          className="w-[280px] max-h-screen h-[90vh] border border-amber-100 bg-white p-2 rounded-lg shadow-lg overflow-y-auto"
         >
-          <ScrollArea className="max-h-[calc(100vh-100px)] w-full pr-2">
+          <ScrollArea className="h-full w-full pr-2">
             <div className="grid grid-cols-1 gap-1 p-1">
               {sortedCountries.map((country) => (
                 <DropdownMenuItem
-                  key={country.country + country.company}
+                  key={country.country}
                   onSelect={(e) => {
                     e.preventDefault();
                     handleCountrySelect(country);
                   }}
                   className="cursor-pointer hover:bg-amber-50 py-4 px-3 min-h-[60px] rounded-md flex items-center gap-3 transition-all"
                 >
-                  <motion.div
-                    whileHover={{ scale: 1.05 }}
-                    className="flex items-center w-full"
-                  >
+                  <motion.div whileHover={{ scale: 1.05 }} className="flex items-center w-full">
                     <div className="flex-shrink-0">
                       {country.flag ? (
                         <img
