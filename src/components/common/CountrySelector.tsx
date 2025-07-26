@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { ChevronDown, Globe } from 'lucide-react';
 import { Button } from "@/components/ui/button";
@@ -45,25 +44,21 @@ const findAustraliaCountry = () => {
 
 const CountrySelector = () => {
   const [isOpen, setIsOpen] = useState(false);
-  // This state is only used for tracking the selected country for redirection
   const [selectedRedirectCountry, setSelectedRedirectCountry] = useState<CountryData>(findAustraliaCountry());
   const dropdownRef = useRef<HTMLDivElement>(null);
-  
-  // Sort countries by priority, with Australia first
+
   const sortedCountries = [...countries].sort((a, b) => {
     if (a.country === "AUSTRALIA") return -1;
     if (b.country === "AUSTRALIA") return 1;
     return a.priority - b.priority;
   });
 
-  // Handle redirect
   const handleCountrySelect = (country: CountryData) => {
     setSelectedRedirectCountry(country);
     window.open(country.website, '_blank', 'noopener,noreferrer');
     setIsOpen(false);
   };
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
@@ -85,7 +80,6 @@ const CountrySelector = () => {
             variant="outline" 
             className="border-[#F6B100] bg-white text-gray-800 hover:bg-[#F6B100]/10 px-4 py-2 rounded-full flex items-center gap-2"
           >
-              {/* Show globe icon instead of Australia flag */}
             <Globe className="w-6 h-6 text-[#F6B100]" />
             <span className="flex items-center gap-1">
               Switch Country <ChevronDown className="h-3 w-3 ml-1 text-gray-500" />
@@ -97,13 +91,13 @@ const CountrySelector = () => {
           className="w-[280px] border border-amber-100 bg-white p-2 rounded-lg shadow-lg"
           onPointerDownOutside={(e) => e.preventDefault()}
         >
-          <ScrollArea className="h-[300px] w-full pr-2">
+          <ScrollArea className="h-[500px] w-full pr-2">
             <div className="grid grid-cols-1 gap-1 p-1">
               {sortedCountries.map((country) => (
                 <DropdownMenuItem
                   key={country.country}
                   onSelect={(e) => {
-                    e.preventDefault(); // Prevent closing on select
+                    e.preventDefault();
                     handleCountrySelect(country);
                   }}
                   className="cursor-pointer hover:bg-amber-50 p-2 rounded-md flex items-center gap-2 transition-colors"
@@ -121,7 +115,7 @@ const CountrySelector = () => {
                         />
                       ) : (
                         <div className="w-6 h-6 bg-gray-200 rounded-sm flex items-center justify-center">
-                         <Globe className="w-6 h-6 text-[#F6B100]" />
+                          <Globe className="w-6 h-6 text-[#F6B100]" />
                         </div>
                       )}
                     </div>
