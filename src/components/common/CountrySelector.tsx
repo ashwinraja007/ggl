@@ -87,11 +87,11 @@ const CountrySelector = () => {
         </DropdownMenuTrigger>
         <DropdownMenuContent 
           align="center" 
-          className="w-[280px] border border-amber-100 bg-white p-2 rounded-lg shadow-lg"
+          ="w-[280px] border border-amber-100 bg-white p-2 rounded-lg shadow-lg"
           onPointerDownOutside={(e) => e.preventDefault()}
         >
-          <ScrollArea className="max-h-[calc(100vh-100px)] w-full pr-2">
-            <div className="grid grid-cols-1 gap-1 p-1">
+          <ScrollArea ="max-h-[calc(100vh-100px)] w-full pr-2">
+            <div ="grid grid-cols-1 gap-1 p-1">
               {sortedCountries.map((country) => (
                 <DropdownMenuItem
                   key={country.country}
@@ -99,7 +99,7 @@ const CountrySelector = () => {
                     e.preventDefault();
                     handleCountrySelect(country);
                   }}
-                  className="cursor-pointer hover:bg-amber-50 p-2 rounded-md flex items-center gap-2 transition-colors"
+                  className="cursor-pointer hover:bg-amber-50 py-4 px-3 min-h-[60px] rounded-md flex items-center gap-3 transition-all"
                 >
                   <motion.div
                     whileHover={{ scale: 1.05 }}
@@ -107,9 +107,9 @@ const CountrySelector = () => {
                   >
                     <div className="flex-shrink-0">
                       {country.flag ? (
-                        <img 
-                          src={country.flag} 
-                          alt={`${country.country} flag`} 
+                        <img
+                          src={country.flag}
+                          alt={`${country.country} flag`}
                           className="w-6 h-6 rounded-sm shadow-sm object-cover"
                         />
                       ) : (
