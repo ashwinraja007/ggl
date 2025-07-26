@@ -87,14 +87,14 @@ const CountrySelector = () => {
         </DropdownMenuTrigger>
         <DropdownMenuContent 
           align="center" 
-          ="w-[280px] border border-amber-100 bg-white p-2 rounded-lg shadow-lg"
+          className="w-[280px] border border-amber-100 bg-white p-2 rounded-lg shadow-lg"
           onPointerDownOutside={(e) => e.preventDefault()}
         >
-          <ScrollArea ="max-h-[calc(100vh-100px)] w-full pr-2">
-            <div ="grid grid-cols-1 gap-1 p-1">
+          <ScrollArea className="max-h-[calc(100vh-100px)] w-full pr-2">
+            <div className="grid grid-cols-1 gap-1 p-1">
               {sortedCountries.map((country) => (
                 <DropdownMenuItem
-                  key={country.country}
+                  key={country.country + country.company}
                   onSelect={(e) => {
                     e.preventDefault();
                     handleCountrySelect(country);
