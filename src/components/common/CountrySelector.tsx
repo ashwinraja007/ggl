@@ -37,7 +37,6 @@ const countries: CountryData[] = [
   { country: "UK", company: "MOLTECH", website: "https://moltech.uk/", priority: 16, flag: "/gb.svg" }
 ];
 
-// Find Australia in the countries list
 const findAustraliaCountry = () => {
   return countries.find(country => country.country === "AUSTRALIA") || countries[0];
 };
@@ -91,7 +90,7 @@ const CountrySelector = () => {
           className="w-[280px] border border-amber-100 bg-white p-2 rounded-lg shadow-lg"
           onPointerDownOutside={(e) => e.preventDefault()}
         >
-          <ScrollArea className="h-[500px] w-full pr-2">
+          <ScrollArea className="max-h-[calc(100vh-100px)] w-full pr-2">
             <div className="grid grid-cols-1 gap-1 p-1">
               {sortedCountries.map((country) => (
                 <DropdownMenuItem
