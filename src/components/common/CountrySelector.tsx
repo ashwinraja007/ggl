@@ -77,16 +77,16 @@ const CountrySelector = () => {
     <div ref={dropdownRef} className="relative z-50">
       <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
         <DropdownMenuTrigger asChild>
-          <Button 
-            variant="outline" 
-            className="border-[#F6B100] bg-white text-gray-800 hover:bg-[#F6B100]/10 px-4 py-2 rounded-full flex items-center gap-2"
-          >
-            <Globe className="w-6 h-6 text-[#F6B100]" />
-            <span className="flex items-center gap-1">
-              Switch Country <ChevronDown className="h-3 w-3 ml-1 text-gray-500" />
-            </span>
-          </Button>
-        </DropdownMenuTrigger>
+  <Button 
+    variant="outline" 
+    className="bg-[#003366] text-white px-4 py-2 rounded-full flex items-center gap-2 hover:bg-[bg-white]"
+  >
+    <Globe className="w-5 h-5 text-white" />
+    <span className="flex items-center gap-1">
+      Switch Country <ChevronDown className="h-3 w-3 ml-1 text-white" />
+    </span>
+  </Button>
+</DropdownMenuTrigger>
         <DropdownMenuContent 
           align="center" 
           className="w-[280px] border border-amber-100 bg-white p-2 rounded-lg shadow-lg max-h-[90vh]"
