@@ -60,12 +60,12 @@ export const Header = () => {
             <button onClick={() => handleNavClick("/services")} className={`text-gray-800 hover:text-brand-gold font-medium transition-colors py-1 ${location.pathname.includes('/services') ? 'text-brand-gold' : ''}`}>
               Services
             </button>
-            <button onClick={() => handleNavClick("/contact")} className={`text-gray-800 hover:text-brand-gold font-medium transition-colors py-1 ${location.pathname === '/contact' ? 'text-brand-gold' : ''}`}>
-              Contact Us
+             <button onClick={() => handleNavClick("/global-presence")} className={`text-gray-800 hover:text-brand-gold font-medium transition-colors py-1 ${location.pathname.includes('/services') ? 'text-brand-gold' : ''}`}>
+             Global Presence
             </button>
             <CountrySelector />
             <button onClick={() => handleNavClick("/contact")} className="px-5 py-2 bg-[#F6B100] text-black rounded-full hover:bg-[#FFCC33] transition font-medium">
-              Get A Quote
+              Contact / Quote
             </button>
           </nav>
         </div>
@@ -82,12 +82,12 @@ export const Header = () => {
             <button onClick={() => handleNavClick("/services")} className={`text-gray-800 hover:text-brand-gold font-medium ${location.pathname.includes('/services') ? 'text-brand-gold' : ''}`}>
               Services
             </button>
-            <button onClick={() => handleNavClick("/contact")} className={`text-gray-800 hover:text-brand-gold font-medium ${location.pathname === '/contact' ? 'text-brand-gold' : ''}`}>
-              Contact Us
+            <button onClick={() => handleNavClick("/global-presence")} className={`text-gray-800 hover:text-brand-gold font-medium ${location.pathname === '/contact' ? 'text-brand-gold' : ''}`}>
+              Global Presence
             </button>
             <CountrySelector />
             <button onClick={() => handleNavClick("/contact")} className="px-4 py-2 bg-brand-gold text-brand-navy rounded-md hover:bg-amber-500 text-center font-medium w-full">
-              Get A Quote
+              Contact / Quote
             </button>
           </nav>
         </div>
