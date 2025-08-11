@@ -14,153 +14,70 @@ interface SidebarProps {
 const countries = [{
   code: "in",
   name: "India",
-  lat: 19.00745,
-  lng: 73.03271,
+  lat: 9.9323,
+  lng: 76.2996,
   cities: [{
+    name: "Kerala",
+    lat: 9.9323,
+    lng: 76.2996,
+    address: "CC 59/801A Elizabeth Memorial Building, Thevara Ferry Jn, Cochin 682013 , Kerala.",
+    contacts: ["+91 484 4019192 / 93"],
+    email: "info.india@ggl.sg"
+  },{
     name: "Mumbai",
-    lat: 19.00745,
-    lng: 73.03271,
-    address: "407, mayuresh planet, plot no - 42 & 43, sector-15, cbd belapur, navi mumbai, maharashtra, 400614",
-    contacts: ["Export customer service: +91 2245174102, +91 2245174109, +91 2245174118", "Export docs team: +91 2245174103, +91 2245174105", "Import docs team: +91 2245174104, +91 2245174106", "Import customer service: +91 2245174113, +91 2245174110, +91 2245174107, +91 2245174112"]
+    lat: 19.01123,
+    lng: 73.03715,
+    address: "803 / 804, Shelton Cubix, Plot No. 87, Sector-15,CBD Belapur, Navi Mumbai, Maharastra - 400614.",
+    contacts: ["022-35131688 / 35113475 / 35082586"],
+    email: "info.india@ggl.sg"
   }, {
+    name: "Mumbai-Andheri",
+    lat: 19.11303, 
+    lng: 72.86848,
+    address: "503, Midas, Sahar Plaza Complex,Sir M.V Road,Andheri East, Mumbai 400059",
+    contacts: ["+91 8879756838"],
+    email: "info.india@ggl.sg"
+  },{
     name: "Delhi",
-    lat: 28.53837,
-    lng: 77.29022,
-    address: "JA 511, DLF Tower A, Jasola District Centre, New Delhi, 110025",
-    contacts: ["+91 9999022030"]
-  }, {
-    name: "Chennai",
-    lat: 13.0827,
-    lng: 80.2707,
-    address: "Old No G1, New G3, KAIZEN 2nd & 3rd Floor Plot No, 565Q, G Block, Annanagar East, Chennai, Tamil Nadu 600102",
-    contacts: ["+91 9123523496"]
+    lat: 28.62748,
+    lng: 77.2221,
+    address: "903, Surya Kiran Building K.G Marg,Connaught Place New Delhi - 110001",
+    contacts: ["+91 11 493224477 / 48 /49"],
+    email: "info.india@ggl.sg"
   }, {
     name: "Bangalore",
-    lat: 12.9716,
-    lng: 77.5946,
-    address: "No 2M-216, First Floor, 2nd Main, East Of NGEF Layout, Kasturinagar, Bangalore-560043",
-    contacts: ["+91 9986949743"]
+    lat: 13.01855,
+    lng: 77.64191,
+    address: "3C-964 IIIrd Cross Street,HRBR LAYOUT 1st Block,Kalayan Nagar Bannaswadi,Bengaluru - 560043.",
+    contacts: ["+91 9841676259"],
+    email: "info.india@ggl.sg"
   }, {
     name: "Kolkata",
-    lat: 22.5726,
-    lng: 88.3639,
-    address: "Room No - 29, 4th Floor, 6, Jawaharlal Nehru Rd, Siddha Esplanade, Adjacent to Metro Central (Previously Metro Cinema), Kolkata, West Bengal 700013",
-    contacts: ["+91 6290921534"]
+    lat: 22.5769, 
+    lng: 88.4341,
+    address: "Merlin Matrix, 3rd floor, Room No. 303 10,D. N. BLOCK, SECTOR - V SALT LAKE CITY, Kolkata – 700091",
+    contacts: ["+91 33 46025458 / 59 / 60/ 61"],
+    email: "info.india@ggl.sg"
   }]
 }, {
   code: "my",
   name: "Malaysia",
-  lat: 1.4720,
-  lng: 103.9027,
+  lat: 1.4842,
+  lng: 103.7629,
   cities: [{
     name: "PASIRGUDANG",
-    lat: 1.4720,
-    lng: 103.9027,
+    lat: 1.4842,
+    lng: 103.7629,
     address: "Unit 20-03A, Level 20 Menara Zurich, 15 Jalan Dato Abdullah Tahir, 80300 Johor Bahru",
-    contacts: ["+603-3319 2778 / 74 / 75, 79"]
+    contacts: ["+603-3319 2778 / 74 / 75, 79"],
+    email: "info@oecl.sg"
   }, {
     name: "PORTKLANG",
-    lat: 3.0038,
-    lng: 101.3929,
+    lat: 2.9982,
+    lng: 101.3831,
     address: "MTBBT 2, 3A-5, Jalan Batu Nilam 16, The Landmark (Behind AEON Mall), Bandar Bukit Tinggi 2, 41200, Klang, Selangor D.E",
-    contacts: ["+603 - 3319 2778 / 74 / 75"]
-  }]
-}, {
-  code: "sg",
-  name: "Singapore",
-  lat: 1.3521,
-  lng: 103.8198,
-  cities: [{
-    name: "Singapore",
-    lat: 1.3521,
-    lng: 103.8198,
-    address: "Blk 511 Kampong Bahru Road, #03-01 Keppel Distripark, Singapore - 099447",
-    contacts: ["+ 65 69080838"],
-    email: "june@ggl.sg"
-  }]
-}, {
-  code: "id",
-  name: "Indonesia",
-    lat: -6.2088,
-    lng: 106.8456,
-  cities: [{
-    name: "Jakarta",
-    lat: -6.2088,
-    lng: 106.8456,
-    address: "408, Lina Building, JL.HR Rasuna Said kav B7, Jakarta",
-    contacts: ["+62 21 529 20292, 522 4887"]
-  }, {
-    name: "Surabaya",
-    lat: -7.2575,
-    lng: 112.7521,
-    address: "Japfa Indoland Center, Japfa Tower 1, Lantai 4/401-A JL Jend, Basuki Rahmat 129-137, Surabaya 60271",
-    contacts: ["+62 21 529 20292, 522 4887"]
-  }]
-}, {
-  code: "lk",
-  name: "Sri Lanka",
-    lat: 6.9271,
-    lng: 79.8612,
-  cities: [{
-    name: "Colombo",
-    lat: 6.9271,
-    lng: 79.8612,
-    address: "Ceylinco House, 9th Floor, No. 69, Janadhipathi Mawatha, Colombo 01, Sri Lanka",
-    contacts: ["+94 114477499", "+94 114477494 / 98"]
-  }]
-}, {
-  code: "th",
-  name: "Thailand",
-    lat: 13.7563,
-    lng: 100.5018,
-  cities: [{
-    name: "Bangkok",
-    lat: 13.7563,
-    lng: 100.5018,
-    address: "109 CCT Building, 3rd Floor, Rm.3, Surawong Road, Suriyawongse, Bangrak, Bangkok 10500 109",
-    contacts: ["+662-634-3240", "+662-634-3942"]
-  }]
-}, {
-  code: "mm",
-  name: "Myanmar",
-    lat: 16.8409,
-    lng: 96.1735,
-  cities: [{
-    name: "Yangon",
-    lat: 16.8409,
-    lng: 96.1735,
-    address: "No.608, Room 8B, Bo Soon Pat Tower, Merchant Street, Pabedan Township, Yangon, Myanmar",
-    contacts: ["+951 243158", "+951 377985, 243101"]
-  }]
-}, {
-  code: "bd",
-  name: "Bangladesh",
-    lat: 23.8103,
-    lng: 90.4125,
-  cities: [{
-    name: "Dhaka",
-    lat: 23.8103,
-    lng: 90.4125,
-    address: "ID #9-N (New), 9-M(Old-N), 9th floor, Tower 1, Police Plaza Concord No.2, Road # 144, Gulshan Model Town, Dhaka 1215, Bangladesh",
-    contacts: ["+880 1716 620989"]
-  }]
-}, {
-  code: "pk",
-  name: "Pakistan",
-    lat: 24.86149,
-    lng: 67.06616,
-  cities: [{
-    name: "Karachi",
-    lat: 24.86149,
-    lng: 67.06616,
-    address: "Suite No.301, 3rd Floor, Fortune Center, Shahrah-e-Faisal, Block 6, PECHS, Karachi, Pakistan",
-    contacts: ["+92-300-8282511", "+92-21-34302281-5"]
-  }, {
-    name: "Lahore",
-    lat: 31.52945,
-    lng: 74.35887,
-    address: "Office # 301, 3rd Floor, Gulberg Arcade Main Market, Gulberg 2, Lahore, Pakistan",
-    contacts: ["+92 42-35782306/07/08"]
+    contacts: ["+603 - 3319 2778 / 74 / 75"],
+    email: "info@oecl.sg"
   }]
 }, {
   code: "ae",
@@ -198,6 +115,19 @@ const countries = [{
     address: "Office no: 48, 2nd Floor, Al matar Centre, Old Airport Road Doha",
     contacts: ["0974 33622555"]
   }]
+},{
+  code: "cn",
+  name: "China",
+    lat: 22.54262,
+    lng: 114.11696,
+  cities: [{
+    name: "China",
+    lat: 22.54262,
+    lng: 114.11696,
+    address: "13C02, Block A, Zhaoxin Huijin Plaza 3085 Shennan East Road, Luohu, Shenzhen.",
+    contacts: ["+86 75582222447"],
+    email: "helen@haixun.co"
+  }]
 }, {
   code: "sa",
   name: "Saudi Arabia",
@@ -222,28 +152,134 @@ const countries = [{
     address: "Al-Madinah Al-Munawarah Road, Al Sharafeyah, Jeddah 4542 -22234, Kingdom of Saudi Arabia",
     contacts: ["+966 12 578 0874"]
   }]
+},{
+  code: "sg",
+  name: "Singapore",
+  lat: 1.3521,
+  lng: 103.8198,
+  cities: [{
+    name: "Singapore",
+    lat: 1.3521,
+    lng: 103.8198,
+    address: "Blk 511 Kampong Bahru Road, #03-01 Keppel Distripark, Singapore - 099447",
+    contacts: ["+ 65 69080838"],
+    email: "buddhika@globalconsol.com"
+  }]
 }, {
+  code: "id",
+  name: "Indonesia",
+  lat: -6.2088,
+  lng: 106.8456,
+  cities: [{
+    name: "Jakarta",
+    lat: -6.2088,
+    lng: 106.8456,
+    address: "408, Lina Building, JL.HR Rasuna Said kav B7, Jakarta",
+    contacts: ["+62 21 529 20292, 522 4887"],
+    email: "logistics.jkt@oecl.sg"
+  }, {
+    name: "Surabaya",
+    lat: -7.2575,
+    lng: 112.7521,
+    address: "Japfa Indoland Center, Japfa Tower 1, Lantai 4/401-A JL Jend, Basuki Rahmat 129-137, Surabaya 60271",
+    contacts: ["+62 21 529 20292, 522 4887"],
+    email: "logistics.jkt@oecl.sg"
+  }]
+}, {
+  code: "lk",
+  name: "Sri Lanka",
+  lat: 6.9271,
+  lng: 79.8612,
+  cities: [{
+    name: "Colombo",
+    lat: 6.9271,
+    lng: 79.8612,
+    address: "Ceylinco House, 9th Floor, No. 69, Janadhipathi Mawatha, Colombo 01, Sri Lanka",
+    contacts: ["+94 114477499", "+94 114477494 / 98"],
+    email: "thilanka.cmb@globalconsol.com"
+  }]
+}, {
+  code: "th",
+  name: "Thailand",
+  lat: 13.72957,  
+  lng: 100.53095,
+  cities: [{
+    name: "Bangkok",
+    lat: 13.72957,  
+    lng: 100.53095,
+    address: "109 CCT Building, 3rd Floor, Rm.3, Surawong Road, Suriyawongse, Bangrak, Bangkok 10500 109",
+    contacts: ["+662-634-3240", "+662-634-3942"],
+    email: "info@oecl.sg"
+  }]
+}, {
+  code: "mm",
+  name: "Myanmar",
+  lat: 16.8409,
+  lng: 96.1735,
+  cities: [{
+    name: "Yangon",
+    lat: 16.8409,
+    lng: 96.1735,
+    address: "No.608, Room 8B, Bo Soon Pat Tower, Merchant Street, Pabedan Township, Yangon, Myanmar",
+    contacts: ["+951 243158", "+951 377985, 243101"],
+    email: "info@globalconsol.com"
+  }]
+}, {
+  code: "bd",
+  name: "Bangladesh",
+  lat: 23.8103,
+  lng: 90.4125,
+  cities: [{
+    name: "Dhaka",
+    lat: 23.8103,
+    lng: 90.4125,
+    address: "ID #9-N (New), 9-M(Old-N), 9th floor, Tower 1, Police Plaza Concord No.2, Road # 144, Gulshan Model Town, Dhaka 1215, Bangladesh",
+    contacts: ["+880 1716 620989"],
+    email: "info@globalconsol.com"
+  }]
+}, {
+  code: "pk",
+  name: "Pakistan",
+  lat: 24.8608,
+  lng: 67.0097,
+  cities: [{
+    name: "Karachi",
+    lat: 24.8608,
+    lng: 67.0097,
+    address: "Suite No.301, 3rd Floor, Fortune Center, Shahrah-e-Faisal, Block 6, PECHS, Karachi, Pakistan",
+    contacts: ["+92-300-8282511", "+92-21-34302281-5"],
+    email: "khalid.pk@globalconsol.com"
+  }, {
+    name: "Lahore",
+    lat: 31.5204,
+    lng: 74.3487,
+    address: "Office # 301, 3rd Floor, Gulberg Arcade Main Market, Gulberg 2, Lahore, Pakistan",
+    contacts: ["+92 42-35782306/07/08"],
+    email: "shazia.pklhe@globalconsol.com"
+  }]
+},  {
   code: "us",
   name: "United States (USA)",
-    lat: 41.8781,
-    lng: -87.6298,
+  lat: 41.8622,
+  lng: -87.7209,
   cities: [{
     name: "Chicago",
-    lat: 41.8781,
-    lng: -87.6298,
+    lat: 41.8622,
+    lng: -87.7209,
     address: "939 W. North Avenue, Suite 750, Chicago, IL 60642",
-    contacts: ["+1 847 254 7320"]
+    contacts: ["+1 847 254 7320"],
+    email: "info@gglusa.us"
   }, {
     name: "New York",
-    lat: 40.7128,
-    lng: -74.0060,
+    lat: 37.4545,
+    lng: -122.1818,
     address: "New Jersey Branch, 33 Wood Avenue South Suite 600, Iselin, NJ 08830",
     contacts: ["+1 732 456 6780"],
     email: "info@gglusa.us"
   }, {
     name: "Los Angeles",
-    lat: 34.0522,
-    lng: -118.2437,
+    lat: 40.5330,
+    lng: -74.3481,
     address: "2250 South Central Avenue Compton, CA 90220",
     contacts: ["+1 310 928 3903"],
     email: "info@gglusa.us"
@@ -251,8 +287,8 @@ const countries = [{
 }, {
   code: "gb",
   name: "United Kingdom (UK)",
-    lat: 51.5074,
-    lng: -0.1278,
+  lat: 51.5074,
+  lng: -0.1278,
   cities: [{
     name: "London",
     lat: 51.5074,
@@ -263,14 +299,15 @@ const countries = [{
 }, {
   code: "au",
   name: "Australia",
-    lat: -37.8136,
-    lng: 144.9631,
+  lat: -37.7064,
+  lng: 144.8503,
   cities: [{
     name: "Melbourne",
-    lat: -37.8136,
-    lng: 144.9631,
+    lat: -37.7064,
+    lng: 144.8503,
     address: "Suite 5, 7-9 Mallet Road, Tullamarine, Victoria, 3043",
-    contacts: ["Mob: +61 432254969", "Tel: +61 388205157"]
+    contacts: ["Mob: +61 432254969", "Tel: +61 388205157"],
+    email: "info@gglaustralia.com"
   }]
 }];
 
