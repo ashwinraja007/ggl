@@ -105,6 +105,14 @@ const Contact = () => {
                       </div>
                     </motion.div>
                   </div>
+   
+                <motion.div whileHover={{ x: 10 }} className="flex items-start gap-4 group">
+  <Mail className="mt-1 text-blue-600 group-hover:scale-110 transition-transform" />
+  <div>
+    <p className="font-medium">Email</p>
+    <p className="text-gray-600">info@gglaustralia.com</p>
+  </div>
+</motion.div>
 
                   <div className="pt-6 border-t">
                     <p className="font-medium mb-4">Connect With Us</p>
