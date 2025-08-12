@@ -196,7 +196,7 @@ const countries = [{
     lng: 79.8612,
     address: "Ceylinco House, 9th Floor, No. 69, Janadhipathi Mawatha, Colombo 01, Sri Lanka",
     contacts: ["+94 114477499", "+94 114477494 / 98"],
-    email: "thilanka.cmb@globalconsol.com"
+    email: "info.cmb@globalconsol.com"
   }]
 }, {
   code: "th",
