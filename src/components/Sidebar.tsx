@@ -163,7 +163,7 @@ const countries = [{
     lng: 103.8198,
     address: "Blk 511 Kampong Bahru Road, #03-01 Keppel Distripark, Singapore - 099447",
     contacts: ["+ 65 69080838"],
-    email: "buddhika@globalconsol.com"
+    email: "info.sg@globalconsol.com ,june@ggl.sg"
   }]
 }, {
   code: "id",
@@ -187,14 +187,14 @@ const countries = [{
   }]
 }, {
   code: "lk",
-  name: "Sri Lanka",
+  name: " Lanka",
   lat: 6.9271,
   lng: 79.8612,
   cities: [{
     name: "Colombo",
     lat: 6.9271,
     lng: 79.8612,
-    address: "Ceylinco House, 9th Floor, No. 69, Janadhipathi Mawatha, Colombo 01, Sri Lanka",
+    address: "Ceylinco House, 9th Floor, No. 69, Janadhipathi Mawatha, Colombo 01,  Lanka",
     contacts: ["+94 114477499", "+94 114477494 / 98"],
     email: "info.cmb@globalconsol.com"
   }]
