@@ -162,7 +162,7 @@ const countries = [{
     lat: 1.3521,
     lng: 103.8198,
     address: "Blk 511 Kampong Bahru Road, #03-01 Keppel Distripark, Singapore - 099447",
-    contacts: ["+ 65 69080838"],
+    contacts: ["+ 65 69084188"],
     email: "info.sg@globalconsol.com ,june@ggl.sg"
   }]
 }, {
