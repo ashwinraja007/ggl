@@ -179,11 +179,34 @@ const Hero: React.FC = () => {
               GGL brings over 25 years of expertise in international logistics,
               offering comprehensive solutions tailored to your business needs.
             </p>
+
+            {/* NEW: Action buttons under the text */}
+            <div className="pt-2 flex flex-col sm:flex-row gap-3 sm:gap-4">
+              {/* Consolmate (gold) -> opens modal */}
+              <button
+                type="button"
+                onClick={() => setIsCustomerPortalOpen(true)}
+                className="inline-flex items-center justify-center font-semibold px-5 py-3 rounded-md bg-[#d4af37] text-black hover:bg-amber-400 transition-colors shadow-md"
+                aria-label="Open Consolmate customer portal"
+              >
+                Consolmate
+              </button>
+
+              {/* Get a Quote (gold) -> link to /contact */}
+              <a href="/contact" aria-label="Get a Quote" className="inline-flex">
+                <button
+                  type="button"
+                  className="inline-flex items-center justify-center font-semibold px-5 py-3 rounded-md bg-[#d4af37] text-black hover:bg-amber-400 transition-colors shadow-md w-full sm:w-auto"
+                >
+                  Get a Quote
+                </button>
+              </a>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Portal Buttons */}
+      {/* Portal Buttons (bottom strip) */}
       <div className="absolute bottom-4 sm:bottom-6 md:bottom-8 left-0 right-0 z-[10] px-2 sm:px-4">
         <div
           className={cx(
@@ -221,7 +244,7 @@ const Hero: React.FC = () => {
                       </button>
                     ) : link.external ? (
                       <a
-                        href={link.url}
+                        href={(link as any).url}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="w-full"
@@ -230,7 +253,7 @@ const Hero: React.FC = () => {
                         {commonBtn}
                       </a>
                     ) : (
-                      <a href={link.url} className="w-full" aria-label={link.title}>
+                      <a href={(link as any).url} className="w-full" aria-label={link.title}>
                         {commonBtn}
                       </a>
                     )}
