@@ -146,13 +146,13 @@ export const Hero = () => {
                 </motion.div>
 
                 <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                  <Link to="/services" onClick={() => setIsMobileMenuOpen(false)}>
+                  <Link to="/https://consolmate.com/auth/login/14" onClick={() => setIsMobileMenuOpen(false)}>
                     <Button
                       size="lg"
                       variant="gold"
                       className="w-full font-semibold shadow-lg hover:shadow-xl transition-all duration-300 gold-glow bg-[#d4af37] text-brand-navy hover:bg-amber-500"
                     >
-                      Our Services
+                      Consolmate
                     </Button>
                   </Link>
                 </motion.div>
