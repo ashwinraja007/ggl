@@ -253,13 +253,13 @@ export const Hero = () => {
               </motion.div>
 
               <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }} className="w-full sm:w-auto">
-                <Link to="/services">
+                <Link to="//https://consolmate.com/auth/login/14">
                   <Button
                     variant="gold"
                     size="lg"
                     className="w-full shadow-lg hover:shadow-xl transition-all duration-300 gold-glow py-0 rounded-md my-[3px] font-bold px-[17px] mx-0 bg-[#d4af37] text-brand-navy hover:bg-amber-500"
                   >
-                    Our Services
+                    Consolmate
                   </Button>
                 </Link>
               </motion.div>
