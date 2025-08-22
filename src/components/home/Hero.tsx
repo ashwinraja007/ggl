@@ -22,7 +22,7 @@ const Hero: React.FC = () => {
   }, []);
 
   const sliderImages = useMemo<string[]>(
-    () => ["/h12.png"], // add more images if you like
+    () => ["/homeimage.jpg"], // add more images if you like
     []
   );
 
@@ -115,34 +115,6 @@ const Hero: React.FC = () => {
       title: "Consolmate",
       description: "Access shipping dashboard",
       onClick: () => setIsCustomerPortalOpen(true),
-    },
-    {
-      icon: <UserCircle className="w-4 h-4 sm:w-5 sm:h-5" />,
-      title: "Partner Portal",
-      description: "Manage partnership",
-      url: "https://pp.onlinetracking.co/auth/login/6",
-      external: true,
-    },
-    {
-      icon: <SearchCode className="w-4 h-4 sm:w-5 sm:h-5" />,
-      title: "Tracking",
-      description: "Track your shipment",
-      url: "http://ec2-13-229-38-56.ap-southeast-1.compute.amazonaws.com:8081/ords/f?p=107:102:::::P0_GROUP_RID:192",
-      external: true,
-    },
-    {
-      icon: <Ship className="w-4 h-4 sm:w-5 sm:h-5" />,
-      title: "Sailing Schedule",
-      description: "View schedules",
-      url: "http://ec2-13-229-38-56.ap-southeast-1.compute.amazonaws.com:8081/ords/f?p=107:104:::::P0_GROUP_RID:192",
-      external: true,
-    },
-    {
-      icon: <Calendar className="w-4 h-4 sm:w-5 sm:h-5" />,
-      title: "Online Quote",
-      description: "Request a quote",
-      url: "/contact",
-      external: false,
     },
   ] as const;
 
@@ -328,7 +300,7 @@ const Hero: React.FC = () => {
                   Cancel
                 </button>
                 <a
-                  href="https://consolmate.com/auth/login/6"
+                  href="https://consolmate.com/auth/login/14"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
