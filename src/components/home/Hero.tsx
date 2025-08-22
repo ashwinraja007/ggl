@@ -27,7 +27,7 @@ export const Hero = () => {
   }, [isMobileMenuOpen]);
   const portalLinks = [{
     icon: <Users className="w-5 h-5" />,
-    title: "Customer Portal",
+    title: "Consolmate",
     description: "Access shipping dashboard",
     url: "/customer-portal"
   }, {
