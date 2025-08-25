@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { motion } from 'framer-motion';
 import { FaLinkedin, FaFacebookF } from 'react-icons/fa';
 import { Phone, Mail, MapPin, Send, CheckCircle } from 'lucide-react';
+import SEO from '@/components/SEO';
 
 type FormData = {
   firstName: string;
@@ -35,7 +36,7 @@ const Contact = () => {
 
       if (response.ok) {
         setSubmitted(true);
-        reset(); // Clear the form
+        reset();
       } else {
         alert("Failed to send message. Please try again later.");
       }
@@ -47,6 +48,16 @@ const Contact = () => {
 
   return (
     <div className="min-h-screen flex flex-col relative">
+      {/* ✅ Page SEO */}
+      <SEO
+        title="Contact GGL Australia | Freight & Logistics Solutions"
+        description="Get in touch with GGL Australia for all your freight forwarding, logistics, warehousing, and supply chain needs. Reach out via our contact form, email, or phone."
+        keywords="GGL Australia, contact, freight forwarding, logistics services, supply chain management, customer support, logistics consultation, warehousing, transportation"
+        url="https://www.gglaustralia.com/contact"
+        image="https://www.gglaustralia.com/lovable-uploads/ggl-logo.png"
+        canonical="https://www.gglaustralia.com/contact"
+      />
+
       <Header />
 
       <main className="flex-grow">
@@ -105,14 +116,14 @@ const Contact = () => {
                       </div>
                     </motion.div>
                   </div>
-   
-                <motion.div whileHover={{ x: 10 }} className="flex items-start gap-4 group">
-  <Mail className="mt-1 text-blue-600 group-hover:scale-110 transition-transform" />
-  <div>
-    <p className="font-medium">Email</p>
-    <p className="text-gray-600">info@gglaustralia.com</p>
-  </div>
-</motion.div>
+
+                  <motion.div whileHover={{ x: 10 }} className="flex items-start gap-4 group">
+                    <Mail className="mt-1 text-blue-600 group-hover:scale-110 transition-transform" />
+                    <div>
+                      <p className="font-medium">Email</p>
+                      <p className="text-gray-600">info@gglaustralia.com</p>
+                    </div>
+                  </motion.div>
 
                   <div className="pt-6 border-t">
                     <p className="font-medium mb-4">Connect With Us</p>
@@ -121,6 +132,7 @@ const Contact = () => {
                         href="https://www.linkedin.com/company/gglus/"
                         whileHover={{ y: -5 }}
                         className="bg-gray-100 p-3 rounded-full text-gray-600 hover:bg-blue-600 hover:text-white transition-colors"
+                        aria-label="LinkedIn"
                       >
                         <FaLinkedin size={18} />
                       </motion.a>
@@ -129,6 +141,7 @@ const Contact = () => {
                         href="https://www.facebook.com/gglusa"
                         whileHover={{ y: -5 }}
                         className="bg-gray-100 p-3 rounded-full text-gray-600 hover:bg-blue-600 hover:text-white transition-colors"
+                        aria-label="Facebook"
                       >
                         <FaFacebookF size={18} />
                       </motion.a>
@@ -174,7 +187,7 @@ const Contact = () => {
                   <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                     <Button
                       type="submit"
-                      className="w-full text-white py-6 flex items-center justify-center gap-2 bg-[_brand-navy] bg-brand-navy"
+                      className="w-full text-white py-6 flex items-center justify-center gap-2 bg-brand-navy"
                     >
                       Send Message
                       <Send size={18} />
