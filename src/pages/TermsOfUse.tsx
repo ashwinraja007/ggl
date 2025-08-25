@@ -1,10 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
+import SEO from '@/components/SEO';
 
 const TermsOfUsePage: React.FC = () => {
   return (
     <>
+     <SEO
+        title="Terms and Conditions – GGL Australia | Freight & Logistics Services"
+        description="Review the terms and conditions governing the use of GGL Australia's freight and logistics services. Understand our policies on services, liabilities, and user responsibilities."
+        keywords="GGL Australia, terms and conditions, freight services terms, logistics terms, user responsibilities, liability, service policies"
+        url="https://www.gglaustralia.com/terms-and-conditions"
+        canonical="https://www.gglaustralia.com/terms-and-conditions"
+        image="https://www.gglaustralia.com/lovable-uploads/ggl-logo.png"
+      />
       <Header />
       <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-12">
         <h1 className="text-4xl font-bold mb-8 text-center text-gray-900">TERMS AND CONDITIONS OF TRADE</h1>
