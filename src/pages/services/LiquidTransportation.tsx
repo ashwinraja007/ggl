@@ -4,6 +4,7 @@ import { Footer } from "@/components/layout/Footer";
 import { motion } from 'framer-motion';
 import { Droplets, Truck, BarChart, ShieldCheck } from "lucide-react";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
+import SEO from '@/components/SEO';
 
 interface LiquidTransportationProps {
   title?: string;
@@ -14,6 +15,16 @@ const LiquidTransportation: React.FC<LiquidTransportationProps> = ({
 }) => {
   return (
     <div className="min-h-screen flex flex-col">
+      {/* ✅ Page SEO */}
+      <SEO
+        title="Liquid Transportation Services – GGL Australia | Safe & Compliant Delivery"
+        description="GGL Australia offers specialized liquid transportation solutions, ensuring safe, compliant, and efficient delivery of hazardous and non-hazardous liquids. Our end-to-end logistics services include pre-shipment planning, route optimization, and temperature-controlled transport."
+        keywords="GGL Australia, liquid transportation services, hazardous liquid transport, non-hazardous liquid transport, temperature-controlled logistics, end-to-end logistics, route optimization, pre-shipment planning, compliance logistics"
+        url="https://www.gglaustralia.com/services/liquid-transportation"
+        canonical="https://www.gglaustralia.com/services/liquid-transportation"
+        image="https://www.gglaustralia.com/lovable-uploads/ggl-logo.png"
+      />
+
       <Header />
       
       <main className="flex-grow pt-24">
@@ -86,52 +97,35 @@ const LiquidTransportation: React.FC<LiquidTransportationProps> = ({
             
             {/* Features Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8 mb-16">
-              {[{
-              icon: <Droplets className="h-10 w-10 text-brand-gold" />,
-              title: "Specialized Equipment",
-              description: "ISO tanks, flexitanks, and specialized tankers for all cargo types"
-            }, {
-              icon: <Truck className="h-10 w-10 text-brand-gold" />,
-              title: "End-to-End Logistics",
-              description: "Complete solutions from planning to delivery"
-            }, {
-              icon: <BarChart className="h-10 w-10 text-brand-gold" />,
-              title: "Temperature Control",
-              description: "Maintain optimal conditions for sensitive cargo"
-            }, {
-              icon: <ShieldCheck className="h-10 w-10 text-brand-gold" />,
-              title: "Safety First",
-              description: "Strict protocols and trained personnel handle your cargo"
-            }].map((feature, index) => <motion.div key={index} initial={{
-              opacity: 0,
-              y: 20
-            }} whileInView={{
-              opacity: 1,
-              y: 0
-            }} transition={{
-              duration: 0.5,
-              delay: index * 0.1
-            }} viewport={{
-              once: true
-            }} className="bg-white rounded-lg p-6 shadow-md hover:shadow-lg transition-shadow border border-gray-100">
+              {[
+                { icon: <Droplets className="h-10 w-10 text-brand-gold" />, title: "Specialized Equipment", description: "ISO tanks, flexitanks, and specialized tankers for all cargo types" },
+                { icon: <Truck className="h-10 w-10 text-brand-gold" />, title: "End-to-End Logistics", description: "Complete solutions from planning to delivery" },
+                { icon: <BarChart className="h-10 w-10 text-brand-gold" />, title: "Temperature Control", description: "Maintain optimal conditions for sensitive cargo" },
+                { icon: <ShieldCheck className="h-10 w-10 text-brand-gold" />, title: "Safety First", description: "Strict protocols and trained personnel handle your cargo" }
+              ].map((feature, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                  viewport={{ once: true }}
+                  className="bg-white rounded-lg p-6 shadow-md hover:shadow-lg transition-shadow border border-gray-100"
+                >
                   <div className="mb-4 bg-amber-50 p-3 rounded-full inline-block">{feature.icon}</div>
                   <h3 className="text-xl font-semibold mb-2 text-gray-800">{feature.title}</h3>
                   <p className="text-gray-600">{feature.description}</p>
-                </motion.div>)}
+                </motion.div>
+              ))}
             </div>
             
             {/* CTA Section */}
-            <motion.div initial={{
-            opacity: 0,
-            y: 20
-          }} whileInView={{
-            opacity: 1,
-            y: 0
-          }} transition={{
-            duration: 0.5
-          }} viewport={{
-            once: true
-          }} className="bg-gradient-to-r from-brand-navy to-brand-navy rounded-xl text-white p-8 text-center">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              viewport={{ once: true }}
+              className="bg-gradient-to-r from-brand-navy to-brand-navy rounded-xl text-white p-8 text-center"
+            >
               <h3 className="text-2xl font-bold mb-4 text-slate-50">Ready to Transport Your Liquid Cargo?</h3>
               <p className="mb-6 text-green-50">
                 Contact our specialists today for tailored transportation solutions.
