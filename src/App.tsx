@@ -5,7 +5,6 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
-import { useSEO } from "./seo";
 import Contact from "./pages/Contact";
 import About from "./pages/About";
 import Services from "./pages/Services";
@@ -25,7 +24,6 @@ const queryClient = new QueryClient();
 
 // App component as a regular function component
 function App() {
-  useSEO();
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
