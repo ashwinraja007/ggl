@@ -43,7 +43,7 @@ function App() {
             <Route path="/services/project-cargo" element={<ProjectCargo />} />
             <Route path="/services/ocean-freight" element={<OceanFreight />} />
             <Route path="/services/customs-clearance" element={<CustomsClearance />} />
-            <Route path="*" element={<NotFound />} />
+            <Route path="*" element={<Index  />} />
           </Routes>
           <Toaster />
           <Sonner />
