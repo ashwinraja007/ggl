@@ -18,6 +18,7 @@ import OceanFreight from "./pages/services/OceanFreight";
 import CustomsClearance from "./pages/services/CustomsClearance";
 import GlobalPresence from "./pages/GlobalPresence";
 import { ScrollToTop } from "./components/common/ScrollToTop";
+import AdminDashboard from "./pages/admin/AdminDashboard";
 
 // Create a new QueryClient instance
 const queryClient = new QueryClient();
@@ -37,6 +38,7 @@ function App() {
             <Route path="/privacy-policy" element={<PrivacyPolicy />} />
             <Route path="/terms-and-conditions" element={<TermsOfUse />} />
             <Route path="/global-presence" element={<GlobalPresence />} />
+            <Route path="/admin" element={<AdminDashboard />} />
             {/* Service specific pages */}
             <Route path="/services/liquid-transportation" element={<LiquidTransportation />} />
             <Route path="/services/air-freight" element={<AirFreight />} />
