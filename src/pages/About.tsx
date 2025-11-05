@@ -95,7 +95,7 @@ const About = () => {
           className="py-16 bg-inherit"
         >
           <div className="container mx-auto px-4">
-            <div className="max-w-4xl mx-auto text-center">
+            <div className="max-w-5xl mx-auto text-center">
               <motion.h2
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -107,26 +107,36 @@ const About = () => {
               </motion.h2>
 
               <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
+                initial={{ opacity: 0, scale: 0.95 }}
                 whileInView={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.8, delay: 0.2 }}
                 viewport={{ once: true }}
                 className="rounded-2xl shadow-lg p-8 md:p-12 bg-neutral-50"
               >
-                <div className="flex flex-col items-center space-y-6">
-                  <div className="w-full max-w-md">
+                {/* 1 row / 2 column logo layout */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                  <div className="w-full flex items-center justify-center">
                     <img
                       src="/ftaLogo.png"
-                      alt="Freight & Trade Alliance"
-                      className="w-full h-20 object-contain"
+                      alt="Freight & Trade Alliance (FTA)"
+                      className="h-20 md:h-24 w-auto object-contain"
+                    />
+                  </div>
+                  <div className="w-full flex items-center justify-center">
+                    <img
+                      src="/VC-logo.png"
+                      alt="Victorian Chamber of Commerce and Industry (VCCI)"
+                      className="h-20 md:h-24 w-auto object-contain"
                     />
                   </div>
 
-                  <div className="text-center space-y-4">
-                    <p className="text-gray-600 leading-relaxed max-w-2xl">
-                      As a proud member of the Freight & Trade Alliance, GGL upholds the highest standards of professional excellence in the logistics industry. This membership reflects our commitment to ethical practices, continuous improvement, and collaborative partnerships that drive industry innovation.
-                    </p>
-                  </div>
+                  {/* Shared description below both logos */}
+                  <p className="md:col-span-2 text-gray-600 leading-relaxed text-center max-w-3xl mx-auto">
+                    GGL is proud to be associated with leading industry bodies including the
+                    Freight &amp; Trade Alliance and the Victorian Chamber of Commerce and
+                    Industry. These partnerships reflect our commitment to best practice,
+                    compliance, and collaborative growth across the logistics ecosystem.
+                  </p>
                 </div>
               </motion.div>
             </div>
