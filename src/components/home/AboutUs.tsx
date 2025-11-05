@@ -29,6 +29,7 @@ const AboutUs = () => {
               <div className="flex items-center justify-center md:justify-start gap-3">
                 <p className="text-gray-600 font-medium text-xl">Proud member of</p>
                 <img src="/ftaLogo.png" alt="Freight & Trade Alliance" className="h-10 md:h-14 object-contain" />
+                <img src="/vcc1.png" alt="Freight & Trade Alliance" className="h-10 md:h-14 object-contain" />
               </div>
             </div>
           </div>
