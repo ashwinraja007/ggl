@@ -41,7 +41,14 @@ export const Header = () => {
             
             {/* Only show separator and 1Global logo on larger screens */}
             <div className="h-8 w-px bg-gray-200 hidden md:block"></div>
+            <a
+  href="https://1ge.sg"
+  target="_blank"
+  rel="noopener noreferrer"
+  aria-label="Visit 1 Global Enterprises Website"
+>
             <img src="/1GlobalEnterprises.png" alt="1 Global Enterprises Logo" className="hidden md:block h-10 w-auto object-contain transition-all duration-300" />
+            </a>
           </div>
 
           {/* Mobile Menu Button */}
