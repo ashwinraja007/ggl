@@ -1,4 +1,4 @@
-import { Suspense, lazy } from "react";
+import React, { Suspense, lazy } from "react";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { Loader2 } from "lucide-react";
@@ -20,13 +20,13 @@ const BGlobalPresence = lazy(() => import("@/components/home/BGlobalPresence"));
 const BQuickEnquiry = lazy(() => import("@/components/home/BQuickEnquiry"));
 
 // Loading component
-const LoadingComponent = () => (
+const LoadingComponent: React.FC = () => (
   <div className="flex items-center justify-center min-h-[100px]">
     <Loader2 className="h-6 w-6 animate-spin text-brand-gold" />
   </div>
 );
 
-const BangladeshHome = () => {
+const BangladeshHome: React.FC = () => {
   return (
     <div className="min-h-screen flex flex-col relative">
       {/* Bangladesh-specific header with BD nav paths */}
@@ -38,7 +38,10 @@ const BangladeshHome = () => {
           sliderImages={["/oceanf.png", "/hom3.png"]}
           badgeText="Bangladesh Logistics Hub"
           headline={
-            'Delivering Excellence for <span class="text-yellow-500">Bangladesh</span> Supply Chains'
+            <>
+              Delivering Excellence for{" "}
+              <span className="text-yellow-500">Bangladesh</span> Supply Chains
+            </>
           }
           subheadline="GGL Bangladesh connects Dhaka with global trade lanes through air, ocean, and land freight expertise backed by local service."
           contactPath="/bangladesh/contact"
@@ -66,7 +69,7 @@ const BangladeshHome = () => {
           <BGlobalPresence linkPath="/bangladesh/global-presence" />
         </Suspense>
 
-        {/* Common enquiry form (can be used for BD as well) */}
+        {/* Common enquiry form (BD variant) */}
         <Suspense fallback={<LoadingComponent />}>
           <BQuickEnquiry />
         </Suspense>
