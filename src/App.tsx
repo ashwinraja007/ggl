@@ -9,6 +9,7 @@ import Contact from "./pages/Contact";
 import About from "./pages/About";
 import Services from "./pages/Services";
 import TermsOfUse from "./pages/TermsOfUse";
+import BangladeshHome from "./pages/BangladeshHome";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import NotFound from "./pages/NotFound";
 import LiquidTransportation from "./pages/services/LiquidTransportation";
@@ -47,8 +48,7 @@ function App() {
             <Route path="/services/customs-clearance" element={<CustomsClearance />} />
             <Route path="*" element={<Index  />} />
             {/* Bangladesh mini-site */}
-          
-
+            <Route path="/bangladesh" element={<BangladeshHome />} />
             
           </Routes>
           <Toaster />
