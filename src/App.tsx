@@ -17,7 +17,6 @@ import AirFreight from "./pages/services/AirFreight";
 import OceanFreight from "./pages/services/OceanFreight";
 import CustomsClearance from "./pages/services/CustomsClearance";
 import GlobalPresence from "./pages/GlobalPresence";
-import BangladeshHome from "./pages/BangladeshHome";
 import { ScrollToTop } from "./components/common/ScrollToTop";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 
@@ -48,7 +47,7 @@ function App() {
             <Route path="/services/customs-clearance" element={<CustomsClearance />} />
             <Route path="*" element={<Index  />} />
             {/* Bangladesh mini-site */}
-            <Route path="/bangladesh" element={<BangladeshHome />} />
+          
 
             
           </Routes>
