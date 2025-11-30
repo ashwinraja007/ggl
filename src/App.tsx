@@ -19,7 +19,7 @@ import OceanFreight from "./pages/services/OceanFreight";
 import CustomsClearance from "./pages/services/CustomsClearance";
 
 import GlobalPresence from "./pages/GlobalPresence";
-import BangladeshHome from "./pages/BangladeshHome";
+
 
 import { ScrollToTop } from "./components/common/ScrollToTop";
 import AdminDashboard from "./pages/admin/AdminDashboard";
@@ -60,7 +60,7 @@ function App() {
 
             {/* Bangladesh mini-site 
                Use /* to allow nested routes inside BangladeshHome if you add them later */}
-            <Route path="/bangladesh/*" element={<BangladeshHome />} />
+            
 
             {/* Fallback */}
             <Route path="*" element={<NotFound />} />
