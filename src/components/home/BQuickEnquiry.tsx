@@ -16,7 +16,6 @@ import {
 } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { motion } from "framer-motion";
-import ReCAPTCHA from "react-google-recaptcha";
 
 interface EnquiryForm {
   fullName: string;
@@ -30,7 +29,6 @@ interface EnquiryForm {
 export const QuickEnquiry = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<"idle" | "success" | "error">("idle");
-  const [recaptchaValue, setRecaptchaValue] = useState<string | null>(null);
 
   const {
     register,
@@ -40,11 +38,6 @@ export const QuickEnquiry = () => {
   } = useForm<EnquiryForm>();
 
   const onSubmit = async (data: EnquiryForm) => {
-    if (!recaptchaValue) {
-      setSubmitStatus("error");
-      return;
-    }
-
     setIsSubmitting(true);
 
     try {
@@ -69,7 +62,6 @@ export const QuickEnquiry = () => {
 
       setSubmitStatus("success");
       reset();
-      setRecaptchaValue(null);
     } catch (error) {
       console.error(error);
       setSubmitStatus("error");
@@ -97,11 +89,7 @@ export const QuickEnquiry = () => {
         </motion.div>
 
         {submitStatus === "success" && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3 }}
-          >
+          <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}>
             <Alert className="mb-6 bg-green-50 border-green-200">
               <CheckCircle2 className="h-4 w-4 text-green-600" />
               <AlertTitle className="text-green-800">Success!</AlertTitle>
@@ -113,16 +101,12 @@ export const QuickEnquiry = () => {
         )}
 
         {submitStatus === "error" && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3 }}
-          >
+          <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}>
             <Alert className="mb-6 bg-red-50 border-red-200">
               <AlertCircle className="h-4 w-4 text-red-600" />
               <AlertTitle className="text-red-800">Error</AlertTitle>
               <AlertDescription className="text-red-700">
-                Something went wrong. Please verify the reCAPTCHA and try again.
+                Something went wrong. Please try again later.
               </AlertDescription>
             </Alert>
           </motion.div>
@@ -148,17 +132,11 @@ export const QuickEnquiry = () => {
                   id="fullName"
                   {...register("fullName", {
                     required: "Full name is required",
-                    minLength: {
-                      value: 2,
-                      message: "Name must be at least 2 characters",
-                    },
+                    minLength: { value: 2, message: "Name must be at least 2 characters" },
                   })}
-                  className={`bg-white/80 ${
-                    errors.fullName ? "border-red-300" : "border-gray-300"
-                  }`}
                 />
                 {errors.fullName && (
-                  <p className="text-red-500 text-sm mt-1">{errors.fullName.message}</p>
+                  <p className="text-red-500 text-sm">{errors.fullName.message}</p>
                 )}
               </div>
 
@@ -176,12 +154,9 @@ export const QuickEnquiry = () => {
                       message: "Please enter a valid phone number",
                     },
                   })}
-                  className={`bg-white/80 ${
-                    errors.phone ? "border-red-300" : "border-gray-300"
-                  }`}
                 />
                 {errors.phone && (
-                  <p className="text-red-500 text-sm mt-1">{errors.phone.message}</p>
+                  <p className="text-red-500 text-sm">{errors.phone.message}</p>
                 )}
               </div>
             </div>
@@ -197,17 +172,11 @@ export const QuickEnquiry = () => {
                   type="email"
                   {...register("email", {
                     required: "Email is required",
-                    pattern: {
-                      value: /^\S+@\S+$/i,
-                      message: "Please enter a valid email",
-                    },
+                    pattern: { value: /^\S+@\S+$/i, message: "Invalid email" },
                   })}
-                  className={`bg-white/80 ${
-                    errors.email ? "border-red-300" : "border-gray-300"
-                  }`}
                 />
                 {errors.email && (
-                  <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
+                  <p className="text-red-500 text-sm">{errors.email.message}</p>
                 )}
               </div>
 
@@ -220,17 +189,11 @@ export const QuickEnquiry = () => {
                   id="purpose"
                   {...register("purpose", {
                     required: "Purpose is required",
-                    minLength: {
-                      value: 3,
-                      message: "Purpose must be at least 3 characters",
-                    },
+                    minLength: { value: 3, message: "Purpose must be at least 3 characters" },
                   })}
-                  className={`bg-white/80 ${
-                    errors.purpose ? "border-red-300" : "border-gray-300"
-                  }`}
                 />
                 {errors.purpose && (
-                  <p className="text-red-500 text-sm mt-1">{errors.purpose.message}</p>
+                  <p className="text-red-500 text-sm">{errors.purpose.message}</p>
                 )}
               </div>
             </div>
@@ -244,68 +207,43 @@ export const QuickEnquiry = () => {
                 id="comment"
                 {...register("comment", {
                   required: "Comment is required",
-                  minLength: {
-                    value: 10,
-                    message: "Comment must be at least 10 characters",
-                  },
+                  minLength: { value: 10, message: "Comment must be at least 10 characters" },
                 })}
-                className={`bg-white/80 min-h-[120px] ${
-                  errors.comment ? "border-red-300" : "border-gray-300"
-                }`}
+                className="min-h-[120px]"
               />
               {errors.comment && (
-                <p className="text-red-500 text-sm mt-1">{errors.comment.message}</p>
+                <p className="text-red-500 text-sm">{errors.comment.message}</p>
               )}
             </div>
 
-
             <div className="space-y-2">
-  <label className="flex items-start gap-2 text-sm text-gray-800 font-medium">
-    <input
-      type="checkbox"
-      {...register("optin", { required: "You must agree to proceed" })}
-      className="mt-1"
-    />
-    <span>
-      I confirm that my new import adheres to these conditions:
-      <ul className="list-disc list-inside mt-2 text-gray-700 text-sm font-normal space-y-1">
-        <li>
-          My contacts explicitly gave me their permission to send Email (newsletter),
-          SMS or WhatsApp campaigns within the last two years, or had been asked to
-          within the last two years.
-        </li>
-        <li>These contacts were not borrowed from a third party</li>
-        <li>These contacts were not purchased or rented</li>
-      </ul>
-    </span>
-  </label>
-  <p className="text-sm text-gray-700">
-    We may suspend or cancel any email, SMS or WhatsApp campaigns sent to contacts
-    that don't adhere to these conditions at any time.
-  </p>
-  {errors.optin && (
-    <p className="text-red-500 text-sm mt-1">{errors.optin.message}</p>
-  )}
-</div>
-
-
-            <div className="flex justify-center">
-              <ReCAPTCHA
-                sitekey="6LdmlJMrAAAAAISp1BfEDn90djyWcnCvOwLSCnbQ"
-                onChange={(value) => setRecaptchaValue(value)}
-              />
+              <label className="flex items-start gap-2 text-sm text-gray-800 font-medium">
+                <input
+                  type="checkbox"
+                  {...register("optin", { required: "You must agree to proceed" })}
+                  className="mt-1"
+                />
+                <span>
+                  I confirm that my new import adheres to these conditions:
+                  <ul className="list-disc list-inside mt-2 text-gray-700 text-sm space-y-1">
+                    <li>
+                      My contacts explicitly gave me permission to send Email, SMS, or WhatsApp campaigns.
+                    </li>
+                    <li>These contacts were not borrowed from a third party.</li>
+                    <li>These contacts were not purchased or rented.</li>
+                  </ul>
+                </span>
+              </label>
+              {errors.optin && (
+                <p className="text-red-500 text-sm">{errors.optin.message}</p>
+              )}
             </div>
-            {!recaptchaValue && (
-              <p className="text-red-500 text-sm text-center">
-                Please verify you're not a robot.
-              </p>
-            )}
 
             <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
               <Button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full text-white bg-gradient-to-r from-[#D4AF37] to-[#f6b100] hover:from-[#f6b100] hover:to-[#D4AF37]"
+                className="w-full text-white bg-gradient-to-r from-[#D4AF37] to-[#f6b100]"
               >
                 {isSubmitting ? (
                   <>
