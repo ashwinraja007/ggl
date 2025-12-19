@@ -101,8 +101,8 @@ const Contact = () => {
                       <Phone className="mt-1 text-blue-600 group-hover:scale-110 transition-transform" />
                       <div>
                         <p className="font-medium">Phone</p>
-                        <p className="text-gray-600">Mob: +61 432254969</p>
-                        <p className="text-gray-600">Tel: +61 388205157</p>
+                        <p className="text-gray-600">Operations: +61 481 359 416</p>
+                        <p className="text-gray-600">Sales: +61 422 843 999</p>
                       </div>
                     </motion.div>
 
