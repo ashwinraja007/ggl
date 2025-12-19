@@ -101,11 +101,11 @@ export const Footer = () => {
               </div>
               <div className="flex items-center gap-2">
                 <Phone size={18} className="text-brand-gold flex-shrink-0" />
-                <p>+61 432254969</p>
+                <p>Operations: +61 481 359 416</p>
               </div>
               <div className="flex items-center gap-2">
                 <Phone size={18} className="text-brand-gold flex-shrink-0" />
-                <p>+61 388205157</p>
+                <p>Sales: +61 422 843 999</p>
               </div>
               <div className="flex items-center gap-2">
                 <Mail size={18} className="text-brand-gold flex-shrink-0" />
