@@ -45,6 +45,13 @@ const countries = [{
     contacts: ["+91 11 493224477 / 48 /49"],
     email: "info.india@ggl.sg"
   }, {
+    name: "Punjab",
+    lat: 30.89135,
+    lng: 75.93255,
+    address: "No. 7A, G K Estate,Hari Nagar, Mundian Kalan,Chandigarh Road,Ludhiana, Punjab – 141015",
+    contacts: ["+91 62845 49881"],
+    email: "navjot.kohli@ggl.sg"
+  },{
     name: "Bangalore",
     lat: 13.01855,
     lng: 77.64191,
