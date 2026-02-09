@@ -21,7 +21,7 @@ interface CountryData {
 const countries: CountryData[] = [
   { country: "SINGAPORE", company: "GGL", website: "https://www.ggl.sg/", priority: 1, flag: "/sg.svg" },
   { country: "SINGAPORE", company: "GC", website: "https://www.globalconsol.com/", priority: 2, flag: "/sg.svg" },
-  { country: "MALAYSIA", company: "OECL", website: "https://www.oecl.sg/malaysia/home", priority: 3, flag: "/my.svg" },
+  { country: "MALAYSIA", company: "GGL", website: "https://www.ggl.sg/malaysia/home", priority: 3, flag: "/my.svg" },
   { country: "INDONESIA", company: "OECL", website: "https://www.oecl.sg/indonesia/home", priority: 4, flag: "/id.svg" },
   { country: "THAILAND", company: "OECL", website: "https://www.oecl.sg/thailand/home", priority: 5, flag: "/th.svg" },
   { country: "MYANMAR", company: "GC", website: "https://www.globalconsol.com/myanmar/home", priority: 6, flag: "/mm.svg" },
@@ -34,7 +34,7 @@ const countries: CountryData[] = [
   { country: "SAUDI ARABIA", company: "AMASS", website: "https://amassmiddleeast.com/", priority: 13, flag: "/sa.svg" },
   { country: "UAE", company: "AMASS", website: "https://amassmiddleeast.com/", priority: 14, flag: "/ae.svg" },
   { country: "USA", company: "GGL", website: "https://gglusa.us/", priority: 15, flag: "/us.svg" },
-  { country: "UK", company: "MOLTECH", website: "https://moltech.uk/", priority: 16, flag: "/gb.svg" }
+  { country: "UK", company: "GGL", website: "https://ggl.sg/uk", priority: 16, flag: "/gb.svg" }
 ];
 
 const findAustraliaCountry = () => {
