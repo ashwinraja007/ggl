@@ -15,13 +15,20 @@ const TermsOfUsePage: React.FC = () => {
 
   useEffect(() => {
     fetch('/content/pages/terms-and-conditions.md')
-      .then((res) => res.text())
+      .then((res) => {
+        if (!res.ok) throw new Error("Failed to fetch terms");
+        return res.text();
+      })
       .then((text) => {
         // In a real app, you'd use gray-matter here.
         const frontmatter = text.split('---')[1];
         const body = text.split('---').slice(2).join('---');
         const title = frontmatter.match(/title: (.*)/)?.[1] || 'Terms and Conditions';
         setContent({ title, body });
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error(err);
         setLoading(false);
       });
   }, []);
