@@ -1,10 +1,8 @@
-import { LogOut } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { LogOut, Pencil, Plus, Trash2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Card,
   CardContent,
@@ -354,22 +352,6 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-muted/40 p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle>Admin Panel Deprecated</CardTitle>
-          <CardDescription>
-            This admin panel has been replaced by Decap CMS.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <p>
-            All content and SEO metadata is now managed through the new Decap CMS. Please access it via the `/admin` route.
-          </p>
-          <Button asChild className="mt-4 w-full">
-            <a href="/admin" target="_blank" rel="noopener noreferrer">
-              Go to Decap CMS
-            </a>
     <div className="min-h-screen bg-muted/40 p-6">
       <div className="mx-auto flex max-w-6xl flex-col gap-6">
         <header className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
@@ -383,7 +365,6 @@ export default function AdminDashboard() {
             <LogOut className="mr-2 h-4 w-4" />
             Sign Out
           </Button>
-        </CardContent>
         </header>
 
         <Card>
