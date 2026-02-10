@@ -3,10 +3,18 @@ import { useLocation, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
-import { Plane, Ship, FileText, Droplets, Warehouse } from "lucide-react";
+import { Plane, Ship, FileText, Droplets, Warehouse, Loader2 } from "lucide-react";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
-import { useIsMobile } from "@/hooks/use-mobile";
 import SEO from '@/components/SEO';
+import { useQuery } from '@tanstack/react-query';
+
+const iconMap: { [key: string]: React.ReactNode } = {
+  Plane: <Plane className="w-5 h-5" />,
+  Ship: <Ship className="w-5 h-5" />,
+  FileText: <FileText className="w-5 h-5" />,
+  Droplets: <Droplets className="w-5 h-5" />,
+  Warehouse: <Warehouse className="w-5 h-5" />,
+};
 
 // Scroll to Top on Route Change
 const ScrollToTop = () => {
@@ -25,21 +33,6 @@ const ServiceCard = ({
   image,
   link
 }) => {
-  const getServiceImage = () => {
-    switch (title) {
-      case "Air Freight":
-        return "/airfreight2.jpg";
-      case "Ocean Freight":
-        return "/lovable-uploads/ocean.jpg";
-      case "Customs Clearance":
-        return "/lovable-uploads/cc.jpg";
-      case "Liquid Transportation":
-        return "/lovable-uploads/liquid.jpg";
-      default:
-        return image;
-    }
-  };
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -51,7 +44,7 @@ const ServiceCard = ({
       <div className="relative w-full overflow-hidden">
         <AspectRatio ratio={866/584} className="w-full">
           <img
-            src={getServiceImage()}
+            src={image}
             alt={title}
             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
           />
@@ -81,51 +74,28 @@ const ServiceCard = ({
 };
 
 const Services = () => {
-  const isMobile = useIsMobile();
-
-  const services = [
-    {
-      id: 1,
-      icon: <Plane className="w-5 h-5" />,
-      title: "Air Freight",
-      image: "/lovable-uploads/airfreight.jpg",
-      description: "Flexible air freight solutions tailored for your needs.",
-      link: "/services/air-freight"
-    },
-    {
-      id: 2,
-      icon: <Ship className="w-5 h-5" />,
-      title: "Ocean Freight",
-      image: "/lovable-uploads/ocean.jpg",
-      description: "Comprehensive ocean freight services for seamless global shipping.",
-      link: "/services/ocean-freight"
-    },
-    {
-      id: 3,
-      icon: <FileText className="w-5 h-5" />,
-      title: "Customs Clearance",
-      image: "/lovable-uploads/cc.jpg",
-      description: "Hassle-free customs clearance for smooth international trade.",
-      link: "/services/customs-clearance"
-    },
-    {
-      id: 4,
-      icon: <Droplets className="w-5 h-5" />,
-      title: "Liquid Transportation",
-      image: "/lovable-uploads/liquid.jpg",
-      description: "Safe and efficient transport solutions for liquid cargo.",
-      link: "/services/liquid-transportation"
-    },
-    {
-      id: 5,
-      icon: <Warehouse className="w-5 h-5" />,
-      title: "Project Cargo",
-      image: "/projectcargo3.png",
-      description: "We specialize in delivering end-to-end logistics solutions for complex, heavy, and oversized shipments—commonly known as project cargo.",
-      link: "/services/project-cargo"
+  const { data, isLoading } = useQuery({
+    queryKey: ['services-content'],
+    queryFn: async () => {
+      const response = await fetch('/data/services.json');
+      if (!response.ok) {
+        throw new Error('Failed to fetch services content');
+      }
+      return response.json();
     }
-  ];
+  });
 
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Header />
+        <main className="flex-grow flex items-center justify-center">
+          <Loader2 className="h-8 w-8 animate-spin text-brand-gold" />
+        </main>
+        <Footer />
+      </div>
+    );
+  }
   return (
     <div className="min-h-screen flex flex-col">
       {/* ✅ Page SEO */}
@@ -152,11 +122,11 @@ const Services = () => {
               className="text-center max-w-2xl mx-auto"
             >
               <h1 className="text-2xl md:text-3xl font-bold mb-3 text-brand-navy">
-                Our Comprehensive Services
+                {data?.hero?.title}
               </h1>
               <div className="w-20 h-1 bg-brand-gold mx-auto mb-3"></div>
               <p className="text-sm md:text-base text-gray-700">
-                From air and ocean freight to specialized liquid transportation, we offer end-to-end logistics solutions tailored to your unique needs.
+                {data?.hero?.subtitle}
               </p>
             </motion.div>
           </div>
@@ -166,7 +136,13 @@ const Services = () => {
         <section className="py-8 md:py-12">
           <div className="container mx-auto px-4 max-w-5xl">
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-6">
-              {services.map(service => <ServiceCard key={service.id} {...service} />)}
+              {data?.services?.map(service => (
+                <ServiceCard
+                  key={service.title}
+                  {...service}
+                  icon={iconMap[service.icon]}
+                />
+              ))}
             </div>
           </div>
         </section>
@@ -181,20 +157,13 @@ const Services = () => {
               viewport={{ once: true }}
               className="text-center max-w-2xl mx-auto mb-6 md:mb-8"
             >
-              <h2 className="text-xl md:text-2xl font-bold text-brand-navy mb-3">Why Choose Our Logistics Services?</h2>
+              <h2 className="text-xl md:text-2xl font-bold text-brand-navy mb-3">{data?.whyChooseUs?.title}</h2>
               <div className="w-20 h-1 bg-brand-gold mx-auto mb-3"></div>
-              <p className="text-gray-700 text-sm md:text-base">We combine industry expertise, advanced technology, and personalized care to deliver exceptional logistics solutions.</p>
+              <p className="text-gray-700 text-sm md:text-base">{data?.whyChooseUs?.subtitle}</p>
             </motion.div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {[
-                { title: "🌍 Global Network", description: "Leverage our extensive worldwide connections for efficient shipping." },
-                { title: "🎯 Customized Solutions", description: "Tailored logistics plans designed for your business." },
-                { title: "📡 Advanced Technology", description: "Real-time tracking & cutting-edge logistics systems." },
-                { title: "👨‍✈️ Expert Team", description: "Industry professionals with years of logistics experience." },
-                { title: "✅ Regulatory Compliance", description: "Ensure smooth operations with up-to-date knowledge." },
-                { title: "📞 24/7 Support", description: "Get help anytime with round-the-clock customer service." }
-              ].map((feature, index) => (
+              {data?.whyChooseUs?.features?.map((feature, index) => (
                 <motion.div
                   key={index}
                   initial={{ opacity: 0, y: 20 }}

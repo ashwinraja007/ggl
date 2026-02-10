@@ -22,7 +22,6 @@ import GlobalPresence from "./pages/GlobalPresence";
 
 
 import { ScrollToTop } from "./components/common/ScrollToTop";
-import AdminDashboard from "./pages/admin/AdminDashboard";
 
 const queryClient = new QueryClient();
 
@@ -43,7 +42,7 @@ function App() {
             <Route path="/global-presence" element={<GlobalPresence />} />
 
             {/* Admin */}
-            <Route path="/admin" element={<AdminDashboard />} />
+            {/* Decap CMS is served statically at /admin/index.html */}
 
             {/* Service specific pages */}
             <Route

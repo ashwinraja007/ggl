@@ -4,8 +4,20 @@ import { Footer } from "@/components/layout/Footer";
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import SEO from '@/components/SEO';
+import { useQuery } from "@tanstack/react-query";
 
 const About = () => {
+  const { data, isLoading } = useQuery({
+    queryKey: ['about-content'],
+    queryFn: async () => {
+      const response = await fetch('/data/about.json');
+      if (!response.ok) {
+        throw new Error('Failed to fetch about content');
+      }
+      return response.json();
+    }
+  });
+
   return (
     <div className="min-h-screen flex flex-col relative">
       {/* ✅ Page SEO */}
@@ -35,10 +47,10 @@ const About = () => {
             className="text-center px-4 relative z-10"
           >
             <h1 className="text-2xl md:text-4xl font-bold text-gray-800 mb-4 font-inter">
-              Who We Are
+              {data?.heroTitle || "Who We Are"}
             </h1>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto font-inter font-light">
-              A global leader in logistics and supply chain solutions
+              {data?.heroSubtitle || "A global leader in logistics and supply chain solutions"}
             </p>
           </motion.div>
         </motion.section>
@@ -47,6 +59,7 @@ const About = () => {
         <section className="py-0">
           <div className="container mx-auto px-4">
             <div className="max-w-6xl mx-auto">
+              {isLoading ? <div className="text-center py-10">Loading...</div> : (
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center mb-16">
                 <motion.div
                   initial={{ opacity: 0, x: -20 }}
@@ -56,13 +69,13 @@ const About = () => {
                   className="space-y-6"
                 >
                   <h3 className="text-2xl font-semibold text-gray-800 mb-4">
-                    Our Story
+                    {data?.storyTitle || "Our Story"}
                   </h3>
                   <p className="text-gray-700 text-lg leading-relaxed">
-                    GGL is a proud subsidiary of 1 Global Enterprises, a dynamic investment company with a diverse portfolio in freight forwarding, supply chain management, and logistics technology. As part of this global network, GGL benefits from strategic investments across multiple brands specializing in transportation, warehousing, and supply chain solutions.
+                    {data?.storyContent1}
                   </p>
                   <p className="text-gray-700 text-lg leading-relaxed">
-                    Backed by 1 Global Enterprises' industry expertise and innovation-driven approach, GGL leverages synergies across its affiliated companies to provide integrated, technology-driven logistics solutions. This connection ensures operational excellence, financial stability, and access to world-class supply chain infrastructure, positioning GGL as a leader in end-to-end global logistics services.
+                    {data?.storyContent2}
                   </p>
                 </motion.div>
 
@@ -75,13 +88,14 @@ const About = () => {
                 >
                   <div className="relative overflow-hidden rounded-xl shadow-lg h-[400px] w-full">
                     <img
-                      src="lovable-uploads/gp.jpg"
+                      src={data?.storyImage || "lovable-uploads/gp.jpg"}
                       alt="Global Business Partnership"
                       className="w-full h-full object-cover"
                     />
                   </div>
                 </motion.div>
               </div>
+              )}
             </div>
           </div>
         </section>

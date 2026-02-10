@@ -3,6 +3,7 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { Loader2 } from "lucide-react";
 import SEO from '@/components/SEO';
+import { useQuery } from "@tanstack/react-query";
 
 // Lazy load components
 const Hero = lazy(() => import("@/components/home/Hero"));
@@ -20,6 +21,17 @@ const LoadingComponent = () => (
 );
 
 const Index = () => {
+  const { data: homeData, isLoading } = useQuery({
+    queryKey: ['home-content'],
+    queryFn: async () => {
+      const response = await fetch('/data/home.json');
+      if (!response.ok) {
+        throw new Error('Failed to fetch home content');
+      }
+      return response.json();
+    }
+  });
+
   return (
     <div className="min-h-screen flex flex-col relative">
       {/* ✅ Add SEO component here */}
@@ -34,7 +46,16 @@ const Index = () => {
       <Header />
       <main className="flex-grow pt-16">
         <Suspense fallback={<LoadingComponent />}>
-          <Hero />
+          {isLoading ? (
+            <LoadingComponent />
+          ) : (
+            <Hero 
+              badgeText={homeData?.badgeText}
+              headline={homeData?.headline}
+              subheadline={homeData?.subheadline}
+              sliderImages={homeData?.sliderImages}
+            />
+          )}
         </Suspense>
 
         <Suspense fallback={<LoadingComponent />}>

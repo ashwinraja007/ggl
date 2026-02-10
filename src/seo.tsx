@@ -138,6 +138,34 @@ export function useSEO() {
     applyMeta(fallbackConfig);
 
     const loadDynamicMeta = async () => {
+      // Try fetching from Decap CMS JSON first
+      try {
+        const response = await fetch('/data/seo.json');
+        if (response.ok) {
+          const data = await response.json();
+          const pageRecord = data.pages?.find((p: any) => p.path === path);
+          
+          if (pageRecord) {
+            const extraMetaRecord: Record<string, string> = {};
+            if (pageRecord.extraMeta && Array.isArray(pageRecord.extraMeta)) {
+              pageRecord.extraMeta.forEach((item: any) => {
+                if (item.name && item.content) extraMetaRecord[item.name] = item.content;
+              });
+            }
+
+            applyMeta({
+              title: pageRecord.title,
+              description: pageRecord.description,
+              keywords: pageRecord.keywords,
+              extraMeta: Object.keys(extraMetaRecord).length > 0 ? extraMetaRecord : null,
+            });
+            return; // If found in JSON, skip Supabase
+          }
+        }
+      } catch (e) {
+        console.warn("Failed to load local SEO JSON", e);
+      }
+
       try {
         const record = await fetchSeoRecordByPath(path);
         if (!isActive || !record) {
