@@ -6,7 +6,6 @@ import { Footer } from "@/components/layout/Footer";
 import { Plane, Ship, FileText, Droplets, Warehouse, Loader2 } from "lucide-react";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import SEO from '@/components/SEO';
-import { useQuery } from '@tanstack/react-query';
 
 const iconMap: { [key: string]: React.ReactNode } = {
   Plane: <Plane className="w-5 h-5" />,
@@ -74,28 +73,62 @@ const ServiceCard = ({
 };
 
 const Services = () => {
-  const { data, isLoading } = useQuery({
-    queryKey: ['services-content'],
-    queryFn: async () => {
-      const response = await fetch('/data/services.json');
-      if (!response.ok) {
-        throw new Error('Failed to fetch services content');
+  const data = {
+    hero: {
+      title: "Our Comprehensive Services",
+      subtitle: "From air and ocean freight to specialized liquid transportation, we offer end-to-end logistics solutions tailored to your unique needs."
+    },
+    services: [
+      {
+        icon: "Plane",
+        title: "Air Freight",
+        image: "/airfreight2.jpg",
+        description: "Flexible air freight solutions tailored for your needs.",
+        link: "/services/air-freight"
+      },
+      {
+        icon: "Ship",
+        title: "Ocean Freight",
+        image: "/lovable-uploads/ocean.jpg",
+        description: "Comprehensive ocean freight services for seamless global shipping.",
+        link: "/services/ocean-freight"
+      },
+      {
+        icon: "FileText",
+        title: "Customs Clearance",
+        image: "/lovable-uploads/cc.jpg",
+        description: "Hassle-free customs clearance for smooth international trade.",
+        link: "/services/customs-clearance"
+      },
+      {
+        icon: "Droplets",
+        title: "Liquid Transportation",
+        image: "/lovable-uploads/liquid.jpg",
+        description: "Safe and efficient transport solutions for liquid cargo.",
+        link: "/services/liquid-transportation"
+      },
+      {
+        icon: "Warehouse",
+        title: "Project Cargo",
+        image: "/projectcargo3.png",
+        description: "We specialize in delivering end-to-end logistics solutions for complex, heavy, and oversized shipments—commonly known as project cargo.",
+        link: "/services/project-cargo"
       }
-      return response.json();
+    ],
+    whyChooseUs: {
+      title: "Why Choose Our Logistics Services?",
+      subtitle: "We combine industry expertise, advanced technology, and personalized care to deliver exceptional logistics solutions.",
+      features: [
+        { title: "🌍 Global Network", description: "Leverage our extensive worldwide connections for efficient shipping." },
+        { title: "🎯 Customized Solutions", description: "Tailored logistics plans designed for your business." },
+        { title: "📡 Advanced Technology", description: "Real-time tracking & cutting-edge logistics systems." },
+        { title: "👨‍✈️ Expert Team", description: "Industry professionals with years of logistics experience." },
+        { title: "✅ Regulatory Compliance", description: "Ensure smooth operations with up-to-date knowledge." },
+        { title: "📞 24/7 Support", description: "Get help anytime with round-the-clock customer service." }
+      ]
     }
-  });
+  };
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex flex-col">
-        <Header />
-        <main className="flex-grow flex items-center justify-center">
-          <Loader2 className="h-8 w-8 animate-spin text-brand-gold" />
-        </main>
-        <Footer />
-      </div>
-    );
-  }
   return (
     <div className="min-h-screen flex flex-col">
       {/* ✅ Page SEO */}

@@ -3,7 +3,6 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { Loader2 } from "lucide-react";
 import SEO from '@/components/SEO';
-import { useQuery } from "@tanstack/react-query";
 
 // Lazy load components
 const Hero = lazy(() => import("@/components/home/Hero"));
@@ -21,16 +20,12 @@ const LoadingComponent = () => (
 );
 
 const Index = () => {
-  const { data: homeData, isLoading } = useQuery({
-    queryKey: ['home-content'],
-    queryFn: async () => {
-      const response = await fetch('/data/home.json');
-      if (!response.ok) {
-        throw new Error('Failed to fetch home content');
-      }
-      return response.json();
-    }
-  });
+  const homeData = {
+    badgeText: "Global Logistics Experts",
+    headline: "Delivering Excellence for Global Supply Chains",
+    subheadline: "GGL Australia connects your business with global trade lanes through air, ocean, and land freight expertise backed by premium service.",
+    sliderImages: ["/lovable-uploads/ocean.jpg", "/lovable-uploads/airfreight.jpg"]
+  };
 
   return (
     <div className="min-h-screen flex flex-col relative">
@@ -46,16 +41,12 @@ const Index = () => {
       <Header />
       <main className="flex-grow pt-16">
         <Suspense fallback={<LoadingComponent />}>
-          {isLoading ? (
-            <LoadingComponent />
-          ) : (
-            <Hero 
-              badgeText={homeData?.badgeText}
-              headline={homeData?.headline}
-              subheadline={homeData?.subheadline}
-              sliderImages={homeData?.sliderImages}
-            />
-          )}
+          <Hero 
+            badgeText={homeData.badgeText}
+            headline={homeData.headline}
+            subheadline={homeData.subheadline}
+            sliderImages={homeData.sliderImages}
+          />
         </Suspense>
 
         <Suspense fallback={<LoadingComponent />}>

@@ -4,19 +4,16 @@ import { Footer } from "@/components/layout/Footer";
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import SEO from '@/components/SEO';
-import { useQuery } from "@tanstack/react-query";
 
 const About = () => {
-  const { data, isLoading } = useQuery({
-    queryKey: ['about-content'],
-    queryFn: async () => {
-      const response = await fetch('/data/about.json');
-      if (!response.ok) {
-        throw new Error('Failed to fetch about content');
-      }
-      return response.json();
-    }
-  });
+  const data = {
+    heroTitle: "Who We Are",
+    heroSubtitle: "A global leader in logistics and supply chain solutions",
+    storyTitle: "Our Story",
+    storyContent1: "GGL is a proud subsidiary of 1 Global Enterprises, a dynamic investment company with a diverse portfolio in freight forwarding, supply chain management, and logistics technology. As part of this global network, GGL benefits from strategic investments across multiple brands specializing in transportation, warehousing, and supply chain solutions.",
+    storyContent2: "Backed by 1 Global Enterprises' industry expertise and innovation-driven approach, GGL leverages synergies across its affiliated companies to provide integrated, technology-driven logistics solutions. This connection ensures operational excellence, financial stability, and access to world-class supply chain infrastructure, positioning GGL as a leader in end-to-end global logistics services.",
+    storyImage: "/lovable-uploads/gp.jpg"
+  };
 
   return (
     <div className="min-h-screen flex flex-col relative">
@@ -59,7 +56,6 @@ const About = () => {
         <section className="py-0">
           <div className="container mx-auto px-4">
             <div className="max-w-6xl mx-auto">
-              {isLoading ? <div className="text-center py-10">Loading...</div> : (
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center mb-16">
                 <motion.div
                   initial={{ opacity: 0, x: -20 }}
@@ -95,7 +91,6 @@ const About = () => {
                   </div>
                 </motion.div>
               </div>
-              )}
             </div>
           </div>
         </section>
