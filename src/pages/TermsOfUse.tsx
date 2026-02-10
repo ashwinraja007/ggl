@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import ReactMarkdown from 'react-markdown';
+// import ReactMarkdown from 'react-markdown';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import SEO from '@/components/SEO';
@@ -43,7 +43,10 @@ const TermsOfUsePage: React.FC = () => {
         ) : content ? (
           <div className="prose max-w-none">
             <h1 className="text-4xl font-bold mb-8 text-center text-gray-900">{content.title}</h1>
-            <ReactMarkdown>{content.body}</ReactMarkdown>
+            {/* <ReactMarkdown>{content.body}</ReactMarkdown> */}
+            <div className="whitespace-pre-wrap text-gray-700">
+              {content.body}
+            </div>
           </div>
         ) : (
           <p>Could not load content.</p>
