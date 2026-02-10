@@ -11,19 +11,107 @@ collections:
     files:
       - name: "privacy-policy"
         label: "Privacy Policy"
-        file: "public/data/privacy-policy.json"
+        file: "public/content/pages/privacy-policy.json"
         fields:
-          - {label: "Title", name: "title", widget: "string"}
+          - { label: "Title", name: "title", widget: "string" }
           - label: "Sections"
             name: "sections"
             widget: "list"
             fields:
-              - {label: "Title", name: "title", widget: "string"}
-              - {label: "Content", name: "content", widget: "text", required: false}
+              - { label: "Title", name: "title", widget: "string" }
+              - { label: "Content", name: "content", widget: "text", required: false }
               - label: "Subsections"
                 name: "subsections"
                 widget: "list"
                 required: false
                 fields:
-                  - {label: "Title", name: "title", widget: "string"}
-                  - {label: "Content", name: "content", widget: "text"}
+                  - { label: "Title", name: "title", widget: "string" }
+                  - { label: "Content", name: "content", widget: "text" }
+      - name: "terms-and-conditions"
+        label: "Terms and Conditions"
+        file: "public/content/pages/terms-and-conditions.md"
+        fields:
+          - { label: "Title", name: "title", widget: "string" }
+          - { label: "Body", name: "body", widget: "markdown" }
+
+  - name: "services"
+    label: "Services"
+    folder: "public/content/services"
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { label: "Title", name: "title", widget: "string" }
+      - { label: "Hero Description", name: "hero_description", widget: "text" }
+      - { label: "Hero Image", name: "hero_image", widget: "image" }
+      - label: "Main Content"
+        name: "main_content"
+        widget: "object"
+        fields:
+          - { label: "Title", name: "title", widget: "string" }
+          - { label: "Body", name: "body", widget: "markdown" }
+      - label: "Key Characteristics"
+        name: "characteristics"
+        widget: "list"
+        required: false
+        fields:
+          - { label: "Title", name: "title", widget: "string" }
+          - { label: "Description", name: "description", widget: "text" }
+      - label: "Why Choose Us"
+        name: "why_choose_us"
+        widget: "object"
+        required: false
+        fields:
+          - { label: "Intro", name: "intro", widget: "text" }
+          - label: "Features"
+            name: "features"
+            widget: "list"
+            fields:
+              - { label: "Title", name: "title", widget: "string" }
+              - { label: "Description", name: "description", widget: "string" }
+      - label: "Benefits"
+        name: "benefits"
+        widget: "list"
+        required: false
+        fields:
+          - { label: "Title", name: "title", widget: "string" }
+          - { label: "Description", name: "description", widget: "string" }
+      - label: "LCL"
+        name: "lcl"
+        widget: "object"
+        required: false
+        fields:
+          - { label: "Image", name: "image", widget: "image" }
+          - { label: "Title", name: "title", widget: "string" }
+          - { label: "Body", name: "body", widget: "markdown" }
+      - label: "FCL"
+        name: "fcl"
+        widget: "object"
+        required: false
+        fields:
+          - { label: "Image", name: "image", widget: "image" }
+          - { label: "Title", name: "title", widget: "string" }
+          - { label: "Body", name: "body", widget: "markdown" }
+      - label: "Features Grid"
+        name: "features_grid"
+        widget: "list"
+        required: false
+        fields:
+          - { label: "Title", name: "title", widget: "string" }
+          - { label: "Description", name: "description", widget: "string" }
+      - label: "CTA"
+        name: "cta"
+        widget: "object"
+        fields:
+          - { label: "Title", name: "title", widget: "string" }
+          - { label: "Description", name: "description", widget: "string" }
+          - { label: "Button Text", name: "button_text", widget: "string" }
+          - { label: "Button Link", name: "button_link", widget: "string", default: "/contact" }
+      - label: "SEO"
+        name: "seo"
+        widget: "object"
+        fields:
+          - { label: "Meta Title", name: "title", widget: "string" }
+          - { label: "Meta Description", name: "description", widget: "text" }
+          - { label: "Meta Keywords", name: "keywords", widget: "string" }
+          - { label: "Canonical URL", name: "canonical", widget: "string" }
+          - { label: "OG Image", name: "image", widget: "image" }
