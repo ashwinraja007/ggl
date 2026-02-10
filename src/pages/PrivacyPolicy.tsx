@@ -19,7 +19,7 @@ const PrivacyPolicyPage: React.FC = () => {
   const { data, isLoading } = useQuery({
     queryKey: ['privacy-policy'],
     queryFn: async () => {
-      const response = await fetch('/content/pages/privacy-policy.json');
+      const response = await fetch('/data/privacy-policy.json');
       if (!response.ok) {
         throw new Error('Failed to fetch privacy policy');
       }
