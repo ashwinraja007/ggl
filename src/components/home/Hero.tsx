@@ -46,7 +46,7 @@ export const Hero = () => {
   const portalLinks = [
     {
       icon: <Users className="w-5 h-5" />,
-      title: "Consolmate",
+      title: "Customer Portal",
       description: "Access shipping dashboard",
       url: "/customer-portal",
     },
