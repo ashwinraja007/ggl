@@ -259,7 +259,7 @@ export const Hero = () => {
                     size="lg"
                     className="w-full shadow-lg hover:shadow-xl transition-all duration-300 gold-glow py-0 rounded-md my-[3px] font-bold px-[17px] mx-0 bg-[#d4af37] text-brand-navy hover:bg-amber-500"
                   >
-                    Consolmate
+                    Customer Portal
                   </Button>
                 </Link>
               </motion.div>
