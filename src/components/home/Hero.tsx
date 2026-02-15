@@ -152,7 +152,7 @@ export const Hero = () => {
                       variant="gold"
                       className="w-full font-semibold shadow-lg hover:shadow-xl transition-all duration-300 gold-glow bg-[#d4af37] text-brand-navy hover:bg-amber-500"
                     >
-                      Consolmate
+                      Customer Portal
                     </Button>
                   </Link>
                 </motion.div>
