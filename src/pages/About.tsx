@@ -5,17 +5,22 @@ import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import SEO from '@/components/SEO';
 import { useQuery } from '@tanstack/react-query';
-import { fetchStrapi, getStrapiMedia } from '@/lib/strapi';
+import { supabase, getSupabaseMedia } from '@/lib/supabase';
 
 const About = () => {
-  // Fetch data from Strapi
-  const { data: strapiResponse, isLoading } = useQuery({
+  // Fetch data from Supabase
+  const { data: supabaseData, isLoading } = useQuery({
     queryKey: ["about-page"],
-    queryFn: () => fetchStrapi("/about-page?populate[storyImage]=*&populate[seo][populate]=*"),
+    queryFn: async () => {
+      const { data } = await supabase
+        .from('pages')
+        .select('*')
+        .eq('slug', 'about')
+        .maybeSingle();
+      return data;
+    },
     retry: false,
   });
-
-  const strapiData = strapiResponse?.data?.attributes;
 
   // Default data (fallback)
   const defaultData = {
@@ -33,15 +38,15 @@ const About = () => {
     }
   };
 
-  // Merge Strapi data with default data
+  // Merge Supabase data with default data
   const data = {
     ...defaultData,
-    ...strapiData,
-    storyImage: getStrapiMedia(strapiData?.storyImage?.data?.attributes?.url) || defaultData.storyImage,
+    ...supabaseData,
+    storyImage: (supabaseData?.storyImage ? getSupabaseMedia('uploads', supabaseData.storyImage) : defaultData.storyImage),
   };
 
-  const seoData = strapiData?.seo || defaultData.seo;
-  const seoImage = getStrapiMedia(seoData?.metaImage?.data?.attributes?.url) || defaultData.seo.metaImage;
+  const seoData = supabaseData?.seo || defaultData.seo;
+  const seoImage = (seoData?.metaImage ? getSupabaseMedia('uploads', seoData.metaImage) : defaultData.seo.metaImage);
 
   return (
     <div className="min-h-screen flex flex-col relative">
