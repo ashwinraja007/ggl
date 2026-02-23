@@ -15,6 +15,10 @@ export function getSupabaseMedia(bucket: string, path: string | null) {
 }
 
 export async function supabaseRequest<T>(endpoint: string, options?: RequestInit): Promise<T | null> {
+  if (supabaseUrl === "https://placeholder.supabase.co" || supabaseKey === "placeholder") {
+    return null;
+  }
+
   const url = `${supabaseUrl}/rest/v1/${endpoint}`;
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
