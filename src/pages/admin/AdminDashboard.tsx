@@ -974,7 +974,7 @@ export default function AdminDashboard() {
                     <Label htmlFor="c-content">Content (JSON)</Label>
                     <DynamicJsonEditor
                       value={contentFormState.content}
-                      onChange={(e) => setContentFormState(prev => ({ ...prev, content: e.target.value }))}
+                      onChange={(val) => setContentFormState(prev => ({ ...prev, content: val }))}
                       type="content"
                     />
                   </div>
@@ -982,7 +982,7 @@ export default function AdminDashboard() {
                     <Label htmlFor="c-images">Images (JSON)</Label>
                     <DynamicJsonEditor
                       value={contentFormState.images}
-                      onChange={(e) => setContentFormState(prev => ({ ...prev, images: e.target.value }))}
+                      onChange={(val) => setContentFormState(prev => ({ ...prev, images: val }))}
                       type="images"
                     />
                   </div>
