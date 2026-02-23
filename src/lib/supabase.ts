@@ -13,3 +13,27 @@ export function getSupabaseMedia(bucket: string, path: string | null) {
   const { data } = supabase.storage.from(bucket).getPublicUrl(path);
   return data.publicUrl;
 }
+
+export async function supabaseRequest<T>(endpoint: string, options?: RequestInit): Promise<T | null> {
+  const url = `${supabaseUrl}/rest/v1/${endpoint}`;
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+    "apikey": supabaseKey,
+    "Authorization": `Bearer ${supabaseKey}`,
+    "Prefer": "return=representation",
+    ...(options?.headers as Record<string, string>),
+  };
+
+  const response = await fetch(url, { ...options, headers });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Supabase request failed: ${response.status} ${errorText}`);
+  }
+
+  if (response.status === 204) {
+    return null;
+  }
+
+  return response.json();
+}
