@@ -4,27 +4,55 @@ import { Footer } from "@/components/layout/Footer";
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import SEO from '@/components/SEO';
+import { useQuery } from '@tanstack/react-query';
+import { fetchStrapi, getStrapiMedia } from '@/lib/strapi';
 
 const About = () => {
-  const data = {
+  // Fetch data from Strapi
+  const { data: strapiResponse, isLoading } = useQuery({
+    queryKey: ["about-page"],
+    queryFn: () => fetchStrapi("/about-page?populate[storyImage]=*&populate[seo][populate]=*"),
+    retry: false,
+  });
+
+  const strapiData = strapiResponse?.data?.attributes;
+
+  // Default data (fallback)
+  const defaultData = {
     heroTitle: "Who We Are",
     heroSubtitle: "A global leader in logistics and supply chain solutions",
     storyTitle: "Our Story",
     storyContent1: "GGL is a proud subsidiary of 1 Global Enterprises, a dynamic investment company with a diverse portfolio in freight forwarding, supply chain management, and logistics technology. As part of this global network, GGL benefits from strategic investments across multiple brands specializing in transportation, warehousing, and supply chain solutions.",
     storyContent2: "Backed by 1 Global Enterprises' industry expertise and innovation-driven approach, GGL leverages synergies across its affiliated companies to provide integrated, technology-driven logistics solutions. This connection ensures operational excellence, financial stability, and access to world-class supply chain infrastructure, positioning GGL as a leader in end-to-end global logistics services.",
-    storyImage: "/lovable-uploads/gp.jpg"
+    storyImage: "/lovable-uploads/gp.jpg",
+    seo: {
+      metaTitle: "About GGL Australia – Expert Freight Forwarding & Logistics",
+      metaDescription: "Discover GGL Australia, a global freight forwarder with 25+ years of experience in international and domestic logistics. We deliver premium freight forwarding, warehousing, transport, and end-to-end supply chain solutions.",
+      keywords: "GGL Australia, freight forwarding, logistics solutions, supply chain management, warehousing services, transportation logistics, international logistics, domestic freight, end-to-end logistics",
+      metaImage: "https://www.gglaustralia.com/lovable-uploads/ggl-logo.png"
+    }
   };
+
+  // Merge Strapi data with default data
+  const data = {
+    ...defaultData,
+    ...strapiData,
+    storyImage: getStrapiMedia(strapiData?.storyImage?.data?.attributes?.url) || defaultData.storyImage,
+  };
+
+  const seoData = strapiData?.seo || defaultData.seo;
+  const seoImage = getStrapiMedia(seoData?.metaImage?.data?.attributes?.url) || defaultData.seo.metaImage;
 
   return (
     <div className="min-h-screen flex flex-col relative">
       {/* ✅ Page SEO */}
       <SEO
-        title="About GGL Australia – Expert Freight Forwarding & Logistics"
-        description="Discover GGL Australia, a global freight forwarder with 25+ years of experience in international and domestic logistics. We deliver premium freight forwarding, warehousing, transport, and end-to-end supply chain solutions."
-        keywords="GGL Australia, freight forwarding, logistics solutions, supply chain management, warehousing services, transportation logistics, international logistics, domestic freight, end-to-end logistics"
+        title={seoData.metaTitle}
+        description={seoData.metaDescription}
+        keywords={seoData.keywords}
         url="https://www.gglaustralia.com/about"
         canonical="https://www.gglaustralia.com/about"
-        image="https://www.gglaustralia.com/lovable-uploads/ggl-logo.png"
+        image={seoImage}
       />
 
       <Header />
@@ -44,10 +72,10 @@ const About = () => {
             className="text-center px-4 relative z-10"
           >
             <h1 className="text-2xl md:text-4xl font-bold text-gray-800 mb-4 font-inter">
-              {data?.heroTitle || "Who We Are"}
+              {data.heroTitle}
             </h1>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto font-inter font-light">
-              {data?.heroSubtitle || "A global leader in logistics and supply chain solutions"}
+              {data.heroSubtitle}
             </p>
           </motion.div>
         </motion.section>
@@ -65,13 +93,13 @@ const About = () => {
                   className="space-y-6"
                 >
                   <h3 className="text-2xl font-semibold text-gray-800 mb-4">
-                    {data?.storyTitle || "Our Story"}
+                    {data.storyTitle}
                   </h3>
                   <p className="text-gray-700 text-lg leading-relaxed">
-                    {data?.storyContent1}
+                    {data.storyContent1}
                   </p>
                   <p className="text-gray-700 text-lg leading-relaxed">
-                    {data?.storyContent2}
+                    {data.storyContent2}
                   </p>
                 </motion.div>
 
@@ -84,7 +112,7 @@ const About = () => {
                 >
                   <div className="relative overflow-hidden rounded-xl shadow-lg h-[400px] w-full">
                     <img
-                      src={data?.storyImage || "lovable-uploads/gp.jpg"}
+                      src={data.storyImage}
                       alt="Global Business Partnership"
                       className="w-full h-full object-cover"
                     />
