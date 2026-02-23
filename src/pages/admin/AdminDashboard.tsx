@@ -161,7 +161,7 @@ const DynamicJsonEditor = ({
   useEffect(() => {
     try {
       const p = JSON.parse(value || '{}');
-      setParsed(p);
+      setParsed(p || {});
       setError(null);
     } catch (e) {
       setError("Invalid JSON");
@@ -277,7 +277,7 @@ const DynamicJsonEditor = ({
           )}
           
           <div className="flex gap-2">
-            <Textarea id={`textarea-${key}`} value={val} onChange={(e) => handleFieldChange(key, e.target.value)} className="text-sm min-h-[80px]" />
+            <Textarea id={`textarea-${key}`} value={typeof val === 'object' && val !== null ? JSON.stringify(val) : (val || '')} onChange={(e) => handleFieldChange(key, e.target.value)} className="text-sm min-h-[80px]" />
             {type === 'images' && (
               <div className="flex flex-col gap-2">
                  <input type="file" id={`file-${key}`} className="hidden" onChange={(e) => handleImageUpload(e, key)} accept="image/*" />
@@ -332,8 +332,8 @@ export default function AdminDashboard() {
       setContentFormState({
         page_path: editingContent.page_path,
         section_key: editingContent.section_key,
-        content: JSON.stringify(editingContent.content, null, 2),
-        images: JSON.stringify(editingContent.images, null, 2),
+        content: JSON.stringify(editingContent.content || {}, null, 2),
+        images: JSON.stringify(editingContent.images || {}, null, 2),
       });
     } else {
       setContentFormState({ page_path: "", section_key: "", content: "{}", images: "{}" });
