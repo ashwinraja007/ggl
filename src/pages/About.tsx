@@ -5,22 +5,19 @@ import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import SEO from '@/components/SEO';
 import { useQuery } from '@tanstack/react-query';
-import { supabase, getSupabaseMedia } from '@/lib/supabase';
+import { getSupabaseMedia } from '@/lib/supabase';
+import { fetchPageContent } from '@/lib/content';
 
 const About = () => {
   // Fetch data from Supabase
-  const { data: supabaseData, isLoading } = useQuery({
-    queryKey: ["about-page"],
-    queryFn: async () => {
-      const { data } = await supabase
-        .from('pages')
-        .select('*')
-        .eq('slug', 'about')
-        .maybeSingle();
-      return data;
-    },
-    retry: false,
+  const { data: pageContent } = useQuery({
+    queryKey: ["page-content", "/about-us"],
+    queryFn: () => fetchPageContent("/about-us"),
   });
+
+  const hero = pageContent?.find(s => s.section_key === 'hero');
+  const mission = pageContent?.find(s => s.section_key === 'mission');
+  const history = pageContent?.find(s => s.section_key === 'history');
 
   // Default data (fallback)
   const defaultData = {
@@ -38,15 +35,15 @@ const About = () => {
     }
   };
 
-  // Merge Supabase data with default data
-  const data = {
-    ...defaultData,
-    ...supabaseData,
-    storyImage: (supabaseData?.storyImage ? getSupabaseMedia('uploads', supabaseData.storyImage) : defaultData.storyImage),
-  };
+  // Map fetched data to display variables
+  const heroTitle = hero?.content?.title || defaultData.heroTitle;
+  const heroSubtitle = hero?.content?.subtitle || defaultData.heroSubtitle;
+  
+  // Use hero background image if available, otherwise default
+  // const heroImage = hero?.images?.background; 
 
-  const seoData = supabaseData?.seo || defaultData.seo;
-  const seoImage = (seoData?.metaImage ? getSupabaseMedia('uploads', seoData.metaImage) : defaultData.seo.metaImage);
+  const seoData = defaultData.seo; // You can also fetch this from seo_gglsgog table if needed
+  const seoImage = defaultData.seo.metaImage;
 
   return (
     <div className="min-h-screen flex flex-col relative">
@@ -77,10 +74,10 @@ const About = () => {
             className="text-center px-4 relative z-10"
           >
             <h1 className="text-2xl md:text-4xl font-bold text-gray-800 mb-4 font-inter">
-              {data.heroTitle}
+              {heroTitle}
             </h1>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto font-inter font-light">
-              {data.heroSubtitle}
+              {heroSubtitle}
             </p>
           </motion.div>
         </motion.section>
@@ -97,15 +94,41 @@ const About = () => {
                   viewport={{ once: true }}
                   className="space-y-6"
                 >
-                  <h3 className="text-2xl font-semibold text-gray-800 mb-4">
-                    {data.storyTitle}
-                  </h3>
-                  <p className="text-gray-700 text-lg leading-relaxed">
-                    {data.storyContent1}
-                  </p>
-                  <p className="text-gray-700 text-lg leading-relaxed">
-                    {data.storyContent2}
-                  </p>
+                  {mission && (
+                    <div>
+                      <h3 className="text-2xl font-semibold text-gray-800 mb-4">
+                        {mission.content.heading}
+                      </h3>
+                      <p className="text-gray-700 text-lg leading-relaxed">
+                        {mission.content.body}
+                      </p>
+                    </div>
+                  )}
+                  
+                  {history && (
+                    <div className="mt-8">
+                      <h3 className="text-2xl font-semibold text-gray-800 mb-4">
+                        {history.content.heading}
+                      </h3>
+                      <p className="text-gray-700 text-lg leading-relaxed">
+                        {history.content.body}
+                      </p>
+                    </div>
+                  )}
+
+                  {!mission && !history && (
+                    <>
+                      <h3 className="text-2xl font-semibold text-gray-800 mb-4">
+                        {defaultData.storyTitle}
+                      </h3>
+                      <p className="text-gray-700 text-lg leading-relaxed">
+                        {defaultData.storyContent1}
+                      </p>
+                      <p className="text-gray-700 text-lg leading-relaxed">
+                        {defaultData.storyContent2}
+                      </p>
+                    </>
+                  )}
                 </motion.div>
 
                 <motion.div
@@ -117,7 +140,7 @@ const About = () => {
                 >
                   <div className="relative overflow-hidden rounded-xl shadow-lg h-[400px] w-full">
                     <img
-                      src={data.storyImage}
+                      src={hero?.images?.background || defaultData.storyImage}
                       alt="Global Business Partnership"
                       className="w-full h-full object-cover"
                     />
