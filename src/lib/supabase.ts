@@ -1,67 +1,15 @@
-const SUPABASE_URL =
-  import.meta.env.VITE_SUPABASE_URL ?? "https://hsryyprixivyqjnxtjdo.supabase.co";
+import { createClient } from '@supabase/supabase-js';
 
-const SUPABASE_ANON_KEY =
-  import.meta.env.VITE_SUPABASE_ANON_KEY ??
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhzcnl5cHJpeGl2eXFqbnh0amRvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA1NjM1NjYsImV4cCI6MjA3NjEzOTU2Nn0.p0fj8ahdDwEqDNlnRm4aofR5d-XX5bsSbYw86iMsnFs";
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || "";
+const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY || "";
 
-const REST_URL = `${SUPABASE_URL}/rest/v1`;
+export const supabase = createClient(supabaseUrl, supabaseKey);
 
-type HttpMethod = "GET" | "POST" | "PATCH" | "DELETE";
-
-interface SupabaseRequestInit extends Omit<RequestInit, "headers" | "method"> {
-  method?: HttpMethod;
-  headers?: HeadersInit;
+// Helper to get public URL for images stored in Supabase Storage
+export function getSupabaseMedia(bucket: string, path: string | null) {
+  if (!path) return null;
+  if (path.startsWith("http") || path.startsWith("//")) return path;
+  
+  const { data } = supabase.storage.from(bucket).getPublicUrl(path);
+  return data.publicUrl;
 }
-
-export async function supabaseRequest<T>(
-  endpoint: string,
-  { method = "GET", headers, body, ...rest }: SupabaseRequestInit = {}
-): Promise<T> {
-  if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
-    throw new Error("Supabase credentials are not configured");
-  }
-
-  const requestHeaders = new Headers(headers);
-  requestHeaders.set("apikey", SUPABASE_ANON_KEY);
-  requestHeaders.set("Authorization", `Bearer ${SUPABASE_ANON_KEY}`);
-  if (!requestHeaders.has("Content-Type") && method !== "GET") {
-    requestHeaders.set("Content-Type", "application/json");
-  }
-  if (!requestHeaders.has("Accept")) {
-    requestHeaders.set("Accept", "application/json");
-  }
-
-  if (method !== "GET") {
-    requestHeaders.set("Prefer", "return=representation");
-  }
-
-  const response = await fetch(`${REST_URL}/${endpoint}`, {
-    method,
-    headers: requestHeaders,
-    body,
-    ...rest,
-  });
-
-  if (!response.ok) {
-    let message = response.statusText;
-    try {
-      const error = await response.json();
-      message = error.message || JSON.stringify(error);
-    } catch (error) {
-      const text = await response.text();
-      if (text) {
-        message = text;
-      }
-    }
-    throw new Error(message || "Supabase request failed");
-  }
-
-  if (response.status === 204) {
-    return undefined as T;
-  }
-
-  return response.json() as Promise<T>;
-}
-
-export { SUPABASE_URL, SUPABASE_ANON_KEY };
