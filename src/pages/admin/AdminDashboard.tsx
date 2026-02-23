@@ -34,6 +34,13 @@ import {
   fetchSeoRecords,
   updateSeoRecord,
 } from "@/lib/seo";
+import {
+  PageContent,
+  createPageContent,
+  deletePageContent,
+  fetchPageContent,
+  updatePageContent,
+} from "@/lib/content";
 
 const ADMIN_EMAIL = "admin@gglau.com";
 const ADMIN_PASSWORD = "GGLAU@2025";
@@ -149,6 +156,15 @@ export default function AdminDashboard() {
   const [formState, setFormState] = useState<FormState>(emptyFormState);
   const [editingRecord, setEditingRecord] = useState<SeoRecord | null>(null);
   const [editFormState, setEditFormState] = useState<FormState>(emptyFormState);
+  
+  const [activeTab, setActiveTab] = useState<'seo' | 'content'>('seo');
+  const [contentFormState, setContentFormState] = useState({
+    page_path: "",
+    section_key: "",
+    content: "{}",
+    images: "{}",
+  });
+  const [editingContent, setEditingContent] = useState<PageContent | null>(null);
 
   useEffect(() => {
     if (editingRecord) {
@@ -162,10 +178,29 @@ export default function AdminDashboard() {
     }
   }, [editingRecord]);
 
+  useEffect(() => {
+    if (editingContent) {
+      setContentFormState({
+        page_path: editingContent.page_path,
+        section_key: editingContent.section_key,
+        content: JSON.stringify(editingContent.content, null, 2),
+        images: JSON.stringify(editingContent.images, null, 2),
+      });
+    } else {
+      setContentFormState({ page_path: "", section_key: "", content: "{}", images: "{}" });
+    }
+  }, [editingContent]);
+
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ["seo-records"],
     queryFn: fetchSeoRecords,
-    enabled: isAuthenticated,
+    enabled: isAuthenticated && activeTab === 'seo',
+  });
+
+  const { data: contentData, isLoading: isContentLoading } = useQuery({
+    queryKey: ["page-content"],
+    queryFn: () => fetchPageContent(),
+    enabled: isAuthenticated && activeTab === 'content',
   });
 
   const createMutation = useMutation({
@@ -216,10 +251,56 @@ export default function AdminDashboard() {
     },
   });
 
+  const createContentMutation = useMutation({
+    mutationFn: (payload: Omit<PageContent, "id">) => createPageContent(payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["page-content"] });
+      toast({ title: "Content created" });
+      setContentFormState({ page_path: "", section_key: "", content: "{}", images: "{}" });
+    },
+    onError: (error: Error) => {
+      toast({ title: "Failed to create content", description: error.message, variant: "destructive" });
+    },
+  });
+
+  const updateContentMutation = useMutation({
+    mutationFn: ({ id, payload }: { id: number; payload: Partial<PageContent> }) =>
+      updatePageContent(id, payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["page-content"] });
+      toast({ title: "Content updated" });
+      setEditingContent(null);
+    },
+    onError: (error: Error) => {
+      toast({ title: "Failed to update content", description: error.message, variant: "destructive" });
+    },
+  });
+
+  const deleteContentMutation = useMutation({
+    mutationFn: (id: number) => deletePageContent(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["page-content"] });
+      toast({ title: "Content deleted" });
+    },
+    onError: (error: Error) => {
+      toast({ title: "Failed to delete content", description: error.message, variant: "destructive" });
+    },
+  });
+
   const sortedRecords = useMemo(() => {
     if (!data) return [];
     return [...data].sort((a, b) => a.path.localeCompare(b.path));
   }, [data]);
+
+  const sortedContent = useMemo(() => {
+    if (!contentData) return [];
+    return [...contentData].sort((a, b) => {
+      if (a.page_path === b.page_path) {
+        return a.section_key.localeCompare(b.section_key);
+      }
+      return a.page_path.localeCompare(b.page_path);
+    });
+  }, [contentData]);
 
   const handleLogin = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -305,6 +386,37 @@ export default function AdminDashboard() {
     }
   };
 
+  const handleContentSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    try {
+      const content = JSON.parse(contentFormState.content);
+      const images = JSON.parse(contentFormState.images);
+      
+      const payload = {
+        page_path: contentFormState.page_path.trim(),
+        section_key: contentFormState.section_key.trim(),
+        content,
+        images,
+      };
+
+      if (!payload.page_path || !payload.section_key) {
+        throw new Error("Page path and Section key are required");
+      }
+
+      if (editingContent) {
+        updateContentMutation.mutate({ id: editingContent.id, payload });
+      } else {
+        createContentMutation.mutate(payload);
+      }
+    } catch (e) {
+      toast({
+        title: "Invalid Input",
+        description: e instanceof Error ? e.message : "Please check your JSON format",
+        variant: "destructive",
+      });
+    }
+  };
+
   if (!isAuthenticated) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-muted/40 p-4">
@@ -357,8 +469,8 @@ export default function AdminDashboard() {
         <header className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h1 className="text-3xl font-semibold">SEO Admin Dashboard</h1>
-            <p className="text-muted-foreground">
-              Manage SEO metadata for every page on the site.
+            <p className="text-muted-foreground text-sm">
+              Manage SEO metadata and page content.
             </p>
           </div>
           <Button onClick={handleLogout} variant="outline">
@@ -367,6 +479,23 @@ export default function AdminDashboard() {
           </Button>
         </header>
 
+        <div className="flex gap-2 border-b pb-2">
+          <Button 
+            variant={activeTab === 'seo' ? 'default' : 'ghost'} 
+            onClick={() => setActiveTab('seo')}
+          >
+            SEO Management
+          </Button>
+          <Button 
+            variant={activeTab === 'content' ? 'default' : 'ghost'} 
+            onClick={() => setActiveTab('content')}
+          >
+            Page Content
+          </Button>
+        </div>
+
+        {activeTab === 'seo' ? (
+          <>
         <Card>
           <CardHeader>
             <CardTitle>Create new SEO entry</CardTitle>
@@ -658,6 +787,172 @@ export default function AdminDashboard() {
             </Table>
           </CardContent>
         </Card>
+          </>
+        ) : (
+          <>
+            <Card>
+              <CardHeader>
+                <CardTitle>{editingContent ? "Edit Content Entry" : "Create New Content Entry"}</CardTitle>
+                <CardDescription>
+                  Manage dynamic content for pages. Content and Images must be valid JSON objects.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <form className="grid gap-4" onSubmit={handleContentSubmit}>
+                  <div className="grid gap-2 sm:grid-cols-2">
+                    <div className="space-y-2">
+                      <Label htmlFor="c-path">Page Path</Label>
+                      <Input
+                        id="c-path"
+                        placeholder="/about-us"
+                        value={contentFormState.page_path}
+                        onChange={(e) => setContentFormState(prev => ({ ...prev, page_path: e.target.value }))}
+                        required
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="c-section">Section Key</Label>
+                      <Input
+                        id="c-section"
+                        placeholder="hero"
+                        value={contentFormState.section_key}
+                        onChange={(e) => setContentFormState(prev => ({ ...prev, section_key: e.target.value }))}
+                        required
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="c-content">Content (JSON)</Label>
+                    <Textarea
+                      id="c-content"
+                      placeholder='{"title": "My Title", "body": "Some text..."}'
+                      rows={5}
+                      className="font-mono text-xs"
+                      value={contentFormState.content}
+                      onChange={(e) => setContentFormState(prev => ({ ...prev, content: e.target.value }))}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="c-images">Images (JSON)</Label>
+                    <Textarea
+                      id="c-images"
+                      placeholder='{"background": "https://..."}'
+                      rows={3}
+                      className="font-mono text-xs"
+                      value={contentFormState.images}
+                      onChange={(e) => setContentFormState(prev => ({ ...prev, images: e.target.value }))}
+                    />
+                  </div>
+                  <CardFooter className="px-0 flex justify-between">
+                    {editingContent && (
+                      <Button type="button" variant="outline" onClick={() => setEditingContent(null)}>
+                        Cancel Edit
+                      </Button>
+                    )}
+                    <Button 
+                      disabled={createContentMutation.isPending || updateContentMutation.isPending} 
+                      type="submit"
+                      className={editingContent ? "ml-auto" : "w-full sm:w-auto"}
+                    >
+                      {(createContentMutation.isPending || updateContentMutation.isPending) && (
+                        <span className="mr-2 inline-flex h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                      )}
+                      {editingContent ? <Pencil className="mr-2 h-4 w-4" /> : <Plus className="mr-2 h-4 w-4" />}
+                      {editingContent ? "Update Content" : "Create Content"}
+                    </Button>
+                  </CardFooter>
+                </form>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Existing Content Entries</CardTitle>
+                <CardDescription>
+                  {isContentLoading
+                    ? "Loading content..."
+                    : `Total entries: ${sortedContent.length}`}
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="min-w-[150px]">Page Path</TableHead>
+                      <TableHead className="min-w-[100px]">Section</TableHead>
+                      <TableHead className="w-full">Content Preview</TableHead>
+                      <TableHead className="min-w-[140px] text-right">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {!sortedContent.length && !isContentLoading ? (
+                      <TableRow>
+                        <TableCell className="py-10 text-center" colSpan={4}>
+                          No content entries found.
+                        </TableCell>
+                      </TableRow>
+                    ) : null}
+                    {sortedContent.map((record) => (
+                      <TableRow key={record.id}>
+                        <TableCell className="font-medium">{record.page_path}</TableCell>
+                        <TableCell>{record.section_key}</TableCell>
+                        <TableCell className="text-xs font-mono text-muted-foreground max-w-md truncate">
+                          {JSON.stringify(record.content)}
+                        </TableCell>
+                        <TableCell className="flex items-center justify-end gap-2">
+                          <Button 
+                            size="sm" 
+                            variant="outline"
+                            onClick={() => {
+                              setEditingContent(record);
+                              window.scrollTo({ top: 0, behavior: 'smooth' });
+                            }}
+                          >
+                            <Pencil className="mr-1 h-4 w-4" />
+                            Edit
+                          </Button>
+                          <Dialog>
+                            <DialogTrigger asChild>
+                              <Button
+                                size="sm"
+                                variant="destructive"
+                                disabled={deleteContentMutation.isPending}
+                              >
+                                <Trash2 className="mr-1 h-4 w-4" />
+                                Delete
+                              </Button>
+                            </DialogTrigger>
+                            <DialogContent>
+                              <DialogHeader>
+                                <DialogTitle>Delete Content</DialogTitle>
+                                <DialogDescription>
+                                  Are you sure? This will remove the content for <strong>{record.page_path}</strong> ({record.section_key}).
+                                </DialogDescription>
+                              </DialogHeader>
+                              <DialogFooter className="gap-2">
+                                <DialogClose asChild>
+                                  <Button variant="outline">Cancel</Button>
+                                </DialogClose>
+                                <DialogClose asChild>
+                                  <Button
+                                    variant="destructive"
+                                    onClick={() => deleteContentMutation.mutate(record.id)}
+                                  >
+                                    Delete
+                                  </Button>
+                                </DialogClose>
+                              </DialogFooter>
+                            </DialogContent>
+                          </Dialog>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
+          </>
+        )}
       </div>
     </div>
   );
