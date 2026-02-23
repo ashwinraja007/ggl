@@ -17,6 +17,7 @@ import ProjectCargo from "./pages/services/ProjectCargo";
 import AirFreight from "./pages/services/AirFreight";
 import OceanFreight from "./pages/services/OceanFreight";
 import CustomsClearance from "./pages/services/CustomsClearance";
+import AdminDashboard from "./pages/admin/AdminDashboard";
 
 import GlobalPresence from "./pages/GlobalPresence";
 
@@ -52,6 +53,7 @@ function App() {
             <Route path="/services/air-freight" element={<AirFreight />} />
             <Route path="/services/project-cargo" element={<ProjectCargo />} />
             <Route path="/services/ocean-freight" element={<OceanFreight />} />
+            <Route path="/admin" element={<AdminDashboard />} />
             <Route
               path="/services/customs-clearance"
               element={<CustomsClearance />}
