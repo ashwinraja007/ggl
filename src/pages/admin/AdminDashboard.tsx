@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, useRef } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { LogOut, Pencil, Plus, Trash2, Image as ImageIcon, Bold, Italic, Link as LinkIcon, X, Upload } from "lucide-react";
 
@@ -251,7 +251,6 @@ const DynamicJsonEditor = ({
       <div className="flex justify-between items-center">
         <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">{type} Fields</span>
         <div className="flex gap-2">
-          <Button variant="outline" size="sm" onClick={() => setMode('raw')}>Raw JSON</Button>
           <Button variant="secondary" size="sm" onClick={handleAddKey}><Plus className="w-3 h-3 mr-1" /> Add Field</Button>
         </div>
       </div>
