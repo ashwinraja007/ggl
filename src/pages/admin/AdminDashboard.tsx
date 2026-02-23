@@ -1,6 +1,6 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useRef } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { LogOut, Pencil, Plus, Trash2 } from "lucide-react";
+import { LogOut, Pencil, Plus, Trash2, Image as ImageIcon, Bold, Italic, Link as LinkIcon, X, Upload } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -41,6 +41,7 @@ import {
   fetchPageContent,
   updatePageContent,
 } from "@/lib/content";
+import { uploadImage } from "@/lib/supabase";
 
 const ADMIN_EMAIL = "admin@gglau.com";
 const ADMIN_PASSWORD = "GGLAU@2025";
@@ -143,6 +144,155 @@ function formatTimestamp(value?: string | null) {
     return value;
   }
 }
+
+const DynamicJsonEditor = ({
+  value,
+  onChange,
+  type
+}: {
+  value: string;
+  onChange: (val: string) => void;
+  type: 'content' | 'images';
+}) => {
+  const [parsed, setParsed] = useState<Record<string, any>>({});
+  const [error, setError] = useState<string | null>(null);
+  const [mode, setMode] = useState<'visual' | 'raw'>('visual');
+
+  useEffect(() => {
+    try {
+      const p = JSON.parse(value || '{}');
+      setParsed(p);
+      setError(null);
+    } catch (e) {
+      setError("Invalid JSON");
+      setMode('raw');
+    }
+  }, [value]);
+
+  const handleFieldChange = (key: string, val: any) => {
+    const newParsed = { ...parsed, [key]: val };
+    setParsed(newParsed);
+    onChange(JSON.stringify(newParsed, null, 2));
+  };
+
+  const handleAddKey = () => {
+    const key = prompt("Enter new key:");
+    if (key && !parsed[key]) {
+      handleFieldChange(key, "");
+    }
+  };
+
+  const handleRemoveKey = (key: string) => {
+    if (confirm(`Remove field '${key}'?`)) {
+      const newParsed = { ...parsed };
+      delete newParsed[key];
+      setParsed(newParsed);
+      onChange(JSON.stringify(newParsed, null, 2));
+    }
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, key: string) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      const url = await uploadImage(file);
+      if (type === 'images') {
+        handleFieldChange(key, url);
+      } else {
+        // For content, append image tag
+        const currentVal = parsed[key] || "";
+        handleFieldChange(key, currentVal + `\n<img src="${url}" alt="Image" class="w-full rounded-lg my-4" />\n`);
+      }
+      toast({ title: "Image uploaded successfully" });
+    } catch (err) {
+      toast({ title: "Upload failed", description: (err as Error).message, variant: "destructive" });
+    }
+  };
+
+  const insertTag = (tagStart: string, tagEnd: string, key: string) => {
+    const textarea = document.getElementById(`textarea-${key}`) as HTMLTextAreaElement;
+    if (!textarea) return;
+    
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const text = textarea.value;
+    const before = text.substring(0, start);
+    const selection = text.substring(start, end);
+    const after = text.substring(end);
+    
+    const newVal = before + tagStart + selection + tagEnd + after;
+    handleFieldChange(key, newVal);
+    
+    // Restore focus (timeout needed for React render cycle)
+    setTimeout(() => {
+      textarea.focus();
+      textarea.setSelectionRange(start + tagStart.length, end + tagStart.length);
+    }, 0);
+  };
+
+  if (mode === 'raw') {
+    return (
+      <div className="space-y-2">
+        <div className="flex justify-end">
+          <Button variant="outline" size="sm" onClick={() => setMode('visual')} disabled={!!error}>Switch to Visual Editor</Button>
+        </div>
+        <Textarea
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          className="font-mono text-xs min-h-[200px]"
+        />
+        {error && <p className="text-red-500 text-xs">{error}</p>}
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-4 border rounded-md p-4 bg-slate-50/50">
+      <div className="flex justify-between items-center">
+        <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">{type} Fields</span>
+        <div className="flex gap-2">
+          <Button variant="outline" size="sm" onClick={() => setMode('raw')}>Raw JSON</Button>
+          <Button variant="secondary" size="sm" onClick={handleAddKey}><Plus className="w-3 h-3 mr-1" /> Add Field</Button>
+        </div>
+      </div>
+      
+      {Object.entries(parsed).map(([key, val]) => (
+        <div key={key} className="space-y-1 bg-white p-3 rounded border shadow-sm">
+          <div className="flex justify-between items-center mb-2">
+            <Label className="text-xs font-mono text-blue-600">{key}</Label>
+            <Button variant="ghost" size="icon" className="h-6 w-6 text-red-400 hover:text-red-600" onClick={() => handleRemoveKey(key)}>
+              <X className="h-3 w-3" />
+            </Button>
+          </div>
+          
+          {type === 'content' && (
+            <div className="flex gap-1 mb-1 border-b pb-1">
+              <Button type="button" variant="ghost" size="sm" className="h-7 px-2" onClick={() => insertTag('<b>', '</b>', key)}><Bold className="h-3 w-3" /></Button>
+              <Button type="button" variant="ghost" size="sm" className="h-7 px-2" onClick={() => insertTag('<i>', '</i>', key)}><Italic className="h-3 w-3" /></Button>
+              <Button type="button" variant="ghost" size="sm" className="h-7 px-2" onClick={() => insertTag('<a href="#">', '</a>', key)}><LinkIcon className="h-3 w-3" /></Button>
+              <div className="relative">
+                <input type="file" id={`file-${key}`} className="hidden" onChange={(e) => handleImageUpload(e, key)} accept="image/*" />
+                <Button type="button" variant="ghost" size="sm" className="h-7 px-2" onClick={() => document.getElementById(`file-${key}`)?.click()}><ImageIcon className="h-3 w-3" /></Button>
+              </div>
+            </div>
+          )}
+          
+          <div className="flex gap-2">
+            <Textarea id={`textarea-${key}`} value={val} onChange={(e) => handleFieldChange(key, e.target.value)} className="text-sm min-h-[80px]" />
+            {type === 'images' && (
+              <div className="flex flex-col gap-2">
+                 <input type="file" id={`file-${key}`} className="hidden" onChange={(e) => handleImageUpload(e, key)} accept="image/*" />
+                 <Button type="button" variant="outline" size="icon" onClick={() => document.getElementById(`file-${key}`)?.click()} title="Upload Image"><Upload className="h-4 w-4" /></Button>
+                 {val && <img src={val} alt="preview" className="w-10 h-10 object-cover rounded border" />}
+              </div>
+            )}
+          </div>
+        </div>
+      ))}
+      {Object.keys(parsed).length === 0 && <p className="text-sm text-muted-foreground text-center py-4">No fields yet.</p>}
+    </div>
+  );
+};
 
 export default function AdminDashboard() {
   const { toast } = useToast();
@@ -823,24 +973,18 @@ export default function AdminDashboard() {
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="c-content">Content (JSON)</Label>
-                    <Textarea
-                      id="c-content"
-                      placeholder='{"title": "My Title", "body": "Some text..."}'
-                      rows={5}
-                      className="font-mono text-xs"
+                    <DynamicJsonEditor
                       value={contentFormState.content}
                       onChange={(e) => setContentFormState(prev => ({ ...prev, content: e.target.value }))}
+                      type="content"
                     />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="c-images">Images (JSON)</Label>
-                    <Textarea
-                      id="c-images"
-                      placeholder='{"background": "https://..."}'
-                      rows={3}
-                      className="font-mono text-xs"
+                    <DynamicJsonEditor
                       value={contentFormState.images}
                       onChange={(e) => setContentFormState(prev => ({ ...prev, images: e.target.value }))}
+                      type="images"
                     />
                   </div>
                   <CardFooter className="px-0 flex justify-between">
