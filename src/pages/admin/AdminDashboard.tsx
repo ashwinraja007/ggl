@@ -475,6 +475,7 @@ export default function AdminDashboard() {
                   <TableHead className="min-w-[180px]">Title</TableHead>
                   <TableHead>Description</TableHead>
                   <TableHead className="min-w-[200px]">Keywords</TableHead>
+                  <TableHead className="min-w-[200px]">Extra Meta</TableHead>
                   <TableHead className="min-w-[150px]">Updated</TableHead>
                   <TableHead className="min-w-[140px] text-right">Actions</TableHead>
                 </TableRow>
@@ -496,6 +497,9 @@ export default function AdminDashboard() {
                     </TableCell>
                     <TableCell className="text-sm text-muted-foreground">
                       {record.keywords ?? "—"}
+                    </TableCell>
+                    <TableCell className="text-sm text-muted-foreground whitespace-pre-wrap font-mono text-xs">
+                      {formatExtraMeta(record.extra_meta) || "—"}
                     </TableCell>
                     <TableCell className="text-sm text-muted-foreground">
                       {formatTimestamp(record.updated_at)}
