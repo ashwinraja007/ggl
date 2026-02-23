@@ -1,7 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || "https://placeholder.supabase.co";
-const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY || "placeholder";
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || "https://hsryyprixivyqjnxtjdo.supabase.co";
+const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY || "sb_publishable_BDkm42qLq4zCo5xgMHIRHQ_PyTDmVmG";
 
 export const supabase = createClient(supabaseUrl, supabaseKey);
 
@@ -15,10 +15,6 @@ export function getSupabaseMedia(bucket: string, path: string | null) {
 }
 
 export async function supabaseRequest<T>(endpoint: string, options?: RequestInit): Promise<T | null> {
-  if (supabaseUrl === "https://placeholder.supabase.co" || supabaseKey === "placeholder") {
-    return null;
-  }
-
   const url = `${supabaseUrl}/rest/v1/${endpoint}`;
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
