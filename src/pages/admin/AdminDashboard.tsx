@@ -205,8 +205,8 @@ const RecursiveFieldEditor = ({
             <span className="text-xs font-bold uppercase text-muted-foreground">{label || 'List'} <span className="font-normal normal-case">({value.length} items)</span></span>
           </div>
           <div className="flex gap-1">
-            <Button variant="ghost" size="sm" onClick={() => onChange([...value, {}])}><Plus className="w-3 h-3 mr-1" /> Add Item</Button>
-            {onRemove && <Button variant="ghost" size="icon" className="h-6 w-6 text-red-400" onClick={onRemove}><X className="w-3 h-3" /></Button>}
+            <Button type="button" variant="ghost" size="sm" onClick={() => onChange([...value, {}])}><Plus className="w-3 h-3 mr-1" /> Add Item</Button>
+            {onRemove && <Button type="button" variant="ghost" size="icon" className="h-6 w-6 text-red-400" onClick={onRemove}><X className="w-3 h-3" /></Button>}
           </div>
         </div>
         {!isCollapsed && (
@@ -229,7 +229,7 @@ const RecursiveFieldEditor = ({
                   depth={depth + 1}
                 />
                 <div className="absolute top-2 right-12 opacity-0 group-hover:opacity-100 transition-opacity">
-                   <Button variant="secondary" size="icon" className="h-6 w-6" onClick={() => {
+                   <Button type="button" variant="secondary" size="icon" className="h-6 w-6" onClick={() => {
                       const newArr = [...value];
                       newArr.splice(idx + 1, 0, JSON.parse(JSON.stringify(item)));
                       onChange(newArr);
@@ -253,11 +253,11 @@ const RecursiveFieldEditor = ({
              <Label className="font-mono text-blue-600 cursor-pointer">{label || 'Object'}</Label>
            </div>
            <div className="flex gap-1">
-             <Button variant="ghost" size="sm" onClick={() => {
+             <Button type="button" variant="ghost" size="sm" onClick={() => {
                 const key = prompt("Enter new key:");
                 if (key && !value[key]) onChange({ ...value, [key]: "" });
              }}><Plus className="w-3 h-3" /></Button>
-             {onRemove && <Button variant="ghost" size="icon" className="h-6 w-6 text-red-400" onClick={onRemove}><X className="w-3 h-3" /></Button>}
+             {onRemove && <Button type="button" variant="ghost" size="icon" className="h-6 w-6 text-red-400" onClick={onRemove}><X className="w-3 h-3" /></Button>}
            </div>
         </div>
         {!isCollapsed && (
@@ -288,7 +288,7 @@ const RecursiveFieldEditor = ({
     <div className="space-y-1 mt-2">
        <div className="flex justify-between items-center">
           {label && <Label className="text-xs font-semibold text-gray-700">{label}</Label>}
-          {onRemove && <Button variant="ghost" size="icon" className="h-6 w-6 text-red-400" onClick={onRemove}><X className="w-3 h-3" /></Button>}
+          {onRemove && <Button type="button" variant="ghost" size="icon" className="h-6 w-6 text-red-400" onClick={onRemove}><X className="w-3 h-3" /></Button>}
        </div>
        
        {type === 'content' && typeof value === 'string' && (
@@ -355,7 +355,7 @@ const DynamicJsonEditor = ({
     return (
       <div className="space-y-2">
         <div className="flex justify-end">
-          <Button variant="outline" size="sm" onClick={() => setMode('visual')} disabled={!!error}>Switch to Visual Editor</Button>
+          <Button type="button" variant="outline" size="sm" onClick={() => setMode('visual')} disabled={!!error}>Switch to Visual Editor</Button>
         </div>
         <Textarea
           value={value}
@@ -372,7 +372,7 @@ const DynamicJsonEditor = ({
       <div className="flex justify-between items-center">
         <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">{type} Editor</span>
         <div className="flex gap-2">
-          <Button variant="ghost" size="sm" onClick={() => setMode('raw')}>Raw JSON</Button>
+          <Button type="button" variant="ghost" size="sm" onClick={() => setMode('raw')}>Raw JSON</Button>
         </div>
       </div>
       
