@@ -49,6 +49,7 @@ import {
   updatePageContent,
 } from "@/lib/content";
 import { supabase, uploadImage } from "@/lib/supabase";
+import { componentKeys } from "@/componentMap";
 import PageRouterManager from "./PageRouterManager";
 
 const ADMIN_EMAIL = "admin@gglau.com";
@@ -438,6 +439,7 @@ export default function AdminDashboard() {
   const [isPageEditorOpen, setIsPageEditorOpen] = useState(false);
   const [editorPagePath, setEditorPagePath] = useState("");
   const [editorSections, setEditorSections] = useState<Partial<PageContent>[]>([]);
+  const [editorComponentKey, setEditorComponentKey] = useState<string>("");
 
   useEffect(() => {
     if (editingRecord) {
@@ -684,7 +686,7 @@ export default function AdminDashboard() {
   };
 
   // New Page Editor Handlers
-  const handleEditPage = (path: string) => {
+  const handleEditPage = async (path: string) => {
     setEditorPagePath(path);
     // Sort sections: SEO first, then Hero, then Main, then others
     const sections = [...(groupedPages[path] || [])].sort((a, b) => {
@@ -697,6 +699,12 @@ export default function AdminDashboard() {
       return a.section_key.localeCompare(b.section_key);
     });
     setEditorSections(JSON.parse(JSON.stringify(sections)));
+    
+    // Fetch existing route config
+    const { data: pageData } = await supabase.from('pages').select('component_key').eq('path', path).maybeSingle();
+    if (pageData) {
+      setEditorComponentKey(pageData.component_key);
+    }
     setIsPageEditorOpen(true);
   };
 
@@ -704,6 +712,7 @@ export default function AdminDashboard() {
     setEditorPagePath("");
     // Pre-fill with default service page template
     setEditorSections(pageTemplates.service);
+    setEditorComponentKey(componentKeys[0] || "DynamicPage");
     setIsPageEditorOpen(true);
   };
 
@@ -717,6 +726,26 @@ export default function AdminDashboard() {
     if (!formattedPath.startsWith('/')) formattedPath = '/' + formattedPath;
 
     try {
+      // 1. Ensure Route Exists in 'pages' table
+      const seoSection = editorSections.find(s => s.section_key === 'seo');
+      const pageTitle = (seoSection?.content as any)?.title || formattedPath;
+      
+      const pagePayload = {
+        path: formattedPath,
+        title: pageTitle,
+        component_key: editorComponentKey || componentKeys[0],
+      };
+
+      // Check if page exists to decide on insert vs update (or just upsert if ID known, but path is unique usually)
+      const { data: existingPage } = await supabase.from('pages').select('id').eq('path', formattedPath).maybeSingle();
+      
+      if (existingPage) {
+        await supabase.from('pages').update(pagePayload).eq('id', existingPage.id);
+      } else {
+        await supabase.from('pages').insert([pagePayload]);
+      }
+
+      // 2. Save Content Sections
       const promises = [];
 
       for (const section of editorSections) {
@@ -741,6 +770,7 @@ export default function AdminDashboard() {
       }
 
       queryClient.invalidateQueries({ queryKey: ["page-content"] });
+      queryClient.invalidateQueries({ queryKey: ["pages-count"] });
       toast({ title: "Page saved successfully" });
       setIsPageEditorOpen(false);
     } catch (e) {
@@ -1391,14 +1421,35 @@ export default function AdminDashboard() {
                         <CardTitle>Page Configuration</CardTitle>
                       </CardHeader>
                       <CardContent className="grid md:grid-cols-2 gap-6">
-                        <div className="space-y-2">
+                        <div className="space-y-2 flex flex-col">
                           <Label htmlFor="page-path-input">Page Path</Label>
                           <Input 
                             id="page-path-input"
                             placeholder="/services/new-service" 
                             value={editorPagePath} 
                             onChange={(e) => setEditorPagePath(e.target.value)} 
+                            onBlur={() => {
+                              if (editorPagePath && !editorPagePath.startsWith('/')) {
+                                setEditorPagePath('/' + editorPagePath);
+                              }
+                            }}
                           />
+                          <p className="text-xs text-muted-foreground">Must start with /</p>
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="component-selector">Route Component</Label>
+                          <Select value={editorComponentKey} onValueChange={setEditorComponentKey}>
+                            <SelectTrigger id="component-selector">
+                              <SelectValue placeholder="Select component" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {componentKeys.map((key) => (
+                                <SelectItem key={key} value={key}>
+                                  {key}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
                         </div>
                         <div className="space-y-2">
                           <Label htmlFor="template-selector">Page Template</Label>
