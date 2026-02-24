@@ -1,30 +1,73 @@
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { QueryClient, QueryClientProvider, useQuery } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { supabase } from "./lib/supabase"; // Assuming you have this
+import { Loader2 } from "lucide-react";
 
-import Index from "./pages/Index";
-import Contact from "./pages/Contact";
-import About from "./pages/About";
-import Services from "./pages/Services";
-import TermsOfUse from "./pages/TermsOfUse";
-import PrivacyPolicy from "./pages/PrivacyPolicy";
 import NotFound from "./pages/NotFound";
-
-import LiquidTransportation from "./pages/services/LiquidTransportation";
-import ProjectCargo from "./pages/services/ProjectCargo";
-import AirFreight from "./pages/services/AirFreight";
-import OceanFreight from "./pages/services/OceanFreight";
-import CustomsClearance from "./pages/services/CustomsClearance";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 
-import GlobalPresence from "./pages/GlobalPresence";
-
-
 import { ScrollToTop } from "./components/common/ScrollToTop";
+import { componentMap } from "./componentMap";
 
 const queryClient = new QueryClient();
+
+type Page = {
+  id: number;
+  path: string;
+  component_key: keyof typeof componentMap;
+};
+
+const fetchPages = async (): Promise<Page[]> => {
+  const { data, error } = await supabase.from("pages").select("id, path, component_key");
+  if (error) {
+    console.error("Error fetching dynamic pages:", error);
+    return []; // Return empty array on error to prevent crash
+  }
+  return data || [];
+};
+
+const DynamicRoutes = () => {
+  const { data: pages, isLoading, isError } = useQuery({
+    queryKey: ['dynamic-pages'],
+    queryFn: fetchPages,
+  });
+
+  if (isLoading) {
+    return (
+      <div className="w-full h-screen flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-brand-gold" />
+      </div>
+    );
+  }
+
+  if (isError) {
+    // You might want a more robust error page here
+    return <p>Error loading page configuration.</p>;
+  }
+
+  return (
+    <Routes>
+      {/* Static routes that are always present */}
+      <Route path="/admin" element={<AdminDashboard />} />
+
+      {/* Render routes from the database */}
+      {pages?.map(({ path, component_key }) => {
+        const Component = componentMap[component_key];
+        if (!Component) {
+          console.warn(`Component for key "${component_key}" not found.`);
+          return null;
+        }
+        return <Route key={path} path={path} element={<Component />} />;
+      })}
+
+      {/* Fallback 404 route */}
+      <Route path="*" element={<NotFound />} />
+    </Routes>
+  );
+};
 
 function App() {
   return (
@@ -32,41 +75,7 @@ function App() {
       <TooltipProvider>
         <BrowserRouter>
           <ScrollToTop />
-          <Routes>
-            {/* Main site */}
-            <Route path="/" element={<Index />} />
-            <Route path="/contact" element={<Contact />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/services" element={<Services />} />
-            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-            <Route path="/terms-and-conditions" element={<TermsOfUse />} />
-            <Route path="/global-presence" element={<GlobalPresence />} />
-
-            {/* Admin */}
-            {/* Decap CMS is served statically at /admin/index.html */}
-
-            {/* Service specific pages */}
-            <Route
-              path="/services/liquid-transportation"
-              element={<LiquidTransportation />}
-            />
-            <Route path="/services/air-freight" element={<AirFreight />} />
-            <Route path="/services/project-cargo" element={<ProjectCargo />} />
-            <Route path="/services/ocean-freight" element={<OceanFreight />} />
-            <Route path="/admin" element={<AdminDashboard />} />
-            <Route
-              path="/services/customs-clearance"
-              element={<CustomsClearance />}
-            />
-
-            {/* Bangladesh mini-site 
-               Use /* to allow nested routes inside BangladeshHome if you add them later */}
-            
-
-            {/* Fallback */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-
+          <DynamicRoutes />
           <Toaster />
           <Sonner />
         </BrowserRouter>
