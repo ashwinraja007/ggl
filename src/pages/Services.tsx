@@ -84,7 +84,7 @@ const ServiceCard = ({
 };
 
 const Services = () => {
-  const { data: pageContent } = useQuery({
+  const { data: pageContent, isLoading } = useQuery({
     queryKey: ["page-content", "/services"],
     queryFn: () => fetchPageContent("/services"),
   });
@@ -153,9 +153,18 @@ const Services = () => {
   const whyChooseUsRecord = findRecord('why-choose-us');
 
   const getServicesList = () => {
-    if (!servicesRecord?.content) return defaultData.services;
-    if (Array.isArray(servicesRecord.content)) return servicesRecord.content;
-    if (Array.isArray(servicesRecord.content.items)) return servicesRecord.content.items;
+    if (!servicesRecord) return defaultData.services;
+    
+    let content = servicesRecord.content;
+    // Handle case where content might be a string (e.g. double stringified)
+    if (typeof content === 'string') {
+      try { content = JSON.parse(content); } catch (e) { console.error("Error parsing content", e); }
+    }
+
+    if (!content) return defaultData.services;
+    if (Array.isArray(content)) return content;
+    if ((content as any).items && Array.isArray((content as any).items)) return (content as any).items;
+    if ((content as any).services && Array.isArray((content as any).services)) return (content as any).services;
     return defaultData.services;
   };
 
@@ -168,7 +177,7 @@ const Services = () => {
     whyChooseUs: {
       title: whyChooseUsRecord?.content?.title || defaultData.whyChooseUs.title,
       subtitle: whyChooseUsRecord?.content?.subtitle || defaultData.whyChooseUs.subtitle,
-      features: Array.isArray(whyChooseUsRecord?.content?.features) ? whyChooseUsRecord?.content?.features : defaultData.whyChooseUs.features
+      features: whyChooseUsRecord?.content?.features && Array.isArray((whyChooseUsRecord.content as any).features) ? (whyChooseUsRecord.content as any).features : defaultData.whyChooseUs.features
     }
   };
 
@@ -187,6 +196,11 @@ const Services = () => {
       <ScrollToTop />
       <Header />
 
+      {isLoading ? (
+        <div className="flex-grow flex items-center justify-center min-h-[50vh]">
+          <Loader2 className="w-8 h-8 animate-spin text-brand-gold" />
+        </div>
+      ) : (
       <main className="flex-grow pt-16 md:pt-20">
         {/* Hero Section */}
         <section className="bg-gradient-to-br from-gray-50 to-brand-lightGray py-6 md:py-12">
@@ -256,6 +270,7 @@ const Services = () => {
           </div>
         </section>
       </main>
+      )}
 
       <Footer />
     </div>

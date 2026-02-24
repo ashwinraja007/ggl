@@ -644,6 +644,10 @@ export default function AdminDashboard() {
         throw new Error("Page path and Section key are required");
       }
 
+      if (!payload.page_path.startsWith('/')) {
+        payload.page_path = '/' + payload.page_path;
+      }
+
       if (editingContent) {
         updateContentMutation.mutate({ id: editingContent.id, payload });
       } else {
