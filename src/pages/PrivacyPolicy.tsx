@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from "react-router-dom";
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
-import SEO from '@/components/SEO';
+import { useSEO } from '@/seo';
 
 interface Section {
   title: string;
@@ -15,6 +15,9 @@ interface Subsection {
 }
 
 const PrivacyPolicyPage: React.FC = () => {
+  // Even though this page is static, using the hook ensures consistency
+  // and automatically applies the metadata from META_CONFIG in seo.tsx.
+  useSEO();
   const [isLoaded, setIsLoaded] = useState(false);
   useEffect(() => {
     setIsLoaded(true);
@@ -319,16 +322,6 @@ const PrivacyPolicyPage: React.FC = () => {
 
   return (
     <div className={`min-h-screen bg-gray-50 transition-opacity duration-500 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}>
-      {/* ✅ Page SEO */}
-      <SEO
-        title="Privacy Policy – GGL Australia | Data Protection & User Privacy"
-        description="Learn how GGL Australia collects, uses, and protects your personal information. Our privacy policy outlines our data practices and your rights regarding your data."
-        keywords="GGL Australia, privacy policy, data protection, user privacy, data collection, cookies, personal information, GDPR, security"
-        url="https://www.gglaustralia.com/privacy-policy"
-        canonical="https://www.gglaustralia.com/privacy-policy"
-        image="https://www.gglaustralia.com/lovable-uploads/ggl-logo.png"
-      />
-
       <Header />
 
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">

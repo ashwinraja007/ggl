@@ -1,13 +1,30 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { motion } from 'framer-motion';
 import { Plane, Clock, Globe, Headset, Loader2 } from "lucide-react";
 import { Link } from 'react-router-dom';
 import { AspectRatio } from "@/components/ui/aspect-ratio";
-import SEO from '@/components/SEO';
+import { useSEO, SeoRecord } from '@/seo';
 import { useQuery } from '@tanstack/react-query';
 import { fetchPageContent } from '@/lib/content';
+
+const processPageContent = (contentArray: any[] | undefined) => {
+  if (!Array.isArray(contentArray)) return {};
+  const contentObj = contentArray.reduce((acc, record) => {
+      let content = record.content;
+      if (typeof content === 'string') {
+          try {
+              content = JSON.parse(content);
+          } catch (e) {
+              console.error("Error parsing content for section:", record.section_key, e);
+          }
+      }
+      acc[record.section_key.toLowerCase()] = { ...(typeof content === 'object' && content !== null ? content : { raw: content }), images: record.images };
+      return acc;
+  }, {});
+  return contentObj;
+};
 
 const iconMap: { [key: string]: React.ReactNode } = {
   Clock: <Clock className="h-10 w-10 text-brand-gold" />,
@@ -25,49 +42,27 @@ const getIcon = (iconName: string) => {
 };
 
 const AirFreight = () => {
-  const { data: pageContent, isLoading } = useQuery({
+  const { data: rawPageContent, isLoading } = useQuery({
     queryKey: ["page-content", "/services/air-freight"],
     queryFn: () => fetchPageContent("/services/air-freight"),
   });
 
-  // Helper to safely get content
-  const getContent = (sectionKey: string) => {
-    const record = pageContent?.find(r => r.section_key.toLowerCase() === sectionKey.toLowerCase());
-    if (!record?.content) return null;
-    let content = record.content;
-    if (typeof content === 'string') {
-      try { content = JSON.parse(content); } catch (e) { console.error("Error parsing content", e); }
-    }
-    return { content, images: record.images };
-  };
+  const pageData = useMemo(() => processPageContent(rawPageContent), [rawPageContent]);
 
-  const heroRecord = getContent('hero');
-  const mainRecord = getContent('main');
-  const featuresRecord = getContent('features');
-  const subServicesRecord = getContent('sub_services');
+  useSEO(pageData.seo as SeoRecord);
 
   const data = {
-    heroTitle: heroRecord?.content?.title || "Air Freight Solutions",
-    heroSubtitle: heroRecord?.content?.subtitle || "Tailored air freight solutions to meet your unique requirements",
-    heroImage: heroRecord?.images?.background || "/airfreight2.jpg",
-    mainTitle: mainRecord?.content?.title || "Comprehensive Air Freight Services",
-    mainBody: mainRecord?.content?.body || `<p class="text-gray-700 mb-6 font-normal text-justify">Tailored air freight solutions to meet your unique requirements. We understand that every shipment is different. That's why we offer flexible air freight solutions designed to meet your specific needs. Whether you're shipping time-sensitive documents or large-scale cargo, we have the expertise and resources to handle it efficiently.</p><p class="text-gray-700 text-justify">Our comprehensive services include air imports, exports, and express deliveries, all with the convenience of door-to-door service. We pride ourselves on our competitive pricing and our unwavering commitment to providing exceptional customer support. Let us optimize your air freight logistics and ensure your shipments reach their destinations seamlessly.</p>`,
-    features: (featuresRecord?.content?.items && Array.isArray(featuresRecord.content.items)) ? featuresRecord.content.items : [],
-    subServices: (subServicesRecord?.content?.items && Array.isArray(subServicesRecord.content.items)) ? subServicesRecord.content.items : []
+    heroTitle: pageData.hero?.title || "Air Freight Solutions",
+    heroSubtitle: pageData.hero?.subtitle || "Tailored air freight solutions to meet your unique requirements",
+    heroImage: pageData.hero?.images?.background || "/airfreight2.jpg",
+    mainTitle: pageData.main?.title || "Comprehensive Air Freight Services",
+    mainBody: pageData.main?.body || `<p class="text-gray-700 mb-6 font-normal text-justify">Tailored air freight solutions to meet your unique requirements. We understand that every shipment is different. That's why we offer flexible air freight solutions designed to meet your specific needs. Whether you're shipping time-sensitive documents or large-scale cargo, we have the expertise and resources to handle it efficiently.</p><p class="text-gray-700 text-justify">Our comprehensive services include air imports, exports, and express deliveries, all with the convenience of door-to-door service. We pride ourselves on our competitive pricing and our unwavering commitment to providing exceptional customer support. Let us optimize your air freight logistics and ensure your shipments reach their destinations seamlessly.</p>`,
+    features: (pageData.features?.items && Array.isArray(pageData.features.items)) ? pageData.features.items : [],
+    subServices: (pageData.sub_services?.items && Array.isArray(pageData.sub_services.items)) ? pageData.sub_services.items : []
   };
 
   return (
     <div className="min-h-screen flex flex-col">
-      {/* ✅ Page SEO */}
-      <SEO
-        title="Air Freight Services – GGL Australia | Global Logistics Solutions"
-        description="GGL Australia offers reliable and efficient air freight solutions tailored to your business needs. From express shipments to specialized cargo, we ensure timely and secure delivery worldwide."
-        keywords="GGL Australia, air freight services, global logistics, express shipments, specialized cargo, international shipping, secure delivery, timely delivery, freight forwarding"
-        url="https://www.gglaustralia.com/services/air-freight"
-        canonical="https://www.gglaustralia.com/services/air-freight"
-        image="https://www.gglaustralia.com/lovable-uploads/ggl-logo.png"
-      />
-
       <Header />
       
       {isLoading ? (

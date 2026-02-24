@@ -1,12 +1,29 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { motion } from 'framer-motion';
 import { FileCheck, ShieldCheck, Lightbulb, Globe, Loader2 } from "lucide-react";
 import { Link } from 'react-router-dom';
-import SEO from '@/components/SEO';
+import { useSEO, SeoRecord } from '@/seo';
 import { useQuery } from '@tanstack/react-query';
 import { fetchPageContent } from '@/lib/content';
+
+const processPageContent = (contentArray: any[] | undefined) => {
+  if (!Array.isArray(contentArray)) return {};
+  const contentObj = contentArray.reduce((acc, record) => {
+      let content = record.content;
+      if (typeof content === 'string') {
+          try {
+              content = JSON.parse(content);
+          } catch (e) {
+              console.error("Error parsing content for section:", record.section_key, e);
+          }
+      }
+      acc[record.section_key.toLowerCase()] = { ...(typeof content === 'object' && content !== null ? content : { raw: content }), images: record.images };
+      return acc;
+  }, {});
+  return contentObj;
+};
 
 const iconMap: { [key: string]: React.ReactNode } = {
   FileCheck: <FileCheck className="h-16 w-16 text-white" />,
@@ -23,41 +40,25 @@ const getIcon = (iconName: string) => {
 };
 
 const CustomsClearance = () => {
-  const { data: pageContent, isLoading } = useQuery({
+  const { data: rawPageContent, isLoading } = useQuery({
     queryKey: ["page-content", "/services/customs-clearance"],
     queryFn: () => fetchPageContent("/services/customs-clearance"),
   });
 
-  const getContent = (sectionKey: string) => {
-    const record = pageContent?.find(r => r.section_key.toLowerCase() === sectionKey.toLowerCase());
-    if (!record?.content) return null;
-    let content = record.content;
-    if (typeof content === 'string') {
-      try { content = JSON.parse(content); } catch (e) { console.error("Error parsing content", e); }
-    }
-    return { content, images: record.images };
-  };
+  const pageData = useMemo(() => processPageContent(rawPageContent), [rawPageContent]);
 
-  const heroRecord = getContent('hero');
-  const mainRecord = getContent('main');
-  const featuresRecord = getContent('features');
-  const subServicesRecord = getContent('sub_services');
+  useSEO(pageData.seo as SeoRecord);
 
-  const features = (featuresRecord?.content?.items && Array.isArray(featuresRecord.content.items)) ? featuresRecord.content.items : [];
-  const subServices = (subServicesRecord?.content?.items && Array.isArray(subServicesRecord.content.items)) ? subServicesRecord.content.items : [];
+  const heroRecord = pageData.hero || {};
+  const mainRecord = pageData.main || {};
+  const featuresRecord = pageData.features || {};
+  const subServicesRecord = pageData.sub_services || {};
+
+  const features = (featuresRecord?.items && Array.isArray(featuresRecord.items)) ? featuresRecord.items : [];
+  const subServices = (subServicesRecord?.items && Array.isArray(subServicesRecord.items)) ? subServicesRecord.items : [];
 
   return (
     <div className="min-h-screen flex flex-col">
-      {/* ✅ Page SEO */}
-      <SEO
-        title="Customs Clearance Services – GGL Australia | Smooth Cross-Border Logistics"
-        description="GGL Australia offers expert customs clearance services to ensure your shipments move smoothly across borders. We handle all aspects of the process, providing efficient and compliant solutions for your logistics needs."
-        keywords="GGL Australia, customs clearance services, cross-border logistics, import/export compliance, customs brokerage, international shipping, freight forwarding, logistics solutions"
-        url="https://www.gglaustralia.com/services/customs-clearance"
-        canonical="https://www.gglaustralia.com/services/customs-clearance"
-        image="https://www.gglaustralia.com/lovable-uploads/ggl-logo.png"
-      />
-
       <Header />
       
       {isLoading ? (
@@ -77,7 +78,7 @@ const CustomsClearance = () => {
                   transition={{ duration: 0.5 }}
                   className="text-3xl md:text-4xl font-bold mb-4 text-gray-900"
                 >
-                  {heroRecord?.content?.title || "Customs Clearance Services"}
+                  {heroRecord?.title || "Customs Clearance Services"}
                 </motion.h1>
                 <motion.p
                   initial={{ opacity: 0, y: 20 }}
@@ -85,7 +86,7 @@ const CustomsClearance = () => {
                   transition={{ duration: 0.5, delay: 0.1 }}
                   className="text-lg text-gray-700 mb-6"
                 >
-                  {heroRecord?.content?.subtitle || "Expert solutions for seamless border crossings"}
+                  {heroRecord?.subtitle || "Expert solutions for seamless border crossings"}
                 </motion.p>
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
@@ -123,12 +124,12 @@ const CustomsClearance = () => {
           <div className="container mx-auto px-4">
             <div className="max-w-3xl mx-auto mb-12">
               <h2 className="text-2xl md:text-3xl font-bold mb-6 text-center text-gray-800">
-                {mainRecord?.content?.title || "Seamless Customs Clearance Solutions"}
+                {mainRecord?.title || "Seamless Customs Clearance Solutions"}
               </h2>
               <div className="w-24 h-1 bg-brand-gold mx-auto mb-8"></div>
               <div 
                 className="prose max-w-none text-gray-700 text-justify"
-                dangerouslySetInnerHTML={{ __html: mainRecord?.content?.body || "<p>Navigating the complexities of global trade is simplified with our expert customs clearance services. We ensure your shipments move smoothly across borders, handling all aspects of the process from accurate documentation and tariff classification to regulatory compliance and specialized cargo handling.</p><p>Our experienced team stays abreast of evolving regulations, leverages advanced technology for expedited clearance, and maintains strong relationships with customs authorities worldwide. We prioritize transparency and open communication, providing real-time updates and peace of mind, allowing you to focus on your core business. Trust us to manage your import and export needs, minimizing delays and ensuring your shipments reach their destinations efficiently and compliantly.</p>" }}
+                dangerouslySetInnerHTML={{ __html: mainRecord?.body || "<p>Navigating the complexities of global trade is simplified with our expert customs clearance services. We ensure your shipments move smoothly across borders, handling all aspects of the process from accurate documentation and tariff classification to regulatory compliance and specialized cargo handling.</p><p>Our experienced team stays abreast of evolving regulations, leverages advanced technology for expedited clearance, and maintains strong relationships with customs authorities worldwide. We prioritize transparency and open communication, providing real-time updates and peace of mind, allowing you to focus on your core business. Trust us to manage your import and export needs, minimizing delays and ensuring your shipments reach their destinations efficiently and compliantly.</p>" }}
               />
             </div>
             

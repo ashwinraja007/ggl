@@ -1,13 +1,30 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { useLocation, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { Plane, Ship, FileText, Droplets, Warehouse, Loader2 } from "lucide-react";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
-import SEO from '@/components/SEO';
+import { useSEO, SeoRecord } from '@/seo';
 import { useQuery } from '@tanstack/react-query';
 import { fetchPageContent } from '@/lib/content';
+
+const processPageContent = (contentArray: any[] | undefined) => {
+  if (!Array.isArray(contentArray)) return {};
+  const contentObj = contentArray.reduce((acc, record) => {
+      let content = record.content;
+      if (typeof content === 'string') {
+          try {
+              content = JSON.parse(content);
+          } catch (e) {
+              console.error("Error parsing content for section:", record.section_key, e);
+          }
+      }
+      acc[record.section_key.toLowerCase()] = { ...(typeof content === 'object' && content !== null ? content : { raw: content }), images: record.images };
+      return acc;
+  }, {});
+  return contentObj;
+};
 
 const iconMap: { [key: string]: React.ReactNode } = {
   Plane: <Plane className="w-5 h-5" />,
@@ -84,10 +101,12 @@ const ServiceCard = ({
 };
 
 const Services = () => {
-  const { data: pageContent, isLoading } = useQuery({
+  const { data: rawPageContent, isLoading } = useQuery({
     queryKey: ["page-content", "/services"],
     queryFn: () => fetchPageContent("/services"),
   });
+
+  const pageData = useMemo(() => processPageContent(rawPageContent), [rawPageContent]);
 
   const defaultData = {
     hero: {
@@ -145,16 +164,18 @@ const Services = () => {
     }
   };
 
+  useSEO(pageData.seo as SeoRecord);
+
   // Helper to find record with flexible matching
   const findRecord = (key: string) => {
-    if (!Array.isArray(pageContent)) return undefined;
-    return pageContent.find(r => r.section_key.toLowerCase() === key.toLowerCase()) ||
-           pageContent.find(r => r.section_key.toLowerCase().includes(key.toLowerCase()));
+    if (!Array.isArray(rawPageContent)) return undefined;
+    return rawPageContent.find(r => r.section_key.toLowerCase() === key.toLowerCase()) ||
+           rawPageContent.find(r => r.section_key.toLowerCase().includes(key.toLowerCase()));
   };
 
-  const heroRecord = findRecord('hero');
-  const servicesRecord = findRecord('services');
-  const whyChooseUsRecord = findRecord('why-choose-us');
+  const heroRecord = pageData.hero;
+  const servicesRecord = pageData.services;
+  const whyChooseUsRecord = pageData['why-choose-us'];
 
   const getServicesList = () => {
     if (!servicesRecord) return defaultData.services;
@@ -180,29 +201,19 @@ const Services = () => {
 
   const data = {
     hero: {
-      title: heroRecord?.content?.title || defaultData.hero.title,
-      subtitle: heroRecord?.content?.subtitle || defaultData.hero.subtitle
+      title: heroRecord?.title || defaultData.hero.title,
+      subtitle: heroRecord?.subtitle || defaultData.hero.subtitle
     },
     services: getServicesList(),
     whyChooseUs: {
-      title: whyChooseUsRecord?.content?.title || defaultData.whyChooseUs.title,
-      subtitle: whyChooseUsRecord?.content?.subtitle || defaultData.whyChooseUs.subtitle,
-      features: whyChooseUsRecord?.content?.features && Array.isArray((whyChooseUsRecord.content as any).features) ? (whyChooseUsRecord.content as any).features : defaultData.whyChooseUs.features
+      title: whyChooseUsRecord?.title || defaultData.whyChooseUs.title,
+      subtitle: whyChooseUsRecord?.subtitle || defaultData.whyChooseUs.subtitle,
+      features: whyChooseUsRecord?.features && Array.isArray((whyChooseUsRecord as any).features) ? (whyChooseUsRecord as any).features : defaultData.whyChooseUs.features
     }
   };
 
   return (
     <div className="min-h-screen flex flex-col">
-      {/* ✅ Page SEO */}
-      <SEO
-        title="Services — GGL Australia | Freight Forwarding & Supply Chain Solutions"
-        description="Explore GGL Australia’s expert freight forwarding, warehousing, transport, and supply chain services. Tailored logistics solutions for smooth, end-to-end delivery."
-        keywords="GGL Australia, freight forwarding services, warehousing solutions, transportation logistics, supply chain management, logistics services, end-to-end delivery, international shipping"
-        url="https://www.gglaustralia.com/services"
-        canonical="https://www.gglaustralia.com/services"
-        image="https://www.gglaustralia.com/lovable-uploads/ggl-logo.png"
-      />
-
       <ScrollToTop />
       <Header />
 

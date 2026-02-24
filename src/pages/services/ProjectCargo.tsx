@@ -1,12 +1,29 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { motion } from 'framer-motion';
 import { Package, Truck, Shield, Globe, Settings, CheckCircle, Route, Eye, DollarSign, Users, Loader2 } from "lucide-react";
 import { Link } from 'react-router-dom';
-import SEO from '@/components/SEO';
+import { useSEO, SeoRecord } from '@/seo';
 import { useQuery } from '@tanstack/react-query';
 import { fetchPageContent } from '@/lib/content';
+
+const processPageContent = (contentArray: any[] | undefined) => {
+  if (!Array.isArray(contentArray)) return {};
+  const contentObj = contentArray.reduce((acc, record) => {
+      let content = record.content;
+      if (typeof content === 'string') {
+          try {
+              content = JSON.parse(content);
+          } catch (e) {
+              console.error("Error parsing content for section:", record.section_key, e);
+          }
+      }
+      acc[record.section_key.toLowerCase()] = { ...(typeof content === 'object' && content !== null ? content : { raw: content }), images: record.images };
+      return acc;
+  }, {});
+  return contentObj;
+};
 
 const iconMap: { [key: string]: React.ReactNode } = {
   Package: <Package className="h-8 w-8 text-brand-gold mr-3" />,
@@ -29,42 +46,26 @@ const getIcon = (iconName: string, className?: string) => {
 };
 
 const ProjectCargo = () => {
-  const { data: pageContent, isLoading } = useQuery({
+  const { data: rawPageContent, isLoading } = useQuery({
     queryKey: ["page-content", "/services/project-cargo"],
     queryFn: () => fetchPageContent("/services/project-cargo"),
   });
 
-  const getContent = (sectionKey: string) => {
-    const record = pageContent?.find(r => r.section_key.toLowerCase() === sectionKey.toLowerCase());
-    if (!record?.content) return null;
-    let content = record.content;
-    if (typeof content === 'string') {
-      try { content = JSON.parse(content); } catch (e) { console.error("Error parsing content", e); }
-    }
-    return { content, images: record.images };
-  };
+  const pageData = useMemo(() => processPageContent(rawPageContent), [rawPageContent]);
 
-  const heroRecord = getContent('hero');
-  const characteristicsRecord = getContent('characteristics');
-  const whyChooseRecord = getContent('why_choose');
-  const benefitsRecord = getContent('benefits');
+  useSEO(pageData.seo as SeoRecord);
 
-  const characteristics = (characteristicsRecord?.content?.items && Array.isArray(characteristicsRecord.content.items)) ? characteristicsRecord.content.items : [];
-  const whyChoose = (whyChooseRecord?.content?.items && Array.isArray(whyChooseRecord.content.items)) ? whyChooseRecord.content.items : [];
-  const benefits = (benefitsRecord?.content?.items && Array.isArray(benefitsRecord.content.items)) ? benefitsRecord.content.items : [];
+  const heroRecord = pageData.hero || {};
+  const characteristicsRecord = pageData.characteristics || {};
+  const whyChooseRecord = pageData.why_choose || {};
+  const benefitsRecord = pageData.benefits || {};
+
+  const characteristics = (characteristicsRecord?.items && Array.isArray(characteristicsRecord.items)) ? characteristicsRecord.items : [];
+  const whyChoose = (whyChooseRecord?.items && Array.isArray(whyChooseRecord.items)) ? whyChooseRecord.items : [];
+  const benefits = (benefitsRecord?.items && Array.isArray(benefitsRecord.items)) ? benefitsRecord.items : [];
 
   return (
     <div className="min-h-screen flex flex-col">
-      {/* ✅ Page SEO */}
-      <SEO
-        title="Project Cargo Services – GGL Australia | Heavy & Oversized Freight Solutions"
-        description="GGL Australia specializes in project cargo logistics—heavy, oversized, and high-value equipment. We handle route surveys, lifting plans, permits, and end-to-end project management for safe, on-time delivery."
-        keywords="GGL Australia, project cargo services, heavy freight logistics, oversized cargo transport, lifting plans, route surveys, end-to-end project management, specialized freight solutions, industrial equipment transport"
-        url="https://www.gglaustralia.com/services/project-cargo"
-        canonical="https://www.gglaustralia.com/services/project-cargo"
-        image="https://www.gglaustralia.com/projectcargo3.png"
-      />
-
       <Header />
       
       {isLoading ? (
@@ -84,7 +85,7 @@ const ProjectCargo = () => {
                   transition={{ duration: 0.5 }}
                   className="text-3xl md:text-4xl font-bold mb-4 text-gray-900"
                 >
-                  {heroRecord?.content?.title || "Project Cargo Services"}
+                  {heroRecord?.title || "Project Cargo Services"}
                 </motion.h1>
                 <motion.p
                   initial={{ opacity: 0, y: 20 }}
@@ -92,7 +93,7 @@ const ProjectCargo = () => {
                   transition={{ duration: 0.5, delay: 0.1 }}
                   className="text-lg text-gray-700 mb-6"
                 >
-                  {heroRecord?.content?.subtitle || "At GGL, we specialize in managing project cargo—the transportation of large, heavy, high-value, or complex pieces of equipment and materials essential to major infrastructure, engineering, or industrial projects. Our expertise ensures that these shipments receive the customized handling, multimodal transport solutions, and precise coordination needed to meet strict timelines and safety standards."}
+                  {heroRecord?.subtitle || "At GGL, we specialize in managing project cargo—the transportation of large, heavy, high-value, or complex pieces of equipment and materials essential to major infrastructure, engineering, or industrial projects. Our expertise ensures that these shipments receive the customized handling, multimodal transport solutions, and precise coordination needed to meet strict timelines and safety standards."}
                 </motion.p>
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
@@ -126,7 +127,7 @@ const ProjectCargo = () => {
             {/* Key Characteristics Section */}
             <div className="max-w-4xl mx-auto mb-16">
               <h2 className="text-2xl md:text-3xl font-bold mb-6 text-center text-gray-800">
-                {characteristicsRecord?.content?.title || "Key Characteristics of Project Cargo"}
+                {characteristicsRecord?.title || "Key Characteristics of Project Cargo"}
               </h2>
               <div className="w-24 h-1 bg-brand-gold mx-auto mb-8"></div>
               
@@ -158,12 +159,12 @@ const ProjectCargo = () => {
             {/* Why Choose GGL Section */}
             <div className="max-w-4xl mx-auto mb-16">
               <h2 className="text-2xl md:text-3xl font-bold mb-6 text-center text-gray-800">
-                {whyChooseRecord?.content?.title || "Why Choose GGL for Your Project Cargo Needs?"}
+                {whyChooseRecord?.title || "Why Choose GGL for Your Project Cargo Needs?"}
               </h2>
               <div className="w-24 h-1 bg-brand-gold mx-auto mb-8"></div>
               
               <p className="text-gray-700 mb-8 text-justify">
-                {whyChooseRecord?.content?.subtitle || "Managing project cargo requires experience, precision, and global coordination. As a seasoned freight forwarder and global logistics company, GGL provides:"}
+                {whyChooseRecord?.subtitle || "Managing project cargo requires experience, precision, and global coordination. As a seasoned freight forwarder and global logistics company, GGL provides:"}
               </p>
               
               <div className="space-y-6">
@@ -197,7 +198,7 @@ const ProjectCargo = () => {
             {/* Benefits Section */}
             <div className="max-w-4xl mx-auto mb-16">
               <h2 className="text-2xl md:text-3xl font-bold mb-6 text-center text-gray-800">
-                {benefitsRecord?.content?.title || "Benefits of Professional Project Cargo Services"}
+                {benefitsRecord?.title || "Benefits of Professional Project Cargo Services"}
               </h2>
               <div className="w-24 h-1 bg-brand-gold mx-auto mb-8"></div>
               

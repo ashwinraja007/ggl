@@ -1,12 +1,18 @@
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import { fetchSeoRecordByPath } from "./lib/seo";
 
 interface MetaConfig {
   title?: string;
   description?: string;
   keywords?: string;
   extraMeta?: Record<string, string> | null;
+  url?: string;
+  canonical?: string;
+  image?: string;
+}
+
+export interface SeoRecord extends Omit<MetaConfig, 'extraMeta' | 'url' | 'canonical' | 'image'> {
+  extra_meta?: Record<string, string> | null;
 }
 
 export const META_CONFIG: Record<string, MetaConfig> = {
@@ -29,10 +35,11 @@ export const META_CONFIG: Record<string, MetaConfig> = {
   },
   "/services": {
     title: "Services — GGL Australia | Freight Forwarding & Supply Chain Solutions",
-    description:
-      "Explore GGL Australia’s expert freight forwarding, warehousing, transport, and supply chain services. Tailored logistics solutions for smooth, end-to-end delivery.",
-    keywords:
-      "GGL Australia, freight forwarding services, warehousing solutions, transportation logistics, supply chain management, logistics services, end-to-end delivery, international shipping",
+    description: "Explore GGL Australia’s expert freight forwarding, warehousing, transport, and supply chain services. Tailored logistics solutions for smooth, end-to-end delivery.",
+    keywords: "GGL Australia, freight forwarding services, warehousing solutions, transportation logistics, supply chain management, logistics services, end-to-end delivery, international shipping",
+    url: "https://www.gglaustralia.com/services",
+    canonical: "https://www.gglaustralia.com/services",
+    image: "https://www.gglaustralia.com/lovable-uploads/ggl-logo.png",
   },
   "/services/air-freight": {
     title: "Air Freight Services – GGL Australia | Global Logistics Solutions",
@@ -40,6 +47,9 @@ export const META_CONFIG: Record<string, MetaConfig> = {
       "GGL Australia offers reliable and efficient air freight solutions tailored to your business needs. From express shipments to specialized cargo, we ensure timely and secure delivery worldwide.",
     keywords:
       "GGL Australia, air freight services, global logistics, express shipments, specialized cargo, international shipping, secure delivery, timely delivery, freight forwarding",
+    url: "https://www.gglaustralia.com/services/air-freight",
+    canonical: "https://www.gglaustralia.com/services/air-freight",
+    image: "https://www.gglaustralia.com/lovable-uploads/ggl-logo.png",
   },
   "/services/ocean-freight": {
     title: "Ocean Freight Services – GGL Australia | Global Shipping Solutions",
@@ -47,6 +57,9 @@ export const META_CONFIG: Record<string, MetaConfig> = {
       "GGL Australia offers comprehensive ocean freight services tailored to your shipping needs. Leverage our extensive global network and competitive pricing for reliable and efficient delivery worldwide.",
     keywords:
       "GGL Australia, ocean freight services, global shipping, international shipping, container shipping, freight forwarding, logistics solutions, sea freight, supply chain management",
+    url: "https://www.gglaustralia.com/services/ocean-freight",
+    canonical: "https://www.gglaustralia.com/services/ocean-freight",
+    image: "https://www.gglaustralia.com/lovable-uploads/ggl-logo.png",
   },
   "/services/customs-clearance": {
     title: "Customs Clearance Services – GGL Australia | Smooth Cross-Border Logistics",
@@ -54,6 +67,9 @@ export const META_CONFIG: Record<string, MetaConfig> = {
       "GGL Australia offers expert customs clearance services to ensure your shipments move smoothly across borders. We handle all aspects of the process, providing efficient and compliant solutions for your logistics needs.",
     keywords:
       "GGL Australia, customs clearance services, cross-border logistics, import/export compliance, customs brokerage, international shipping, freight forwarding, logistics solutions",
+    url: "https://www.gglaustralia.com/services/customs-clearance",
+    canonical: "https://www.gglaustralia.com/services/customs-clearance",
+    image: "https://www.gglaustralia.com/lovable-uploads/ggl-logo.png",
   },
   "/services/liquid-transportation": {
     title: "Liquid Transportation Services – GGL Australia | Safe & Compliant Delivery",
@@ -65,9 +81,12 @@ export const META_CONFIG: Record<string, MetaConfig> = {
   "/services/project-cargo": {
     title: "Project Cargo Services – GGL Australia | Heavy & Oversized Freight Solutions",
     description:
-      "GGL Australia specializes in project cargo logistics, providing tailored solutions for the transport of heavy and oversized equipment. Our services include route surveys, lifting plans, and end-to-end project management to ensure safe and efficient delivery.",
+      "GGL Australia specializes in project cargo logistics—heavy, oversized, and high-value equipment. We handle route surveys, lifting plans, permits, and end-to-end project management for safe, on-time delivery.",
     keywords:
       "GGL Australia, project cargo services, heavy freight logistics, oversized cargo transport, lifting plans, route surveys, end-to-end project management, specialized freight solutions, industrial equipment transport",
+    url: "https://www.gglaustralia.com/services/project-cargo",
+    canonical: "https://www.gglaustralia.com/services/project-cargo",
+    image: "https://www.gglaustralia.com/projectcargo3.png",
   },
   "/global-presence": {
     title: "Global Presence – GGL Australia | Worldwide Logistics Network",
@@ -87,6 +106,10 @@ export const META_CONFIG: Record<string, MetaConfig> = {
     title: "Privacy Policy – GGL Australia | Data Protection & User Privacy",
     description:
       "Learn how GGL Australia collects, uses, and protects your personal information. Our privacy policy outlines our data practices and your rights regarding your data.",
+    keywords: "GGL Australia, privacy policy, data protection, user privacy, data collection, cookies, personal information, GDPR, security",
+    url: "https://www.gglaustralia.com/privacy-policy",
+    canonical: "https://www.gglaustralia.com/privacy-policy",
+    image: "https://www.gglaustralia.com/lovable-uploads/ggl-logo.png",
   },
   "/terms-and-conditions": {
     title: "Terms and Conditions – GGL Australia | Freight & Logistics Services",
@@ -101,69 +124,91 @@ function applyMeta(config?: MetaConfig) {
     document.title = config.title;
   }
 
-  const setMeta = (name: string, content: string) => {
-    let element = document.querySelector(`meta[name='${name}']`) as HTMLMetaElement | null;
+  const setMeta = (name: string, content: string, isProperty = false) => {
+    const selector = isProperty ? `meta[property='${name}']` : `meta[name='${name}']`;
+    let element = document.querySelector(selector) as HTMLMetaElement | null;
     if (!element) {
       element = document.createElement("meta");
-      element.setAttribute("name", name);
+      if (isProperty) {
+        element.setAttribute("property", name);
+      } else {
+        element.setAttribute("name", name);
+      }
       document.head.appendChild(element);
     }
     element.setAttribute("content", content);
   };
 
+  const setLink = (rel: string, href: string) => {
+    let element = document.querySelector(`link[rel='${rel}']`) as HTMLLinkElement | null;
+    if (!element) {
+      element = document.createElement("link");
+      element.setAttribute("rel", rel);
+      document.head.appendChild(element);
+    }
+    element.setAttribute("href", href);
+  };
+
   if (config.description) {
     setMeta("description", config.description);
+    setMeta("og:description", config.description, true);
   }
 
   if (config.keywords) {
     setMeta("keywords", config.keywords);
   }
 
+  if (config.title) {
+    setMeta("og:title", config.title, true);
+  }
+
+  if (config.url) {
+    setMeta("og:url", config.url, true);
+  }
+
+  if (config.image) {
+    setMeta("og:image", config.image, true);
+  }
+
+  if (config.canonical) {
+    setLink("canonical", config.canonical);
+  }
+
   if (config.extraMeta) {
     Object.entries(config.extraMeta).forEach(([name, content]) => {
       if (typeof content === "string") {
-        setMeta(name, content);
+        if (name.startsWith('og:') || name.startsWith('twitter:')) {
+          setMeta(name, content, true);
+        } else {
+          setMeta(name, content);
+        }
       }
     });
   }
 }
 
-export function useSEO() {
+export function useSEO(dynamicRecord?: SeoRecord | null) {
   const location = useLocation();
 
   useEffect(() => {
-    let isActive = true;
     const path = location.pathname;
     const fallbackConfig = META_CONFIG[path];
+
     applyMeta(fallbackConfig);
 
-    const loadDynamicMeta = async () => {
-      try {
-        const record = await fetchSeoRecordByPath(path);
-        if (!isActive || !record) {
-          return;
-        }
+    if (dynamicRecord) {
+      const mergedExtraMeta = {
+        ...(fallbackConfig?.extraMeta ?? {}),
+        ...(dynamicRecord.extra_meta ?? {}),
+      };
 
-        const mergedExtraMeta = {
-          ...(fallbackConfig?.extraMeta ?? {}),
-          ...(record.extra_meta ?? {}),
-        } as Record<string, string> | undefined;
-
-        applyMeta({
-          title: record.title ?? fallbackConfig?.title,
-          description: record.description ?? fallbackConfig?.description,
-          keywords: record.keywords ?? fallbackConfig?.keywords,
-          extraMeta: mergedExtraMeta ?? null,
-        });
-      } catch (error) {
-        console.error("Failed to load dynamic SEO metadata", error);
-      }
-    };
-
-    loadDynamicMeta();
-
-    return () => {
-      isActive = false;
-    };
-  }, [location.pathname]);
+      const dynamicConfig: MetaConfig = {
+        title: dynamicRecord.title ?? fallbackConfig?.title,
+        description: dynamicRecord.description ?? fallbackConfig?.description,
+        keywords: dynamicRecord.keywords ?? fallbackConfig?.keywords,
+        extraMeta: Object.keys(mergedExtraMeta).length > 0 ? mergedExtraMeta : null,
+      };
+      applyMeta(dynamicConfig);
+    }
+  }, [location.pathname, dynamicRecord]);
 }

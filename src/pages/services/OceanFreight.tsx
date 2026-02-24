@@ -1,13 +1,30 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { motion } from 'framer-motion';
 import { Ship, Package, Box, Globe, FileCheck, Anchor, Container, MapPin, Gauge, Loader2 } from "lucide-react";
 import { Link } from 'react-router-dom';
 import { AspectRatio } from "@/components/ui/aspect-ratio";
-import SEO from '@/components/SEO';
+import { useSEO, SeoRecord } from '@/seo';
 import { useQuery } from '@tanstack/react-query';
 import { fetchPageContent } from '@/lib/content';
+
+const processPageContent = (contentArray: any[] | undefined) => {
+  if (!Array.isArray(contentArray)) return {};
+  const contentObj = contentArray.reduce((acc, record) => {
+      let content = record.content;
+      if (typeof content === 'string') {
+          try {
+              content = JSON.parse(content);
+          } catch (e) {
+              console.error("Error parsing content for section:", record.section_key, e);
+          }
+      }
+      acc[record.section_key.toLowerCase()] = { ...(typeof content === 'object' && content !== null ? content : { raw: content }), images: record.images };
+      return acc;
+  }, {});
+  return contentObj;
+};
 
 const iconMap: { [key: string]: React.ReactNode } = {
   Ship: <Ship className="h-5 w-5 text-brand-gold" />,
@@ -29,41 +46,25 @@ const getIcon = (iconName: string) => {
 };
 
 const OceanFreight = () => {
-  const { data: pageContent, isLoading } = useQuery({
+  const { data: rawPageContent, isLoading } = useQuery({
     queryKey: ["page-content", "/services/ocean-freight"],
     queryFn: () => fetchPageContent("/services/ocean-freight"),
   });
 
-  const getContent = (sectionKey: string) => {
-    const record = pageContent?.find(r => r.section_key.toLowerCase() === sectionKey.toLowerCase());
-    if (!record?.content) return null;
-    let content = record.content;
-    if (typeof content === 'string') {
-      try { content = JSON.parse(content); } catch (e) { console.error("Error parsing content", e); }
-    }
-    return { content, images: record.images };
-  };
+  const pageData = useMemo(() => processPageContent(rawPageContent), [rawPageContent]);
 
-  const heroRecord = getContent('hero');
-  const mainRecord = getContent('main');
-  const featuresRecord = getContent('features');
-  const subServicesRecord = getContent('sub_services');
+  useSEO(pageData.seo as SeoRecord);
 
-  const features = (featuresRecord?.content?.items && Array.isArray(featuresRecord.content.items)) ? featuresRecord.content.items : [];
-  const subServices = (subServicesRecord?.content?.items && Array.isArray(subServicesRecord.content.items)) ? subServicesRecord.content.items : [];
+  const heroRecord = pageData.hero || {};
+  const mainRecord = pageData.main || {};
+  const featuresRecord = pageData.features || {};
+  const subServicesRecord = pageData.sub_services || {};
+
+  const features = (featuresRecord?.items && Array.isArray(featuresRecord.items)) ? featuresRecord.items : [];
+  const subServices = (subServicesRecord?.items && Array.isArray(subServicesRecord.items)) ? subServicesRecord.items : [];
 
   return (
     <div className="min-h-screen flex flex-col">
-      {/* ✅ Page SEO */}
-      <SEO
-        title="Ocean Freight Services – GGL Australia | Global Shipping Solutions"
-        description="GGL Australia offers comprehensive ocean freight services tailored to your shipping needs. Leverage our extensive global network and competitive pricing for reliable and efficient delivery worldwide."
-        keywords="GGL Australia, ocean freight services, global shipping, international shipping, container shipping, freight forwarding, logistics solutions, sea freight, supply chain management"
-        url="https://www.gglaustralia.com/services/ocean-freight"
-        canonical="https://www.gglaustralia.com/services/ocean-freight"
-        image="https://www.gglaustralia.com/lovable-uploads/ggl-logo.png"
-      />
-
       <Header />
       
       {isLoading ? (
@@ -83,7 +84,7 @@ const OceanFreight = () => {
                   transition={{ duration: 0.5 }}
                   className="text-3xl md:text-4xl font-bold mb-4 text-gray-900"
                 >
-                  {heroRecord?.content?.title || "Ocean Freight Solutions"}
+                  {heroRecord?.title || "Ocean Freight Solutions"}
                 </motion.h1>
                 <motion.p
                   initial={{ opacity: 0, y: 20 }}
@@ -91,7 +92,7 @@ const OceanFreight = () => {
                   transition={{ duration: 0.5, delay: 0.1 }}
                   className="text-lg text-gray-700 mb-6"
                 >
-                  {heroRecord?.content?.subtitle || "Connecting you globally with comprehensive ocean freight services"}
+                  {heroRecord?.subtitle || "Connecting you globally with comprehensive ocean freight services"}
                 </motion.p>
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
@@ -128,12 +129,12 @@ const OceanFreight = () => {
           <div className="container mx-auto px-4">
             <div className="max-w-3xl mx-auto mb-12">
               <h2 className="text-2xl md:text-3xl font-bold mb-6 text-center text-gray-800">
-                {mainRecord?.content?.title || "Comprehensive Ocean Freight Services"}
+                {mainRecord?.title || "Comprehensive Ocean Freight Services"}
               </h2>
               <div className="w-24 h-1 bg-brand-gold mx-auto mb-8"></div>
               <div 
                 className="prose max-w-none text-gray-700 text-justify"
-                dangerouslySetInnerHTML={{ __html: mainRecord?.content?.body || "<p>We provide comprehensive ocean freight services designed to meet your diverse shipping needs. Leveraging our extensive global network and offering competitive rates, we ensure your cargo moves efficiently and reliably.</p>" }}
+                dangerouslySetInnerHTML={{ __html: mainRecord?.body || "<p>We provide comprehensive ocean freight services designed to meet your diverse shipping needs. Leveraging our extensive global network and offering competitive rates, we ensure your cargo moves efficiently and reliably.</p>" }}
               />
             </div>
             
