@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState, useId } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { LogOut, Pencil, Plus, Trash2, Image as ImageIcon, Bold, Italic, Link as LinkIcon, X, Upload, Copy, ChevronDown, ChevronRight, Eye, Search, FileText, Menu, LayoutDashboard, Route, Save, ArrowLeft, Layers } from "lucide-react";
+import { LogOut, Pencil, Plus, Trash2, Image as ImageIcon, Bold, Italic, Link as LinkIcon, X, Upload, Copy, ChevronDown, ChevronRight, Eye, Search, FileText, Menu, LayoutDashboard, Route, Save, ArrowLeft, Layers, Loader2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -21,7 +21,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import {
+import { 
   Select,
   SelectContent,
   SelectItem,
@@ -29,7 +29,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Label } from "@/components/ui/label"; 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/use-toast";
@@ -37,6 +37,7 @@ import {
   SeoPayload,
   SeoRecord,
   createSeoRecord,
+
   deleteSeoRecord,
   fetchSeoRecords,
   updateSeoRecord,
@@ -44,6 +45,7 @@ import {
 import {
   PageContent,
   createPageContent,
+
   deletePageContent,
   fetchPageContent,
   updatePageContent,
@@ -55,6 +57,7 @@ import PageRouterManager from "./PageRouterManager";
 const ADMIN_EMAIL = "admin@gglau.com";
 const ADMIN_PASSWORD = "GGLAU@2025";
 const AUTH_STORAGE_KEY = "gglau-admin-authenticated";
+
 
 interface FormState {
   path: string;
@@ -71,6 +74,7 @@ const emptyFormState: FormState = {
   keywords: "",
   extraMeta: "",
 };
+
 
 function parseExtraMeta(value: string): Record<string, string> | null {
   const trimmedValue = value.trim();
@@ -133,6 +137,7 @@ function parseExtraMeta(value: string): Record<string, string> | null {
   }
 }
 
+
 function formatExtraMeta(meta: Record<string, string> | null | undefined) {
   if (!meta || Object.keys(meta).length === 0) {
     return "";
@@ -141,6 +146,7 @@ function formatExtraMeta(meta: Record<string, string> | null | undefined) {
     .map(([key, val]) => `${key}=${val}`)
     .join("\n");
 }
+
 
 function formatTimestamp(value?: string | null) {
   if (!value) return "—";
@@ -153,6 +159,7 @@ function formatTimestamp(value?: string | null) {
     return value;
   }
 }
+
 
 const RecursiveFieldEditor = ({
   value,
@@ -170,6 +177,7 @@ const RecursiveFieldEditor = ({
   depth?: number;
 }) => {
   const { toast } = useToast();
+
   const uniqueId = useId();
   const [isCollapsed, setIsCollapsed] = useState(depth > 1);
 
@@ -186,7 +194,7 @@ const RecursiveFieldEditor = ({
   };
 
   const insertTag = (tagStart: string, tagEnd: string) => {
-    const textarea = document.getElementById(`textarea-${uniqueId}`) as HTMLTextAreaElement;
+    const textarea = document.getElementById(`textarea-${uniqueId}`) as HTMLTextAreaElement; 
     if (!textarea) return;
     
     const start = textarea.selectionStart;
@@ -205,7 +213,7 @@ const RecursiveFieldEditor = ({
     }, 0);
   };
 
-  if (Array.isArray(value)) {
+  if (Array.isArray(value)) { 
     return (
       <div className={`border rounded-md bg-slate-50/50 ${depth > 0 ? 'mt-2' : ''}`}>
         <div className="flex justify-between items-center p-2 bg-slate-100 rounded-t-md border-b">
@@ -221,7 +229,7 @@ const RecursiveFieldEditor = ({
         {!isCollapsed && (
           <div className="p-2 space-y-2">
             {value.map((item, idx) => (
-              <div key={idx} className="relative group">
+              <div key={idx} className="relative group"> 
                 <RecursiveFieldEditor
                   label={`Item ${idx + 1}`}
                   value={item}
@@ -238,11 +246,11 @@ const RecursiveFieldEditor = ({
                   depth={depth + 1}
                 />
                 <div className="absolute top-2 right-12 opacity-0 group-hover:opacity-100 transition-opacity">
-                   <Button type="button" variant="secondary" size="icon" className="h-6 w-6" onClick={() => {
+                   <Button type="button" variant="secondary" size="icon" className="h-6 w-6" onClick={() => { 
                       const newArr = [...value];
                       newArr.splice(idx + 1, 0, JSON.parse(JSON.stringify(item)));
                       onChange(newArr);
-                   }} title="Duplicate"><Copy className="w-3 h-3" /></Button>
+                   }} title="Duplicate"><Copy className="w-3 h-3" /></Button> 
                 </div>
               </div>
             ))}
@@ -253,7 +261,7 @@ const RecursiveFieldEditor = ({
     );
   }
 
-  if (typeof value === 'object' && value !== null) {
+  if (typeof value === 'object' && value !== null) { 
     return (
       <div className={`border rounded-md bg-white shadow-sm ${depth > 0 ? 'mt-2' : ''}`}>
         <div className="flex justify-between items-center p-2 bg-gray-50 rounded-t-md border-b">
@@ -262,7 +270,7 @@ const RecursiveFieldEditor = ({
              <Label className="font-mono text-blue-600 cursor-pointer">{label || 'Object'}</Label>
            </div>
            <div className="flex gap-1">
-             <Button type="button" variant="ghost" size="sm" onClick={() => {
+             <Button type="button" variant="ghost" size="sm" onClick={() => { 
                 const key = prompt("Enter new key:");
                 if (key && !value[key]) onChange({ ...value, [key]: "" });
              }}><Plus className="w-3 h-3" /></Button>
@@ -271,7 +279,7 @@ const RecursiveFieldEditor = ({
         </div>
         {!isCollapsed && (
           <div className="p-2 space-y-2">
-            {Object.entries(value).map(([key, val]) => (
+            {Object.entries(value).map(([key, val]) => ( 
               <RecursiveFieldEditor
                 key={key}
                 label={key}
@@ -293,7 +301,7 @@ const RecursiveFieldEditor = ({
     );
   }
 
-  return (
+  return ( 
     <div className="space-y-1 mt-2">
        <div className="flex justify-between items-center">
           {label && <Label className="text-xs font-semibold text-gray-700">{label}</Label>}
@@ -301,10 +309,10 @@ const RecursiveFieldEditor = ({
        </div>
        
        {type === 'content' && typeof value === 'string' && (
-          <div className="flex gap-1 mb-1">
+          <div className="flex gap-1 mb-1"> 
             <Button type="button" variant="ghost" size="sm" className="h-6 px-2" onClick={() => insertTag('<b>', '</b>')}><Bold className="h-3 w-3" /></Button>
             <Button type="button" variant="ghost" size="sm" className="h-6 px-2" onClick={() => insertTag('<i>', '</i>')}><Italic className="h-3 w-3" /></Button>
-            <Button type="button" variant="ghost" size="sm" className="h-6 px-2" onClick={() => insertTag('<a href="#">', '</a>')}><LinkIcon className="h-3 w-3" /></Button>
+            <Button type="button" variant="ghost" size="sm" className="h-6 px-2" onClick={() => insertTag('<a href="#">', '</a>')}><LinkIcon className="h-3 w-3" /></Button> 
           </div>
        )}
 
@@ -318,7 +326,7 @@ const RecursiveFieldEditor = ({
           {(type === 'images' || (typeof label === 'string' && (label.toLowerCase().includes('image') || label.toLowerCase().includes('icon') || label.toLowerCase().includes('background') || label.toLowerCase().includes('banner')))) && (
              <div className="flex flex-col gap-2 shrink-0">
                  <input type="file" id={`file-${uniqueId}`} className="hidden" onChange={handleImageUpload} accept="image/*" />
-                 <Button type="button" variant="outline" size="icon" onClick={() => document.getElementById(`file-${uniqueId}`)?.click()} title="Upload Image"><Upload className="h-4 w-4" /></Button>
+                 <Button type="button" variant="outline" size="icon" onClick={() => document.getElementById(`file-${uniqueId}`)?.click()} title="Upload Image"><Upload className="h-4 w-4" /></Button> 
                  {typeof value === 'string' && (value.startsWith('http') || value.startsWith('/')) && (
                    <div className="w-10 h-10 border rounded overflow-hidden bg-gray-100">
                       <img src={value} alt="preview" className="w-full h-full object-cover" />
@@ -331,6 +339,7 @@ const RecursiveFieldEditor = ({
   );
 };
 
+
 const DynamicJsonEditor = ({
   value,
   onChange,
@@ -340,6 +349,7 @@ const DynamicJsonEditor = ({
   onChange: (val: string) => void;
   type: 'content' | 'images';
 }) => {
+
   const [parsed, setParsed] = useState<any>({});
   const [error, setError] = useState<string | null>(null);
   const [mode, setMode] = useState<'visual' | 'raw'>('visual');
@@ -356,6 +366,7 @@ const DynamicJsonEditor = ({
   }, [value]);
 
   const handleRecursiveChange = (newVal: any) => {
+
     setParsed(newVal);
     onChange(JSON.stringify(newVal, null, 2));
   };
@@ -395,6 +406,7 @@ const DynamicJsonEditor = ({
   );
 };
 
+
 const pageTemplates: Record<string, Partial<PageContent>[]> = {
   service: [
     { section_key: "seo", content: { title: "Service Page Title", description: "Description of the service." }, images: {} },
@@ -409,6 +421,7 @@ const pageTemplates: Record<string, Partial<PageContent>[]> = {
   ]
 };
 
+
 export default function AdminDashboard() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -420,6 +433,7 @@ export default function AdminDashboard() {
   const [credentials, setCredentials] = useState({ email: "", password: "" });
   const [formState, setFormState] = useState<FormState>(emptyFormState);
   const [editingRecord, setEditingRecord] = useState<SeoRecord | null>(null);
+
   const [editFormState, setEditFormState] = useState<FormState>(emptyFormState);
   
   const [activeTab, setActiveTab] = useState<'seo' | 'content' | 'router'>('seo');
@@ -441,6 +455,8 @@ export default function AdminDashboard() {
   const [editorSections, setEditorSections] = useState<Partial<PageContent>[]>([]);
   const [editorComponentKey, setEditorComponentKey] = useState<string>("");
 
+  const [pathExistsWarning, setPathExistsWarning] = useState(false);
+
   useEffect(() => {
     if (editingRecord) {
       setEditFormState({
@@ -452,6 +468,7 @@ export default function AdminDashboard() {
       });
     }
   }, [editingRecord]);
+
 
   useEffect(() => {
     if (editingContent) {
@@ -466,6 +483,7 @@ export default function AdminDashboard() {
     }
   }, [editingContent]);
 
+
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ["seo-records"],
     queryFn: fetchSeoRecords,
@@ -473,6 +491,7 @@ export default function AdminDashboard() {
   });
 
   const { data: contentData, isLoading: isContentLoading } = useQuery({
+
     queryKey: ["page-content"],
     queryFn: () => fetchPageContent(),
     enabled: isAuthenticated && activeTab === 'content',
@@ -487,6 +506,7 @@ export default function AdminDashboard() {
     },
     enabled: isAuthenticated,
   });
+
 
   const createMutation = useMutation({
     mutationFn: (payload: SeoPayload) => createSeoRecord(payload),
@@ -503,6 +523,7 @@ export default function AdminDashboard() {
       });
     },
   });
+
 
   const updateMutation = useMutation({
     mutationFn: ({ id, payload }: { id: number; payload: SeoPayload }) =>
@@ -521,6 +542,7 @@ export default function AdminDashboard() {
     },
   });
 
+
   const deleteMutation = useMutation({
     mutationFn: (id: number) => deleteSeoRecord(id),
     onSuccess: () => {
@@ -536,6 +558,7 @@ export default function AdminDashboard() {
     },
   });
 
+
   const createContentMutation = useMutation({
     mutationFn: (payload: Omit<PageContent, "id">) => createPageContent(payload),
     onSuccess: () => {
@@ -547,6 +570,7 @@ export default function AdminDashboard() {
       toast({ title: "Failed to create content", description: error.message, variant: "destructive" });
     },
   });
+
 
   const updateContentMutation = useMutation({
     mutationFn: ({ id, payload }: { id: number; payload: Partial<PageContent> }) =>
@@ -561,6 +585,7 @@ export default function AdminDashboard() {
     },
   });
 
+
   const deleteContentMutation = useMutation({
     mutationFn: (id: number) => deletePageContent(id),
     onSuccess: () => {
@@ -571,6 +596,31 @@ export default function AdminDashboard() {
       toast({ title: "Failed to delete content", description: error.message, variant: "destructive" });
     },
   });
+
+
+  const deletePageMutation = useMutation({
+    mutationFn: async (path: string) => {
+        const sections = groupedPages[path] || [];
+        const sectionIds = sections.map(s => s.id).filter((id): id is number => !!id);
+
+        if (sectionIds.length > 0) {
+            const { error: contentError } = await supabase.from('content').delete().in('id', sectionIds);
+            if (contentError) throw contentError;
+        }
+
+        const { error: pageError } = await supabase.from('pages').delete().eq('path', path);
+        if (pageError) throw pageError;
+    },
+    onSuccess: (_, path) => {
+        queryClient.invalidateQueries({ queryKey: ["page-content"] });
+        queryClient.invalidateQueries({ queryKey: ["pages-count"] });
+        queryClient.invalidateQueries({ queryKey: ["content-paths"] });
+        toast({ title: `Page "${path}" deleted successfully` });
+        setIsPageEditorOpen(false);
+        setPathExistsWarning(false);
+    },
+    onError: (error: Error) => toast({ title: "Error deleting page", description: error.message, variant: "destructive" })
+});
 
   // Group content by page_path for the new view
   const groupedPages = useMemo(() => {
@@ -583,6 +633,7 @@ export default function AdminDashboard() {
     return groups;
   }, [contentData]);
 
+
   const filteredPagePaths = useMemo(() => {
     let paths = Object.keys(groupedPages).sort();
     if (searchTerm) {
@@ -590,6 +641,7 @@ export default function AdminDashboard() {
     }
     return paths;
   }, [groupedPages, searchTerm]);
+
 
   const filteredRecords = useMemo(() => {
     if (!data) return [];
@@ -600,6 +652,7 @@ export default function AdminDashboard() {
     }
     return records;
   }, [data, searchTerm]);
+
 
   const handleLogin = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -621,6 +674,7 @@ export default function AdminDashboard() {
     }
   };
 
+
   const handleLogout = () => {
     setIsAuthenticated(false);
     if (typeof window !== "undefined") {
@@ -628,6 +682,7 @@ export default function AdminDashboard() {
     }
     toast({ title: "Signed out" });
   };
+
 
   const handleCreate = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -655,6 +710,7 @@ export default function AdminDashboard() {
       });
     }
   };
+
 
   const handleUpdate = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -685,6 +741,7 @@ export default function AdminDashboard() {
     }
   };
 
+
   // New Page Editor Handlers
   const handleEditPage = async (path: string) => {
     setEditorPagePath(path);
@@ -708,17 +765,37 @@ export default function AdminDashboard() {
     setIsPageEditorOpen(true);
   };
 
+
   const handleCreatePage = () => {
     setEditorPagePath("");
     // Pre-fill with default service page template
     setEditorSections(pageTemplates.service);
     setEditorComponentKey(componentKeys[0] || "DynamicPage");
+    setPathExistsWarning(false);
     setIsPageEditorOpen(true);
   };
+
+
+  const handlePathBlur = () => {
+    let currentPath = editorPagePath.trim().toLowerCase();
+    if (currentPath && !currentPath.startsWith('/')) {
+        currentPath = '/' + currentPath;
+        setEditorPagePath(currentPath);
+    }
+
+    if (currentPath) {
+        const pathExists = Object.keys(groupedPages).includes(currentPath);
+        setPathExistsWarning(pathExists);
+    } else {
+        setPathExistsWarning(false);
+    }
+  };
+
 
   const handleSavePage = async () => {
     if (!editorPagePath) {
       toast({ title: "Page path is required", variant: "destructive" });
+      handlePathBlur(); // to show warning if empty
       return;
     }
 
@@ -778,6 +855,38 @@ export default function AdminDashboard() {
     }
   };
 
+  const handleDuplicatePage = async () => {
+    if (!editorPagePath) {
+      toast({ title: "Page path is required", variant: "destructive" });
+      return;
+    }
+
+    const originalPath = editorPagePath;
+    const newPath = prompt("Enter the new page path:", `${originalPath}-copy`);
+
+    if (!newPath) return;
+
+    try {
+      // Duplicate the page with a new path
+      const formattedPath = newPath.trim().toLowerCase();
+      if (!formattedPath.startsWith('/')) formattedPath = '/' + formattedPath;
+      setEditorPagePath(formattedPath);
+      handleCreatePage();
+      toast({ title: "Page duplicated successfully. Please edit the new page." });
+      setIsPageEditorOpen(true);
+
+    } catch (e) {
+      toast({ title: "Error duplicating page", description: (e as Error).message, variant: "destructive" });
+    }
+  };
+
+
+
+  const handleDeletePage = () => {
+    if (!editorPagePath || isCreatingNewPage) return;
+    deletePageMutation.mutate(editorPagePath);
+  };
+
   const handleAddSection = () => {
     setEditorSections([...editorSections, { section_key: "new_section", content: {}, images: {} }]);
   };
@@ -798,9 +907,12 @@ export default function AdminDashboard() {
     }
   };
 
+
   const handleTemplateChange = (templateKey: string) => {
     if (templateKey in pageTemplates) setEditorSections(pageTemplates[templateKey]);
   };
+
+  const isCreatingNewPage = useMemo(() => editorSections.every(s => !s.id), [editorSections]);
 
   if (!isAuthenticated) {
     return (
@@ -1322,11 +1434,14 @@ export default function AdminDashboard() {
               <>
                 <div className="flex justify-between items-center">
                   <h2 className="text-xl font-semibold">Pages</h2>
-                  <Button onClick={handleCreatePage} className="bg-amber-500 hover:bg-amber-600 text-white">
-                    <Plus className="mr-2 h-4 w-4" /> Create New Page
-                  </Button>
+                  <div className="flex items-center gap-2">
+                    <Button onClick={handleCreatePage} className="bg-amber-500 hover:bg-amber-600 text-white">
+                      <Plus className="mr-2 h-4 w-4" /> Create New Page
+                    </Button>
+                  </div>
                 </div>
                 <Card className="shadow-md border-gray-200">
+
                   <CardHeader>
                     <CardTitle>Managed Pages</CardTitle>
                     <CardDescription>
@@ -1396,9 +1511,11 @@ export default function AdminDashboard() {
               <div className="space-y-6">
                 <div className="flex items-center justify-between bg-white p-4 rounded-lg shadow-sm border">
                   <div className="flex items-center gap-4">
-                    <Button variant="ghost" size="icon" onClick={() => setIsPageEditorOpen(false)}>
-                      <ArrowLeft className="h-5 w-5" />
+                    <Button variant="outline" onClick={() => { setIsPageEditorOpen(false); setPathExistsWarning(false); }}>
+                      <ArrowLeft className="h-4 w-4 mr-2" />
+                      Back to Pages
                     </Button>
+
                     <div>
                       <h2 className="text-lg font-bold">{editorPagePath ? `Editing: ${editorPagePath}` : "Create New Page"}</h2>
                       <p className="text-xs text-muted-foreground">Manage all sections for this page</p>
@@ -1411,11 +1528,38 @@ export default function AdminDashboard() {
                     <Button onClick={handleSavePage} className="bg-green-600 hover:bg-green-700 text-white">
                       <Save className="mr-2 h-4 w-4" /> Save Page
                     </Button>
+
+                    {!isCreatingNewPage && (
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <Button variant="destructive">
+                            <Trash2 className="mr-2 h-4 w-4" /> Delete Page
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent>
+                          <DialogHeader>
+                            <DialogTitle>Are you absolutely sure?</DialogTitle>
+                            <DialogDescription>
+                              This will permanently delete the page <strong className="mx-1">{editorPagePath}</strong> and all of its content. This action cannot be undone.
+                            </DialogDescription>
+                          </DialogHeader>
+                          <DialogFooter>
+                            <DialogClose asChild><Button variant="outline">Cancel</Button></DialogClose>
+                            <Button variant="destructive" onClick={handleDeletePage} disabled={deletePageMutation.isPending}>
+                              {deletePageMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />} Yes, delete page
+                            </Button>
+                          </DialogFooter>
+                        </DialogContent>
+                      </Dialog>
+                    )}
+                     {!isCreatingNewPage && (
+                      <Button onClick={handleDuplicatePage} className="bg-blue-600 hover:bg-blue-700 text-white">Duplicate Page</Button>
+                    )}
                   </div>
                 </div>
 
                 <div className="grid gap-6">
-                  {!editorPagePath && (
+                  {isCreatingNewPage && (
                     <Card>
                       <CardHeader>
                         <CardTitle>Page Configuration</CardTitle>
@@ -1427,14 +1571,19 @@ export default function AdminDashboard() {
                             id="page-path-input"
                             placeholder="/services/new-service" 
                             value={editorPagePath} 
-                            onChange={(e) => setEditorPagePath(e.target.value)} 
-                            onBlur={() => {
-                              if (editorPagePath && !editorPagePath.startsWith('/')) {
-                                setEditorPagePath('/' + editorPagePath);
-                              }
-                            }}
+                            onChange={(e) => setEditorPagePath(e.target.value)}
+                            onBlur={handlePathBlur}
                           />
-                          <p className="text-xs text-muted-foreground">Must start with /</p>
+                          {pathExistsWarning ? (
+                            <p className="text-sm text-amber-600 flex items-center gap-1">
+                                Warning: This path already exists.
+                                <Button variant="link" className="p-0 h-auto text-amber-700 underline" onClick={() => handleEditPage(editorPagePath)}>
+                                    Edit page?
+                                </Button>
+                            </p>
+                          ) : (
+                            <p className="text-xs text-muted-foreground">Must start with /</p>
+                          )}
                         </div>
                         <div className="space-y-2">
                           <Label htmlFor="component-selector">Route Component</Label>
