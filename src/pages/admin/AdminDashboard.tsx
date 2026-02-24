@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState, useId } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { LogOut, Pencil, Plus, Trash2, Image as ImageIcon, Bold, Italic, Link as LinkIcon, X, Upload, Copy, ChevronDown, ChevronRight, Eye, Search, FileText, Menu, LayoutDashboard, Route } from "lucide-react";
+import { LogOut, Pencil, Plus, Trash2, Image as ImageIcon, Bold, Italic, Link as LinkIcon, X, Upload, Copy, ChevronDown, ChevronRight, Eye, Search, FileText, Menu, LayoutDashboard, Route, Save, ArrowLeft, Layers } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -403,6 +403,8 @@ export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState<'seo' | 'content' | 'router'>('seo');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  
+  // Legacy state (can be cleaned up later if unused, but keeping for safety)
   const [contentFormState, setContentFormState] = useState({
     page_path: "",
     section_key: "",
@@ -410,6 +412,11 @@ export default function AdminDashboard() {
     images: "{}",
   });
   const [editingContent, setEditingContent] = useState<PageContent | null>(null);
+
+  // New Page Editor State
+  const [isPageEditorOpen, setIsPageEditorOpen] = useState(false);
+  const [editorPagePath, setEditorPagePath] = useState("");
+  const [editorSections, setEditorSections] = useState<Partial<PageContent>[]>([]);
 
   useEffect(() => {
     if (editingRecord) {
@@ -542,6 +549,25 @@ export default function AdminDashboard() {
     },
   });
 
+  // Group content by page_path for the new view
+  const groupedPages = useMemo(() => {
+    if (!contentData) return {};
+    const groups: Record<string, PageContent[]> = {};
+    contentData.forEach(item => {
+      if (!groups[item.page_path]) groups[item.page_path] = [];
+      groups[item.page_path].push(item);
+    });
+    return groups;
+  }, [contentData]);
+
+  const filteredPagePaths = useMemo(() => {
+    let paths = Object.keys(groupedPages).sort();
+    if (searchTerm) {
+      paths = paths.filter(p => p.toLowerCase().includes(searchTerm.toLowerCase()));
+    }
+    return paths;
+  }, [groupedPages, searchTerm]);
+
   const filteredRecords = useMemo(() => {
     if (!data) return [];
     let records = [...data].sort((a, b) => a.path.localeCompare(b.path));
@@ -551,21 +577,6 @@ export default function AdminDashboard() {
     }
     return records;
   }, [data, searchTerm]);
-
-  const filteredContent = useMemo(() => {
-    if (!contentData) return [];
-    let content = [...contentData].sort((a, b) => {
-      if (a.page_path === b.page_path) {
-        return a.section_key.localeCompare(b.section_key);
-      }
-      return a.page_path.localeCompare(b.page_path);
-    });
-    if (searchTerm) {
-      const lower = searchTerm.toLowerCase();
-      content = content.filter(c => c.page_path.toLowerCase().includes(lower) || c.section_key.toLowerCase().includes(lower));
-    }
-    return content;
-  }, [contentData, searchTerm]);
 
   const handleLogin = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -651,53 +662,99 @@ export default function AdminDashboard() {
     }
   };
 
-  const handleContentSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+  // New Page Editor Handlers
+  const handleEditPage = (path: string) => {
+    setEditorPagePath(path);
+    // Sort sections: SEO first, then Hero, then Main, then others
+    const sections = [...(groupedPages[path] || [])].sort((a, b) => {
+      const order = ['seo', 'hero', 'main', 'features', 'sub_services'];
+      const ia = order.indexOf(a.section_key);
+      const ib = order.indexOf(b.section_key);
+      if (ia !== -1 && ib !== -1) return ia - ib;
+      if (ia !== -1) return -1;
+      if (ib !== -1) return 1;
+      return a.section_key.localeCompare(b.section_key);
+    });
+    setEditorSections(JSON.parse(JSON.stringify(sections)));
+    setIsPageEditorOpen(true);
+  };
+
+  const handleCreatePage = () => {
+    setEditorPagePath("");
+    // Pre-fill with standard service page structure
+    setEditorSections([
+      { section_key: "seo", content: { title: "Page Title", description: "Description" }, images: {} },
+      { section_key: "hero", content: { title: "Hero Title", subtitle: "Hero Subtitle" }, images: { background: "/lovable-uploads/oceanfrieght.jpg" } },
+      { section_key: "main", content: { title: "Main Heading", body: "<p>Content goes here...</p>" }, images: {} },
+    ]);
+    setIsPageEditorOpen(true);
+  };
+
+  const handleSavePage = async () => {
+    if (!editorPagePath) {
+      toast({ title: "Page path is required", variant: "destructive" });
+      return;
+    }
+
+    let formattedPath = editorPagePath.trim().toLowerCase();
+    if (!formattedPath.startsWith('/')) formattedPath = '/' + formattedPath;
+
     try {
-      const content = JSON.parse(contentFormState.content);
-      const images = JSON.parse(contentFormState.images);
-      
-      const payload = {
-        page_path: contentFormState.page_path.trim(),
-        section_key: contentFormState.section_key.trim(),
-        content,
-        images,
-      };
+      const updates = [];
+      const inserts = [];
 
-      if (!payload.page_path || !payload.section_key) {
-        throw new Error("Page path and Section key are required");
+      for (const section of editorSections) {
+        if (!section.section_key) continue;
+        
+        const payload = {
+          page_path: formattedPath,
+          section_key: section.section_key.toLowerCase(),
+          content: section.content,
+          images: section.images
+        };
+
+        if (section.id && section.id > 0) {
+          updates.push(supabase.from('content').update(payload).eq('id', section.id));
+        } else {
+          inserts.push(payload);
+        }
       }
 
-      if (!payload.page_path.startsWith('/')) {
-        payload.page_path = '/' + payload.page_path;
+      if (inserts.length > 0) {
+        const { error } = await supabase.from('content').insert(inserts);
+        if (error) throw error;
       }
-      payload.page_path = payload.page_path.toLowerCase();
-      payload.section_key = payload.section_key.toLowerCase();
 
-      if (editingContent) {
-        updateContentMutation.mutate({ id: editingContent.id, payload });
-      } else {
-        createContentMutation.mutate(payload);
+      if (updates.length > 0) {
+        await Promise.all(updates);
       }
+
+      queryClient.invalidateQueries({ queryKey: ["page-content"] });
+      toast({ title: "Page saved successfully" });
+      setIsPageEditorOpen(false);
     } catch (e) {
-      toast({
-        title: "Invalid Input",
-        description: e instanceof Error ? e.message : "Please check your JSON format",
-        variant: "destructive",
-      });
+      toast({ title: "Error saving page", description: (e as Error).message, variant: "destructive" });
     }
   };
 
-  const handleDuplicateContent = (record: PageContent) => {
-    setContentFormState({
-      page_path: record.page_path,
-      section_key: `${record.section_key}_copy`,
-      content: JSON.stringify(record.content || {}, null, 2),
-      images: JSON.stringify(record.images || {}, null, 2),
-    });
-    setEditingContent(null);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-    toast({ title: "Duplicated", description: "Entry copied to form. Please update the Section Key and Save." });
+  const handleAddSection = () => {
+    setEditorSections([...editorSections, { section_key: "new_section", content: {}, images: {} }]);
+  };
+
+  const handleRemoveSection = async (index: number) => {
+    const section = editorSections[index];
+    if (section.id) {
+      if (confirm("Are you sure you want to delete this section? This cannot be undone.")) {
+        await deleteContentMutation.mutateAsync(section.id);
+        const newSections = [...editorSections];
+        newSections.splice(index, 1);
+        setEditorSections(newSections);
+      }
+    } else {
+      const newSections = [...editorSections];
+      newSections.splice(index, 1);
+      setEditorSections(newSections);
+    }
   };
 
   if (!isAuthenticated) {
@@ -1216,183 +1273,181 @@ export default function AdminDashboard() {
           </div>
         ) : activeTab === 'content' ? (
           <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <Card className="border-t-4 border-t-amber-500 shadow-md">
-              <CardHeader>
-                <CardTitle>{editingContent ? "Edit Content Entry" : "Create New Content Entry"}</CardTitle>
-                <CardDescription>
-                  Manage dynamic content for pages. Content and Images must be valid JSON objects.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <form className="grid gap-4" onSubmit={handleContentSubmit}>
-                  <div className="grid gap-2 sm:grid-cols-2">
-                    <div className="space-y-2">
-                      <Label htmlFor="c-path">Page Path</Label>
-                      <Input
-                        id="c-path"
-                        placeholder="/about-us"
-                        value={contentFormState.page_path}
-                        onChange={(e) => setContentFormState(prev => ({ ...prev, page_path: e.target.value }))}
-                        required
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="c-section">Section Key</Label>
-                      <Input
-                        id="c-section"
-                        placeholder="hero"
-                        value={contentFormState.section_key}
-                        onChange={(e) => setContentFormState(prev => ({ ...prev, section_key: e.target.value }))}
-                        required
-                      />
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="c-content">Content (JSON)</Label>
-                    <DynamicJsonEditor
-                      value={contentFormState.content}
-                      onChange={(val) => setContentFormState(prev => ({ ...prev, content: val }))}
-                      type="content"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="c-images">Images (JSON)</Label>
-                    <DynamicJsonEditor
-                      value={contentFormState.images}
-                      onChange={(val) => setContentFormState(prev => ({ ...prev, images: val }))}
-                      type="images"
-                    />
-                  </div>
-                  <CardFooter className="px-0 flex flex-col sm:flex-row gap-3 justify-between">
-                    {editingContent && (
-                      <Button type="button" variant="outline" onClick={() => setEditingContent(null)}>
-                        Cancel Edit
-                      </Button>
-                    )}
-                    
-                    <Button 
-                      disabled={createContentMutation.isPending || updateContentMutation.isPending} 
-                      type="submit"
-                      className={`${editingContent ? "bg-amber-600 hover:bg-amber-700" : "w-full sm:w-auto bg-amber-500 hover:bg-amber-600"} text-white`}
-                    >
-                      {(createContentMutation.isPending || updateContentMutation.isPending) && (
-                        <span className="mr-2 inline-flex h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
-                      )}
-                      {editingContent ? <Pencil className="mr-2 h-4 w-4" /> : <Plus className="mr-2 h-4 w-4" />}
-                      {editingContent ? "Update Content" : "Create Content"}
-                    </Button>
-                  </CardFooter>
-                </form>
-              </CardContent>
-            </Card>
-
-            <Card className="shadow-md border-gray-200">
-              <CardHeader>
-                <CardTitle>Existing Content Entries</CardTitle>
-                <CardDescription>
-                  {isContentLoading
-                    ? "Loading content..."
-                    : `Total entries: ${filteredContent.length}`}
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="overflow-x-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead className="min-w-[150px]">Page Path</TableHead>
-                      <TableHead className="min-w-[100px]">Section</TableHead>
-                      <TableHead className="w-full">Content Preview</TableHead>
-                      <TableHead className="min-w-[140px] text-right">Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {!filteredContent.length && !isContentLoading ? (
-                      <TableRow>
-                        <TableCell className="py-10 text-center" colSpan={4}>
-                          No content entries found.
-                        </TableCell>
-                      </TableRow>
-                    ) : null}
-                    {filteredContent.map((record) => (
-                      <TableRow key={record.id}>
-                        <TableCell className="font-medium">{record.page_path}</TableCell>
-                        <TableCell>{record.section_key}</TableCell>
-                        <TableCell className="text-xs font-mono text-muted-foreground max-w-md truncate">
-                          {JSON.stringify(record.content)}
-                        </TableCell>
-                        <TableCell className="flex items-center justify-end gap-2">
-                          <Button 
-                            size="sm" 
-                            variant="ghost"
-                            onClick={() => window.open(record.page_path, '_blank')}
-                            title="View Page"
-                            type="button"
-                          >
-                            <Eye className="h-4 w-4" />
-                          </Button>
-                          <Button 
-                            size="sm" 
-                            variant="ghost"
-                            onClick={() => handleDuplicateContent(record)}
-                            title="Duplicate Entry"
-                            type="button"
-                          >
-                            <Copy className="h-4 w-4" />
-                          </Button>
-                          <Button 
-                            size="sm" 
-                            variant="outline"
-                            onClick={() => {
-                              setEditingContent(record);
-                              window.scrollTo({ top: 0, behavior: 'smooth' });
-                            }}
-                            type="button"
-                          >
-                            <Pencil className="mr-1 h-4 w-4" />
-                            Edit
-                          </Button>
-                          <Dialog>
-                            <DialogTrigger asChild>
-                              <Button
-                                size="sm"
-                                variant="destructive"
-                                disabled={deleteContentMutation.isPending}
+            {!isPageEditorOpen ? (
+              <>
+                <div className="flex justify-between items-center">
+                  <h2 className="text-xl font-semibold">Pages</h2>
+                  <Button onClick={handleCreatePage} className="bg-amber-500 hover:bg-amber-600 text-white">
+                    <Plus className="mr-2 h-4 w-4" /> Create New Page
+                  </Button>
+                </div>
+                <Card className="shadow-md border-gray-200">
+                  <CardHeader>
+                    <CardTitle>Managed Pages</CardTitle>
+                    <CardDescription>
+                      {isContentLoading
+                        ? "Loading pages..."
+                        : `Total pages: ${filteredPagePaths.length}`}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="overflow-x-auto">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead className="w-full">Page Path</TableHead>
+                          <TableHead className="min-w-[150px]">Sections</TableHead>
+                          <TableHead className="min-w-[140px] text-right">Actions</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {!filteredPagePaths.length && !isContentLoading ? (
+                          <TableRow>
+                            <TableCell className="py-10 text-center" colSpan={3}>
+                              No pages found. Create one to get started.
+                            </TableCell>
+                          </TableRow>
+                        ) : null}
+                        {filteredPagePaths.map((path) => (
+                          <TableRow key={path}>
+                            <TableCell className="font-medium text-base">{path}</TableCell>
+                            <TableCell>
+                              <div className="flex flex-wrap gap-1">
+                                {groupedPages[path]?.map(s => (
+                                  <span key={s.id} className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-gray-100 text-gray-600">
+                                    {s.section_key}
+                                  </span>
+                                ))}
+                              </div>
+                            </TableCell>
+                            <TableCell className="flex items-center justify-end gap-2">
+                              <Button 
+                                size="sm" 
+                                variant="ghost"
+                                onClick={() => window.open(path, '_blank')}
+                                title="View Page"
                                 type="button"
                               >
-                                <Trash2 className="mr-1 h-4 w-4" />
-                                Delete
+                                <Eye className="h-4 w-4" />
                               </Button>
-                            </DialogTrigger>
-                            <DialogContent>
-                              <DialogHeader>
-                                <DialogTitle>Delete Content</DialogTitle>
-                                <DialogDescription>
-                                  Are you sure? This will remove the content for <strong>{record.page_path}</strong> ({record.section_key}).
-                                </DialogDescription>
-                              </DialogHeader>
-                              <DialogFooter className="gap-2">
-                                <DialogClose asChild>
-                                  <Button variant="outline" type="button">Cancel</Button>
-                                </DialogClose>
-                                <DialogClose asChild>
-                                  <Button
-                                    variant="destructive"
-                                    onClick={() => deleteContentMutation.mutate(record.id)}
-                                    type="button"
-                                  >
-                                    Delete
-                                  </Button>
-                                </DialogClose>
-                              </DialogFooter>
-                            </DialogContent>
-                          </Dialog>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </CardContent>
-            </Card>
+                              <Button 
+                                size="sm" 
+                                variant="outline"
+                                onClick={() => handleEditPage(path)}
+                                type="button"
+                                className="border-amber-200 hover:bg-amber-50 text-amber-700"
+                              >
+                                <Pencil className="mr-1 h-4 w-4" />
+                                Edit Page
+                              </Button>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </CardContent>
+                </Card>
+              </>
+            ) : (
+              <div className="space-y-6">
+                <div className="flex items-center justify-between bg-white p-4 rounded-lg shadow-sm border">
+                  <div className="flex items-center gap-4">
+                    <Button variant="ghost" size="icon" onClick={() => setIsPageEditorOpen(false)}>
+                      <ArrowLeft className="h-5 w-5" />
+                    </Button>
+                    <div>
+                      <h2 className="text-lg font-bold">{editorPagePath ? `Editing: ${editorPagePath}` : "Create New Page"}</h2>
+                      <p className="text-xs text-muted-foreground">Manage all sections for this page</p>
+                    </div>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button variant="outline" onClick={handleAddSection}>
+                      <Plus className="mr-2 h-4 w-4" /> Add Section
+                    </Button>
+                    <Button onClick={handleSavePage} className="bg-green-600 hover:bg-green-700 text-white">
+                      <Save className="mr-2 h-4 w-4" /> Save Page
+                    </Button>
+                  </div>
+                </div>
+
+                <div className="grid gap-6">
+                  {!editorPagePath && (
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>Page Configuration</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <Label>Page Path</Label>
+                        <Input 
+                          placeholder="/services/new-service" 
+                          value={editorPagePath} 
+                          onChange={(e) => setEditorPagePath(e.target.value)} 
+                          className="mt-2"
+                        />
+                      </CardContent>
+                    </Card>
+                  )}
+
+                  {editorSections.map((section, index) => (
+                    <Card key={index} className="border-l-4 border-l-brand-gold overflow-hidden">
+                      <CardHeader className="bg-gray-50/50 pb-3">
+                        <div className="flex justify-between items-center">
+                          <div className="flex items-center gap-2">
+                            <Layers className="h-4 w-4 text-gray-400" />
+                            {section.id ? (
+                              <span className="font-bold text-lg uppercase tracking-wide">{section.section_key}</span>
+                            ) : (
+                              <Input 
+                                value={section.section_key} 
+                                onChange={(e) => {
+                                  const newSections = [...editorSections];
+                                  newSections[index].section_key = e.target.value;
+                                  setEditorSections(newSections);
+                                }}
+                                placeholder="section_key (e.g. hero)"
+                                className="w-48 h-8"
+                              />
+                            )}
+                          </div>
+                          <Button variant="ghost" size="sm" className="text-red-400 hover:text-red-600 hover:bg-red-50" onClick={() => handleRemoveSection(index)}>
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </CardHeader>
+                      <CardContent className="p-4 grid md:grid-cols-2 gap-6">
+                        <div className="space-y-2">
+                          <Label className="text-xs text-muted-foreground uppercase">Content Data</Label>
+                          <DynamicJsonEditor
+                            value={JSON.stringify(section.content || {}, null, 2)}
+                            onChange={(val) => {
+                              const newSections = [...editorSections];
+                              try {
+                                newSections[index].content = JSON.parse(val);
+                                setEditorSections(newSections);
+                              } catch (e) { /* ignore invalid json while typing */ }
+                            }}
+                            type="content"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label className="text-xs text-muted-foreground uppercase">Images / Assets</Label>
+                          <DynamicJsonEditor
+                            value={JSON.stringify(section.images || {}, null, 2)}
+                            onChange={(val) => {
+                              const newSections = [...editorSections];
+                              try {
+                                newSections[index].images = JSON.parse(val);
+                                setEditorSections(newSections);
+                              } catch (e) { /* ignore invalid json while typing */ }
+                            }}
+                            type="images"
+                          />
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         ) : activeTab === 'router' ? (
           <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
