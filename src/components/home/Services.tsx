@@ -1,15 +1,26 @@
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Truck, Package, Anchor, Droplets } from "lucide-react";
+import { ArrowRight, Truck, Package, Anchor, Droplets, Ship, Globe, FileCheck, Warehouse } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { motion } from 'framer-motion';
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
+
+const iconComponents: { [key: string]: React.ElementType } = {
+  Package,
+  Anchor,
+  Truck,
+  Droplets,
+  Ship,
+  Globe,
+  FileCheck,
+  Warehouse
+};
 
 const EnhancedServiceCard = ({ image, title, description, icon, link }: { 
   image: string; 
   title: string; 
   description: string; 
-  icon: JSX.Element; 
+  icon: string | JSX.Element; 
   link: string;
 }) => {
   const getServiceImage = () => {
@@ -49,7 +60,11 @@ const EnhancedServiceCard = ({ image, title, description, icon, link }: {
           <div>
             <div className="flex items-center space-x-3 mb-3">
               <div className="w-10 h-10 rounded-full flex items-center justify-center text-brand-navy bg-[#f6b100]">
-                {icon}
+                {typeof icon === 'string' ? (
+                  React.createElement(iconComponents[icon] || Package, { size: 20 })
+                ) : (
+                  icon
+                )}
               </div>
               <h3 className="text-lg font-bold text-brand-navy">{title}</h3>
             </div>
