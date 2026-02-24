@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useId } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { LogOut, Pencil, Plus, Trash2, Image as ImageIcon, Bold, Italic, Link as LinkIcon, X, Upload, Copy, ChevronDown, ChevronRight, Eye, Search } from "lucide-react";
 
@@ -161,6 +161,7 @@ const RecursiveFieldEditor = ({
   depth?: number;
 }) => {
   const { toast } = useToast();
+  const uniqueId = useId();
   const [isCollapsed, setIsCollapsed] = useState(depth > 1);
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -176,7 +177,7 @@ const RecursiveFieldEditor = ({
   };
 
   const insertTag = (tagStart: string, tagEnd: string) => {
-    const textarea = document.getElementById(`textarea-${label}`) as HTMLTextAreaElement;
+    const textarea = document.getElementById(`textarea-${uniqueId}`) as HTMLTextAreaElement;
     if (!textarea) return;
     
     const start = textarea.selectionStart;
@@ -300,7 +301,7 @@ const RecursiveFieldEditor = ({
 
        <div className="flex gap-2">
           <Textarea 
-            id={`textarea-${label}`}
+            id={`textarea-${uniqueId}`}
             value={String(value || '')} 
             onChange={(e) => onChange(e.target.value)} 
             className="text-sm min-h-[60px] font-sans" 
@@ -673,6 +674,18 @@ export default function AdminDashboard() {
         variant: "destructive",
       });
     }
+  };
+
+  const handleDuplicateContent = (record: PageContent) => {
+    setContentFormState({
+      page_path: record.page_path,
+      section_key: `${record.section_key}_copy`,
+      content: JSON.stringify(record.content || {}, null, 2),
+      images: JSON.stringify(record.images || {}, null, 2),
+    });
+    setEditingContent(null);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    toast({ title: "Duplicated", description: "Entry copied to form. Please update the Section Key and Save." });
   };
 
   if (!isAuthenticated) {
@@ -1179,6 +1192,14 @@ export default function AdminDashboard() {
                             title="View Page"
                           >
                             <Eye className="h-4 w-4" />
+                          </Button>
+                          <Button 
+                            size="sm" 
+                            variant="ghost"
+                            onClick={() => handleDuplicateContent(record)}
+                            title="Duplicate Entry"
+                          >
+                            <Copy className="h-4 w-4" />
                           </Button>
                           <Button 
                             size="sm" 

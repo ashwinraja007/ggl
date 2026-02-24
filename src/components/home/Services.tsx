@@ -75,8 +75,14 @@ const EnhancedServiceCard = ({ image, title, description, icon, link }: {
   );
 };
 
-export const Services = () => {
-  const services = [
+interface ServicesProps {
+  title?: string;
+  subtitle?: string;
+  items?: any[];
+}
+
+export const Services = ({ title, subtitle, items }: ServicesProps) => {
+  const defaultServices = [
     {
       image: "/lovable-uploads/airfreight.jpg",
       title: "Air Freight",
@@ -114,6 +120,8 @@ export const Services = () => {
     }
   ];
 
+  const services = items || defaultServices;
+
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: { opacity: 1, transition: { staggerChildren: 0.1 } }
@@ -140,16 +148,16 @@ export const Services = () => {
       <div className="container mx-auto px-4">
         <motion.div variants={itemVariants} className="text-center mb-8">
           <h2 className="text-2xl md:text-3xl font-bold text-brand-navy mb-3">
-            Our Core Services
+            {title || "Our Core Services"}
           </h2>
           <div className="w-24 h-1 bg-brand-gold mx-auto mb-4"></div>
           <p className="text-gray-600 max-w-xl mx-auto text-sm md:text-base">
-            Discover our comprehensive range of logistics solutions designed to meet your global shipping needs.
+            {subtitle || "Discover our comprehensive range of logistics solutions designed to meet your global shipping needs."}
           </p>
         </motion.div>
         
         <motion.div variants={containerVariants} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
-          {services.map((service, index) => (
+          {services.map((service: any, index: number) => (
             <motion.div key={index} variants={itemVariants} transition={{ duration: 0.5, delay: index * 0.1 }}>
               <EnhancedServiceCard 
                 image={service.image} 

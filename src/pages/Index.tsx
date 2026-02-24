@@ -3,6 +3,8 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { Loader2 } from "lucide-react";
 import SEO from '@/components/SEO';
+import { useQuery } from '@tanstack/react-query';
+import { fetchPageContent } from '@/lib/content';
 
 // Lazy load components
 const Hero = lazy(() => import("@/components/home/Hero"));
@@ -20,11 +22,57 @@ const LoadingComponent = () => (
 );
 
 const Index = () => {
+  const { data: pageContent } = useQuery({
+    queryKey: ["page-content", "/"],
+    queryFn: () => fetchPageContent("/"),
+  });
+
+  // Helper to safely get content
+  const getContent = (sectionKey: string) => {
+    const record = pageContent?.find(r => r.section_key.toLowerCase() === sectionKey.toLowerCase());
+    if (!record?.content) return null;
+    let content = record.content;
+    if (typeof content === 'string') {
+      try { content = JSON.parse(content); } catch (e) { console.error("Error parsing content", e); }
+    }
+    return { content, images: record.images };
+  };
+
+  const heroData = getContent('hero');
+  const aboutData = getContent('about_us');
+  const servicesData = getContent('services');
+  const globalData = getContent('global_presence');
+  const enquiryData = getContent('quick_enquiry');
+
   const homeData = {
-    badgeText: "Global Logistics Experts",
-    headline: "Delivering Excellence for Global Supply Chains",
-    subheadline: "GGL Australia connects your business with global trade lanes through air, ocean, and land freight expertise backed by premium service.",
-    sliderImages: ["/lovable-uploads/ocean.jpg", "/lovable-uploads/airfreight.jpg"]
+    badgeText: heroData?.content?.badge || "Beyond Logistics, a Complete Solution",
+    headline: heroData?.content?.title || "Delivering Excellence in Global Logistics Solutions",
+    subheadline: heroData?.content?.subtitle || "GGL brings over 25 years of expertise in international logistics, offering comprehensive solutions tailored to your business needs.",
+    sliderImages: heroData?.images?.slider || ["/lovable-uploads/ocean.jpg", "/lovable-uploads/airfreight.jpg"],
+    consolamateLink: heroData?.content?.consolamate_link || "https://consolamate.com.au"
+  };
+
+  const aboutProps = {
+    title: aboutData?.content?.title || "About Us",
+    subtitle: aboutData?.content?.subtitle || "",
+    content: aboutData?.content?.body || "GGL is a proud subsidiary of 1 Global Enterprises, a dynamic investment company with a diverse portfolio in freight forwarding, supply chain management, and logistics technology.",
+    image: aboutData?.images?.main || "/lovable-uploads/gp.jpg"
+  };
+
+  const servicesProps = {
+    title: servicesData?.content?.title || "Our Core Services",
+    subtitle: servicesData?.content?.subtitle || "Discover our comprehensive range of logistics solutions designed to meet your global shipping needs.",
+    items: servicesData?.content?.items
+  };
+
+  const globalProps = {
+    title: globalData?.content?.title || "Global Presence",
+    subtitle: globalData?.content?.subtitle || "Our logistics network spans across continents, enabling seamless global shipping solutions."
+  };
+
+  const enquiryProps = {
+    title: enquiryData?.content?.title || "Quick Enquiry",
+    subtitle: enquiryData?.content?.subtitle || "Have a question? Fill out the form below and we'll get back to you shortly."
   };
 
   return (
@@ -46,11 +94,12 @@ const Index = () => {
             headline={homeData.headline}
             subheadline={homeData.subheadline}
             sliderImages={homeData.sliderImages}
+            consolamateLink={homeData.consolamateLink}
           />
         </Suspense>
 
         <Suspense fallback={<LoadingComponent />}>
-          <AboutUs />
+          <AboutUs {...aboutProps} />
         </Suspense>
 
         {/* Memberships is hidden
@@ -60,15 +109,15 @@ const Index = () => {
         */}
 
         <Suspense fallback={<LoadingComponent />}>
-          <Services />
+          <Services {...servicesProps} />
         </Suspense>
 
         <Suspense fallback={<LoadingComponent />}>
-          <GlobalPresence />
+          <GlobalPresence {...globalProps} />
         </Suspense>
 
         <Suspense fallback={<LoadingComponent />}>
-          <QuickEnquiry />
+          <QuickEnquiry {...enquiryProps} />
         </Suspense>
       </main>
       <Footer />
