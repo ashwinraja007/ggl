@@ -647,6 +647,7 @@ export default function AdminDashboard() {
       if (!payload.page_path.startsWith('/')) {
         payload.page_path = '/' + payload.page_path;
       }
+      payload.page_path = payload.page_path.toLowerCase();
 
       if (editingContent) {
         updateContentMutation.mutate({ id: editingContent.id, payload });

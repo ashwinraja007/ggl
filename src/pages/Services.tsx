@@ -146,7 +146,11 @@ const Services = () => {
   };
 
   // Helper to find record with flexible matching
-  const findRecord = (key: string) => pageContent?.find(r => r.section_key.toLowerCase() === key.toLowerCase());
+  const findRecord = (key: string) => {
+    if (!Array.isArray(pageContent)) return undefined;
+    return pageContent.find(r => r.section_key.toLowerCase() === key.toLowerCase()) ||
+           pageContent.find(r => r.section_key.toLowerCase().includes(key.toLowerCase()));
+  };
 
   const heroRecord = findRecord('hero');
   const servicesRecord = findRecord('services');
@@ -165,6 +169,12 @@ const Services = () => {
     if (Array.isArray(content)) return content;
     if ((content as any).items && Array.isArray((content as any).items)) return (content as any).items;
     if ((content as any).services && Array.isArray((content as any).services)) return (content as any).services;
+    if ((content as any).cards && Array.isArray((content as any).cards)) return (content as any).cards;
+
+    // Fallback: find first array property
+    const firstArray = Object.values(content).find(val => Array.isArray(val));
+    if (firstArray) return firstArray as any[];
+
     return defaultData.services;
   };
 
