@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { LogOut, Pencil, Plus, Trash2, Image as ImageIcon, Bold, Italic, Link as LinkIcon, X, Upload, Copy, ChevronDown, ChevronRight, Eye } from "lucide-react";
+import { LogOut, Pencil, Plus, Trash2, Image as ImageIcon, Bold, Italic, Link as LinkIcon, X, Upload, Copy, ChevronDown, ChevronRight, Eye, Search } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -399,6 +399,7 @@ export default function AdminDashboard() {
   const [editFormState, setEditFormState] = useState<FormState>(emptyFormState);
   
   const [activeTab, setActiveTab] = useState<'seo' | 'content'>('seo');
+  const [searchTerm, setSearchTerm] = useState("");
   const [contentFormState, setContentFormState] = useState({
     page_path: "",
     section_key: "",
@@ -528,20 +529,30 @@ export default function AdminDashboard() {
     },
   });
 
-  const sortedRecords = useMemo(() => {
+  const filteredRecords = useMemo(() => {
     if (!data) return [];
-    return [...data].sort((a, b) => a.path.localeCompare(b.path));
-  }, [data]);
+    let records = [...data].sort((a, b) => a.path.localeCompare(b.path));
+    if (searchTerm) {
+      const lower = searchTerm.toLowerCase();
+      records = records.filter(r => r.path.toLowerCase().includes(lower) || (r.title && r.title.toLowerCase().includes(lower)));
+    }
+    return records;
+  }, [data, searchTerm]);
 
-  const sortedContent = useMemo(() => {
+  const filteredContent = useMemo(() => {
     if (!contentData) return [];
-    return [...contentData].sort((a, b) => {
+    let content = [...contentData].sort((a, b) => {
       if (a.page_path === b.page_path) {
         return a.section_key.localeCompare(b.section_key);
       }
       return a.page_path.localeCompare(b.page_path);
     });
-  }, [contentData]);
+    if (searchTerm) {
+      const lower = searchTerm.toLowerCase();
+      content = content.filter(c => c.page_path.toLowerCase().includes(lower) || c.section_key.toLowerCase().includes(lower));
+    }
+    return content;
+  }, [contentData, searchTerm]);
 
   const handleLogin = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -726,19 +737,30 @@ export default function AdminDashboard() {
           </Button>
         </header>
 
-        <div className="flex gap-2 border-b pb-2">
-          <Button 
-            variant={activeTab === 'seo' ? 'default' : 'ghost'} 
-            onClick={() => setActiveTab('seo')}
-          >
-            SEO Management
-          </Button>
-          <Button 
-            variant={activeTab === 'content' ? 'default' : 'ghost'} 
-            onClick={() => setActiveTab('content')}
-          >
-            Page Content
-          </Button>
+        <div className="flex flex-col sm:flex-row gap-4 justify-between items-end sm:items-center border-b pb-4">
+          <div className="flex gap-2">
+            <Button 
+              variant={activeTab === 'seo' ? 'default' : 'ghost'} 
+              onClick={() => setActiveTab('seo')}
+            >
+              SEO Management
+            </Button>
+            <Button 
+              variant={activeTab === 'content' ? 'default' : 'ghost'} 
+              onClick={() => setActiveTab('content')}
+            >
+              Page Content
+            </Button>
+          </div>
+          <div className="relative w-full sm:w-64">
+            <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Search..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-8"
+            />
+          </div>
         </div>
 
         {activeTab === 'seo' ? (
@@ -840,7 +862,7 @@ export default function AdminDashboard() {
                   ? error instanceof Error
                     ? error.message
                     : "Unable to load entries"
-                  : `Total entries: ${sortedRecords.length}`}
+                  : `Total entries: ${filteredRecords.length}`}
             </CardDescription>
           </CardHeader>
           <CardContent className="overflow-x-auto">
@@ -857,14 +879,14 @@ export default function AdminDashboard() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {!sortedRecords.length && !isLoading ? (
+                {!filteredRecords.length && !isLoading ? (
                   <TableRow>
                     <TableCell className="py-10 text-center" colSpan={6}>
                       No entries found. Create one above to get started.
                     </TableCell>
                   </TableRow>
                 ) : null}
-                {sortedRecords.map((record) => (
+                {filteredRecords.map((record) => (
                   <TableRow key={record.id}>
                     <TableCell className="font-medium">{record.path}</TableCell>
                     <TableCell>{record.title ?? "—"}</TableCell>
@@ -881,6 +903,14 @@ export default function AdminDashboard() {
                       {formatTimestamp(record.updated_at)}
                     </TableCell>
                     <TableCell className="flex items-center justify-end gap-2">
+                      <Button 
+                        size="sm" 
+                        variant="ghost"
+                        onClick={() => window.open(record.path, '_blank')}
+                        title="View Page"
+                      >
+                        <Eye className="h-4 w-4" />
+                      </Button>
                       <Dialog open={editingRecord?.id === record.id} onOpenChange={(open) => open ? setEditingRecord(record) : setEditingRecord(null)}>
                         <DialogTrigger asChild>
                           <Button size="sm" variant="outline">
@@ -1113,7 +1143,7 @@ export default function AdminDashboard() {
                 <CardDescription>
                   {isContentLoading
                     ? "Loading content..."
-                    : `Total entries: ${sortedContent.length}`}
+                    : `Total entries: ${filteredContent.length}`}
                 </CardDescription>
               </CardHeader>
               <CardContent className="overflow-x-auto">
@@ -1127,14 +1157,14 @@ export default function AdminDashboard() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {!sortedContent.length && !isContentLoading ? (
+                    {!filteredContent.length && !isContentLoading ? (
                       <TableRow>
                         <TableCell className="py-10 text-center" colSpan={4}>
                           No content entries found.
                         </TableCell>
                       </TableRow>
                     ) : null}
-                    {sortedContent.map((record) => (
+                    {filteredContent.map((record) => (
                       <TableRow key={record.id}>
                         <TableCell className="font-medium">{record.page_path}</TableCell>
                         <TableCell>{record.section_key}</TableCell>

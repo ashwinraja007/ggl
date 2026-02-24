@@ -7,8 +7,10 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { motion } from 'framer-motion';
 import { FaLinkedin, FaFacebookF } from 'react-icons/fa';
-import { Phone, Mail, MapPin, Send, CheckCircle } from 'lucide-react';
+import { Phone, Mail, MapPin, Send, CheckCircle, Loader2 } from 'lucide-react';
 import SEO from '@/components/SEO';
+import { useQuery } from '@tanstack/react-query';
+import { fetchPageContent } from '@/lib/content';
 
 type FormData = {
   firstName: string;
@@ -22,6 +24,41 @@ type FormData = {
 const Contact = () => {
   const [submitted, setSubmitted] = useState(false);
   const { register, handleSubmit, reset } = useForm<FormData>();
+
+  const { data: pageContent, isLoading } = useQuery({
+    queryKey: ["page-content", "/contact"],
+    queryFn: () => fetchPageContent("/contact"),
+  });
+
+  const getContent = (sectionKey: string) => {
+    const record = pageContent?.find(r => r.section_key.toLowerCase() === sectionKey.toLowerCase());
+    if (!record?.content) return null;
+    let content = record.content;
+    if (typeof content === 'string') {
+      try { content = JSON.parse(content); } catch (e) { console.error("Error parsing content", e); }
+    }
+    return content;
+  };
+
+  const hero = getContent('hero');
+  const contactInfo = getContent('contact_info');
+  const socials = getContent('socials');
+  const mapData = getContent('map');
+  const formSection = getContent('form_section');
+
+  const data = {
+    heroTitle: hero?.title || "Get in Touch",
+    heroSubtitle: hero?.subtitle || "We're here to help and answer any questions you might have.",
+    phoneOperations: contactInfo?.phone_operations || "+61 481 359 416",
+    phoneSales: contactInfo?.phone_sales || "+61 422 843 999",
+    address: contactInfo?.address || "Suite 5, 7-9 Mallet Road,<br />Tullamarine, Victoria, 3043",
+    email: contactInfo?.email || "info@gglaustralia.com",
+    linkedin: socials?.linkedin || "https://www.linkedin.com/company/gglus/",
+    facebook: socials?.facebook || "https://www.facebook.com/gglusa",
+    mapUrl: mapData?.embed_url || "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3148.583489498719!2d144.8464884754868!3d-37.70139647207317!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x6ad6579f3b24534d%3A0x7501633196ff14b!2s7-9+Mallett+Rd%2C+Tullamarine+VIC+3043%2C+Australia!5e0!3m2!1sen!2sus!4v1712665730878!5m2!1sen!2sus",
+    formTitle: formSection?.title || "Send us a Message",
+    formDesc: formSection?.description || "Fill in the form below and we'll get back to you as soon as possible."
+  };
 
   const onSubmit = async (data: FormData) => {
     try {
@@ -60,6 +97,11 @@ const Contact = () => {
 
       <Header />
 
+      {isLoading ? (
+        <div className="flex-grow flex items-center justify-center min-h-[50vh]">
+          <Loader2 className="w-8 h-8 animate-spin text-brand-gold" />
+        </div>
+      ) : (
       <main className="flex-grow">
         {/* Hero Section */}
         <motion.section
@@ -74,9 +116,9 @@ const Contact = () => {
             transition={{ delay: 0.2, duration: 0.8 }}
             className="text-center px-4 relative z-10"
           >
-            <h1 className="text-4xl md:text-5xl font-bold text-white mb-5">Get in Touch</h1>
+            <h1 className="text-4xl md:text-5xl font-bold text-white mb-5">{data.heroTitle}</h1>
             <p className="text-lg text-white/90 max-w-2xl mx-auto font-light">
-              We're here to help and answer any questions you might have.
+              {data.heroSubtitle}
             </p>
           </motion.div>
         </motion.section>
@@ -101,8 +143,8 @@ const Contact = () => {
                       <Phone className="mt-1 text-blue-600 group-hover:scale-110 transition-transform" />
                       <div>
                         <p className="font-medium">Phone</p>
-                        <p className="text-gray-600">Operations: +61 481 359 416</p>
-                        <p className="text-gray-600">Sales: +61 422 843 999</p>
+                        <p className="text-gray-600">Operations: {data.phoneOperations}</p>
+                        <p className="text-gray-600">Sales: {data.phoneSales}</p>
                       </div>
                     </motion.div>
 
@@ -110,9 +152,7 @@ const Contact = () => {
                       <MapPin className="mt-1 text-blue-600 group-hover:scale-110 transition-transform" />
                       <div>
                         <p className="font-medium">Address</p>
-                        <p className="text-gray-600">
-                          Suite 5, 7-9 Mallet Road,<br />Tullamarine, Victoria, 3043
-                        </p>
+                        <p className="text-gray-600" dangerouslySetInnerHTML={{ __html: data.address }} />
                       </div>
                     </motion.div>
                   </div>
@@ -121,7 +161,7 @@ const Contact = () => {
                     <Mail className="mt-1 text-blue-600 group-hover:scale-110 transition-transform" />
                     <div>
                       <p className="font-medium">Email</p>
-                      <p className="text-gray-600">info@gglaustralia.com</p>
+                      <p className="text-gray-600">{data.email}</p>
                     </div>
                   </motion.div>
 
@@ -129,7 +169,7 @@ const Contact = () => {
                     <p className="font-medium mb-4">Connect With Us</p>
                     <div className="flex gap-4">
                       <motion.a
-                        href="https://www.linkedin.com/company/gglus/"
+                        href={data.linkedin}
                         whileHover={{ y: -5 }}
                         className="bg-gray-100 p-3 rounded-full text-gray-600 hover:bg-blue-600 hover:text-white transition-colors"
                         aria-label="LinkedIn"
@@ -138,7 +178,7 @@ const Contact = () => {
                       </motion.a>
 
                       <motion.a
-                        href="https://www.facebook.com/gglusa"
+                        href={data.facebook}
                         whileHover={{ y: -5 }}
                         className="bg-gray-100 p-3 rounded-full text-gray-600 hover:bg-blue-600 hover:text-white transition-colors"
                         aria-label="Facebook"
@@ -157,8 +197,8 @@ const Contact = () => {
                 transition={{ duration: 0.8 }}
                 className="bg-white p-8 rounded-xl shadow-lg"
               >
-                <h2 className="text-2xl font-bold mb-4">Send us a Message</h2>
-                <p className="text-gray-600 mb-6">Fill in the form below and we'll get back to you as soon as possible.</p>
+                <h2 className="text-2xl font-bold mb-4">{data.formTitle}</h2>
+                <p className="text-gray-600 mb-6">{data.formDesc}</p>
 
                 {submitted && (
                   <div className="bg-green-100 text-green-800 p-4 rounded-md mb-6 flex items-start gap-3">
@@ -210,7 +250,7 @@ const Contact = () => {
               className="relative h-[400px] md:h-[500px] rounded-xl shadow-lg overflow-hidden border border-gray-200"
             >
               <iframe
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3148.583489498719!2d144.8464884754868!3d-37.70139647207317!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x6ad6579f3b24534d%3A0x7501633196ff14b!2s7-9+Mallett+Rd%2C+Tullamarine+VIC+3043%2C+Australia!5e0!3m2!1sen!2sus!4v1712665730878!5m2!1sen!2sus"
+                src={data.mapUrl}
                 width="100%"
                 height="100%"
                 style={{ border: 0 }}
@@ -222,6 +262,7 @@ const Contact = () => {
           </div>
         </section>
       </main>
+      )}
 
       <Footer />
     </div>
