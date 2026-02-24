@@ -717,8 +717,7 @@ export default function AdminDashboard() {
     if (!formattedPath.startsWith('/')) formattedPath = '/' + formattedPath;
 
     try {
-      const updates = [];
-      const inserts = [];
+      const promises = [];
 
       for (const section of editorSections) {
         if (!section.section_key) continue;
@@ -731,23 +730,14 @@ export default function AdminDashboard() {
         };
 
         if (section.id && section.id > 0) {
-          updates.push(supabase.from('content').update(payload).eq('id', section.id));
+          promises.push(updatePageContent(section.id, payload));
         } else {
-          inserts.push(payload);
+          promises.push(createPageContent(payload));
         }
       }
 
-      if (inserts.length > 0) {
-        const { error } = await supabase.from('content').insert(inserts);
-        if (error) throw error;
-      }
-
-      if (updates.length > 0) {
-        const results = await Promise.all(updates);
-        const errors = results.filter((r) => r.error);
-        if (errors.length > 0) {
-          throw new Error(`Failed to update ${errors.length} sections. First error: ${errors[0].error?.message}`);
-        }
+      if (promises.length > 0) {
+        await Promise.all(promises);
       }
 
       queryClient.invalidateQueries({ queryKey: ["page-content"] });
