@@ -2,6 +2,8 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import PageRouterManager from "./PageRouterManager";
+import ContentManager from "./ContentManager";
+import SeoManager from "./SeoManager";
 
 const AdminDashboard = () => {
   return (
@@ -17,10 +19,10 @@ const AdminDashboard = () => {
               <TabsTrigger value="router">Page Router</TabsTrigger>
             </TabsList>
             <TabsContent value="content" className="mt-4 bg-white p-6 rounded-lg shadow-sm border">
-              <p className="text-gray-600">Your content management interface for editing page sections (hero, features, etc.) will go here.</p>
+              <ContentManager />
             </TabsContent>
             <TabsContent value="seo" className="mt-4 bg-white p-6 rounded-lg shadow-sm border">
-              <p className="text-gray-600">Manage SEO metadata for your pages here.</p>
+              <SeoManager />
             </TabsContent>
             <TabsContent value="router" className="mt-4">
               <PageRouterManager />
