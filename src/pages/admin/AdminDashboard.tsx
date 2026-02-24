@@ -1586,21 +1586,6 @@ export default function AdminDashboard() {
                           )}
                         </div>
                         <div className="space-y-2">
-                          <Label htmlFor="component-selector">Route Component</Label>
-                          <Select value={editorComponentKey} onValueChange={setEditorComponentKey}>
-                            <SelectTrigger id="component-selector">
-                              <SelectValue placeholder="Select component" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {componentKeys.map((key) => (
-                                <SelectItem key={key} value={key}>
-                                  {key}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </div>
-                        <div className="space-y-2">
                           <Label htmlFor="template-selector">Page Template</Label>
                           <Select onValueChange={handleTemplateChange} defaultValue="service">
                             <SelectTrigger id="template-selector">
