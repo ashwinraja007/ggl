@@ -6,6 +6,8 @@ import { Footer } from "@/components/layout/Footer";
 import { Plane, Ship, FileText, Droplets, Warehouse, Loader2 } from "lucide-react";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import SEO from '@/components/SEO';
+import { useQuery } from '@tanstack/react-query';
+import { fetchPageContent } from '@/lib/content';
 
 const iconMap: { [key: string]: React.ReactNode } = {
   Plane: <Plane className="w-5 h-5" />,
@@ -73,7 +75,12 @@ const ServiceCard = ({
 };
 
 const Services = () => {
-  const data = {
+  const { data: pageContent } = useQuery({
+    queryKey: ["page-content", "/services"],
+    queryFn: () => fetchPageContent("/services"),
+  });
+
+  const defaultData = {
     hero: {
       title: "Our Comprehensive Services",
       subtitle: "From air and ocean freight to specialized liquid transportation, we offer end-to-end logistics solutions tailored to your unique needs."
@@ -126,6 +133,23 @@ const Services = () => {
         { title: "✅ Regulatory Compliance", description: "Ensure smooth operations with up-to-date knowledge." },
         { title: "📞 24/7 Support", description: "Get help anytime with round-the-clock customer service." }
       ]
+    }
+  };
+
+  const heroRecord = pageContent?.find(r => r.section_key === 'hero');
+  const servicesRecord = pageContent?.find(r => r.section_key === 'services');
+  const whyChooseUsRecord = pageContent?.find(r => r.section_key === 'why-choose-us');
+
+  const data = {
+    hero: {
+      title: heroRecord?.content?.title || defaultData.hero.title,
+      subtitle: heroRecord?.content?.subtitle || defaultData.hero.subtitle
+    },
+    services: servicesRecord?.content?.items || defaultData.services,
+    whyChooseUs: {
+      title: whyChooseUsRecord?.content?.title || defaultData.whyChooseUs.title,
+      subtitle: whyChooseUsRecord?.content?.subtitle || defaultData.whyChooseUs.subtitle,
+      features: whyChooseUsRecord?.content?.features || defaultData.whyChooseUs.features
     }
   };
 

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { LogOut, Pencil, Plus, Trash2, Image as ImageIcon, Bold, Italic, Link as LinkIcon, X, Upload, Copy, ChevronDown, ChevronRight, Eye } from "lucide-react";
+import { LogOut, Pencil, Plus, Trash2, Image as ImageIcon, Bold, Italic, Link as LinkIcon, X, Upload, Copy, ChevronDown, ChevronRight } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -383,65 +383,6 @@ const DynamicJsonEditor = ({
       />
     </div>
   );
-};
-
-const ContentPreview = ({ contentStr, imagesStr }: { contentStr: string, imagesStr: string }) => {
-  try {
-    const content = JSON.parse(contentStr || '{}');
-    const images = JSON.parse(imagesStr || '{}');
-
-    // 1. Hero Pattern (Title + Subtitle + Background)
-    if (content.title && content.subtitle && !content.items) {
-      return (
-        <div className="border rounded-lg overflow-hidden shadow-sm">
-          <div className="relative h-64 bg-slate-900 flex items-center justify-center text-center p-8 text-white">
-            {images.background && (
-              <img src={images.background} alt="bg" className="absolute inset-0 w-full h-full object-cover opacity-40" />
-            )}
-            <div className="relative z-10 max-w-2xl">
-              <h2 className="text-3xl font-bold mb-3">{content.title}</h2>
-              <p className="text-lg text-gray-200">{content.subtitle}</p>
-            </div>
-          </div>
-        </div>
-      );
-    }
-
-    // 2. List Pattern (e.g. Services, Features)
-    if (content.items && Array.isArray(content.items)) {
-      return (
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 bg-slate-50 rounded-lg">
-          {content.items.map((item: any, i: number) => (
-            <div key={i} className="bg-white border rounded-lg overflow-hidden shadow-sm">
-              {item.image && <img src={item.image} alt={item.title} className="w-full h-40 object-cover" />}
-              <div className="p-4">
-                {item.title && <h3 className="font-bold text-lg mb-2">{item.title}</h3>}
-                {item.description && <p className="text-sm text-gray-600">{item.description}</p>}
-              </div>
-            </div>
-          ))}
-        </div>
-      );
-    }
-
-    // 3. HTML Body Pattern
-    if (content.body) {
-      return (
-        <div className="prose max-w-none p-6 border rounded-lg bg-white shadow-sm">
-           <div dangerouslySetInnerHTML={{ __html: content.body }} />
-        </div>
-      );
-    }
-
-    // Fallback: JSON View
-    return (
-      <div className="bg-slate-950 text-slate-50 p-4 rounded-lg overflow-auto max-h-[400px] font-mono text-xs">
-        <pre>{JSON.stringify({ content, images }, null, 2)}</pre>
-      </div>
-    );
-  } catch (e) {
-    return <div className="text-red-500">Invalid JSON data for preview</div>;
-  }
 };
 
 export default function AdminDashboard() {
@@ -1144,21 +1085,6 @@ export default function AdminDashboard() {
                       </Button>
                     )}
                     
-                    <Dialog>
-                      <DialogTrigger asChild>
-                        <Button type="button" variant="secondary" className="w-full sm:w-auto">
-                          <Eye className="mr-2 h-4 w-4" /> Preview
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
-                        <DialogHeader>
-                          <DialogTitle>Content Preview</DialogTitle>
-                          <DialogDescription>Visual approximation of the content.</DialogDescription>
-                        </DialogHeader>
-                        <ContentPreview contentStr={contentFormState.content} imagesStr={contentFormState.images} />
-                      </DialogContent>
-                    </Dialog>
-
                     <Button 
                       disabled={createContentMutation.isPending || updateContentMutation.isPending} 
                       type="submit"
