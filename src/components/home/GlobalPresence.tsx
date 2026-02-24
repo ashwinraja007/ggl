@@ -4,7 +4,12 @@ import { MapPin, Globe, ExternalLink } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 
-const GlobalPresence = () => {
+interface GlobalPresenceProps {
+  title?: string;
+  subtitle?: string;
+}
+
+const GlobalPresence = ({ title, subtitle }: GlobalPresenceProps) => {
   const locations = [
     { id: 1, name: "Melbourne", position: { top: "75%", left: "85%" }, country: "Australia" },
     { id: 2, name: "Singapore", position: { top: "58%", left: "75%" }, country: "Singapore" },
@@ -30,11 +35,11 @@ const GlobalPresence = () => {
             <motion.div animate={{ rotate: 360 }} transition={{ duration: 20, repeat: Infinity, ease: "linear" }}>
               <Globe className="h-10 w-10 text-brand-gold" />
             </motion.div>
-            <h2 className="text-3xl md:text-4xl font-bold text-slate-50">Global Presence</h2>
+            <h2 className="text-3xl md:text-4xl font-bold text-slate-50">{title || "Global Presence"}</h2>
           </motion.div>
           <div className="w-24 h-1 bg-brand-gold mx-auto mb-4"></div>
           <p className="text-white/80 max-w-2xl mx-auto text-lg md:text-xl">
-            Our logistics network spans across continents, enabling seamless global shipping solutions.
+            {subtitle || "Our logistics network spans across continents, enabling seamless global shipping solutions."}
           </p>
         </div>
 

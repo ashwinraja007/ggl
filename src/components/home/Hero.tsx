@@ -14,7 +14,16 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
 import { useIsMobile } from "@/hooks/use-mobile";
 
-export const Hero = () => {
+interface HeroProps {
+  badgeText?: string;
+  headline?: string;
+  subheadline?: string;
+  sliderImages?: string[];
+  consolamateLink?: string;
+  contactPath?: string;
+}
+
+export const Hero = ({ badgeText, headline, subheadline, sliderImages, consolamateLink, contactPath = "/contact" }: HeroProps) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);           // mobile quick links (bottom)
   const [isVisible, setIsVisible] = useState(false);             // entrance anims
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false); // left drawer
@@ -134,7 +143,7 @@ export const Hero = () => {
 
               <div className="mt-8 space-y-3">
                 <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                  <Link to="/contact" onClick={() => setIsMobileMenuOpen(false)}>
+                  <Link to={contactPath} onClick={() => setIsMobileMenuOpen(false)}>
                     <Button
                       variant="gold"
                       size="lg"
@@ -146,7 +155,7 @@ export const Hero = () => {
                 </motion.div>
 
                 <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                  <Link to="https://consolmate.com/auth/login/14" onClick={() => setIsMobileMenuOpen(false)}>
+                  <Link to={consolamateLink || "https://consolmate.com/auth/login/14"} onClick={() => setIsMobileMenuOpen(false)}>
                     <Button
                       size="lg"
                       variant="gold"
@@ -171,7 +180,7 @@ export const Hero = () => {
         aria-hidden="true"
       >
         <img
-          src="homeimage.jpg"
+          src={sliderImages && sliderImages.length > 0 ? sliderImages[0] : "homeimage.jpg"}
           alt="Hero background"
           className="w-full h-full object-cover object-center"
           loading="eager"
@@ -209,7 +218,7 @@ export const Hero = () => {
                 transition={{ duration: 0.8, delay: 0.6 }}
                 className="inline-block bg-brand-gold/20 backdrop-blur-sm text-white px-3 py-1 sm:px-4 sm:py-1.5 rounded-full text-xs sm:text-sm font-medium border border-brand-gold/30"
               >
-                Beyond Logistics, a Complete Solution
+                {badgeText || "Beyond Logistics, a Complete Solution"}
               </motion.span>
             </motion.div>
 
@@ -218,10 +227,8 @@ export const Hero = () => {
               animate={isVisible ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.8, delay: 0.7 }}
               className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight"
-            >
-              Delivering Excellence in{" "}
-              <span className="text-[#f6b100]">Global Logistics</span> Solutions
-            </motion.h1>
+              dangerouslySetInnerHTML={{ __html: headline || 'Delivering Excellence in <span class="text-[#f6b100]">Global Logistics</span> Solutions' }}
+            />
 
             <motion.p
               initial={{ opacity: 0, y: 20 }}
@@ -229,8 +236,7 @@ export const Hero = () => {
               transition={{ duration: 0.8, delay: 0.9 }}
               className="text-base sm:text-lg md:text-xl text-white/90 leading-relaxed max-w-xl"
             >
-              GGL brings over 25 years of expertise in international logistics,
-              offering comprehensive solutions tailored to your business needs.
+              {subheadline || "GGL brings over 25 years of expertise in international logistics, offering comprehensive solutions tailored to your business needs."}
             </motion.p>
 
             {/* CTA buttons exactly like above section */}
@@ -241,7 +247,7 @@ export const Hero = () => {
               className="flex flex-col sm:flex-row gap-3 sm:gap-4 pt-2"
             >
               <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }} className="w-full sm:w-auto">
-                <Link to="/contact">
+                <Link to={contactPath}>
                   <Button
                     variant="gold"
                     size="lg"
@@ -253,7 +259,7 @@ export const Hero = () => {
               </motion.div>
 
               <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }} className="w-full sm:w-auto">
-                <Link to="https://consolmate.com/auth/login/14">
+                <Link to={consolamateLink || "https://consolmate.com/auth/login/14"}>
                   <Button
                     variant="gold"
                     size="lg"

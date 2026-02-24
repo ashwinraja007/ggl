@@ -16,7 +16,12 @@ interface EnquiryForm {
   comment: string;
 }
 
-export const QuickEnquiry = () => {
+interface QuickEnquiryProps {
+  title?: string;
+  subtitle?: string;
+}
+
+export const QuickEnquiry = ({ title, subtitle }: QuickEnquiryProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
 
@@ -68,11 +73,11 @@ export const QuickEnquiry = () => {
           className="text-center mb-10"
         >
           <h2 className="text-2xl font-bold text-gray-800 mb-3">
-            Quick Enquiry
+            {title || "Quick Enquiry"}
           </h2>
           <div className="w-20 h-1 bg-brand-gold mx-auto mb-4"></div>
           <p className="text-gray-600">
-            Have a question? Fill out the form below and we'll get back to you shortly.
+            {subtitle || "Have a question? Fill out the form below and we'll get back to you shortly."}
           </p>
         </motion.div>
 
