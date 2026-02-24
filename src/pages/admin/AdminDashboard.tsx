@@ -13,10 +13,14 @@ const AdminDashboard = () => {
           <Tabs defaultValue="router" className="w-full">
             <TabsList>
               <TabsTrigger value="content">Content Management</TabsTrigger>
+              <TabsTrigger value="seo">SEO Management</TabsTrigger>
               <TabsTrigger value="router">Page Router</TabsTrigger>
             </TabsList>
             <TabsContent value="content" className="mt-4 bg-white p-6 rounded-lg shadow-sm border">
               <p className="text-gray-600">Your content management interface for editing page sections (hero, features, etc.) will go here.</p>
+            </TabsContent>
+            <TabsContent value="seo" className="mt-4 bg-white p-6 rounded-lg shadow-sm border">
+              <p className="text-gray-600">Manage SEO metadata for your pages here.</p>
             </TabsContent>
             <TabsContent value="router" className="mt-4">
               <PageRouterManager />
