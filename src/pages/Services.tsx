@@ -145,11 +145,11 @@ const Services = () => {
       title: heroRecord?.content?.title || defaultData.hero.title,
       subtitle: heroRecord?.content?.subtitle || defaultData.hero.subtitle
     },
-    services: servicesRecord?.content?.items || defaultData.services,
+    services: Array.isArray(servicesRecord?.content?.items) ? servicesRecord?.content?.items : defaultData.services,
     whyChooseUs: {
       title: whyChooseUsRecord?.content?.title || defaultData.whyChooseUs.title,
       subtitle: whyChooseUsRecord?.content?.subtitle || defaultData.whyChooseUs.subtitle,
-      features: whyChooseUsRecord?.content?.features || defaultData.whyChooseUs.features
+      features: Array.isArray(whyChooseUsRecord?.content?.features) ? whyChooseUsRecord?.content?.features : defaultData.whyChooseUs.features
     }
   };
 
