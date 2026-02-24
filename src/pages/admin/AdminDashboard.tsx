@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState, useId } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { LogOut, Pencil, Plus, Trash2, Image as ImageIcon, Bold, Italic, Link as LinkIcon, X, Upload, Copy, ChevronDown, ChevronRight, Eye, Search, FileText, Menu, LayoutDashboard } from "lucide-react";
+import { LogOut, Pencil, Plus, Trash2, Image as ImageIcon, Bold, Italic, Link as LinkIcon, X, Upload, Copy, ChevronDown, ChevronRight, Eye, Search, FileText, Menu, LayoutDashboard, Route } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -42,6 +42,7 @@ import {
   updatePageContent,
 } from "@/lib/content";
 import { uploadImage } from "@/lib/supabase";
+import PageRouterManager from "./PageRouterManager";
 
 const ADMIN_EMAIL = "admin@gglau.com";
 const ADMIN_PASSWORD = "GGLAU@2025";
@@ -399,7 +400,7 @@ export default function AdminDashboard() {
   const [editingRecord, setEditingRecord] = useState<SeoRecord | null>(null);
   const [editFormState, setEditFormState] = useState<FormState>(emptyFormState);
   
-  const [activeTab, setActiveTab] = useState<'seo' | 'content'>('seo');
+  const [activeTab, setActiveTab] = useState<'seo' | 'content' | 'router'>('seo');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [contentFormState, setContentFormState] = useState({
@@ -773,6 +774,14 @@ export default function AdminDashboard() {
            >
              <FileText className="mr-3 h-4 w-4" /> Page Content
            </Button>
+           <Button 
+             variant={activeTab === 'router' ? 'secondary' : 'ghost'} 
+             className={`w-full justify-start ${activeTab === 'router' ? 'bg-brand-gold text-brand-navy hover:bg-brand-gold/90' : 'text-gray-300 hover:text-white hover:bg-white/10'}`} 
+             onClick={() => setActiveTab('router')}
+             type="button"
+           >
+             <Route className="mr-3 h-4 w-4" /> Page Router
+           </Button>
         </nav>
         <div className="p-4 border-t border-white/10 bg-black/20">
            <Button variant="ghost" className="w-full justify-start text-red-300 hover:text-red-100 hover:bg-red-900/30 transition-colors" onClick={handleLogout} type="button">
@@ -805,6 +814,9 @@ export default function AdminDashboard() {
              <Button variant={activeTab === 'content' ? 'secondary' : 'ghost'} className="w-full justify-start text-white hover:bg-white/10" onClick={() => { setActiveTab('content'); setIsMobileMenuOpen(false); }} type="button">
                <FileText className="mr-2 h-4 w-4" /> Page Content
              </Button>
+             <Button variant={activeTab === 'router' ? 'secondary' : 'ghost'} className="w-full justify-start text-white hover:bg-white/10" onClick={() => { setActiveTab('router'); setIsMobileMenuOpen(false); }} type="button">
+               <Route className="mr-2 h-4 w-4" /> Page Router
+             </Button>
              <div className="h-px bg-white/10 my-2"></div>
              <Button variant="ghost" className="w-full justify-start text-red-300 hover:bg-red-900/20" onClick={handleLogout} type="button">
                <LogOut className="mr-2 h-4 w-4" /> Sign Out
@@ -817,8 +829,8 @@ export default function AdminDashboard() {
            <div className="flex flex-col gap-6">
              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                <div>
-                 <h1 className="text-3xl font-bold text-gray-900 tracking-tight">{activeTab === 'seo' ? 'SEO Management' : 'Content Management'}</h1>
-                 <p className="text-gray-500 mt-1">Manage your website's {activeTab === 'seo' ? 'metadata and search visibility' : 'dynamic content and images'}.</p>
+                 <h1 className="text-3xl font-bold text-gray-900 tracking-tight">{activeTab === 'seo' ? 'SEO Management' : activeTab === 'content' ? 'Content Management' : 'Page Router'}</h1>
+                 <p className="text-gray-500 mt-1">Manage your website's {activeTab === 'seo' ? 'metadata and search visibility' : activeTab === 'content' ? 'dynamic content and images' : 'page routes'}.</p>
                </div>
                {/* Search Bar */}
                <div className="relative w-full sm:w-72 group">
@@ -1181,7 +1193,7 @@ export default function AdminDashboard() {
           </CardContent>
         </Card>
           </div>
-        ) : (
+        ) : activeTab === 'content' ? (
           <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
             <Card className="border-t-4 border-t-amber-500 shadow-md">
               <CardHeader>
@@ -1360,6 +1372,10 @@ export default function AdminDashboard() {
                 </Table>
               </CardContent>
             </Card>
+          </div>
+        ) : (
+          <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <PageRouterManager />
           </div>
         )}
       </div>
