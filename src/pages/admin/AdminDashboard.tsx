@@ -41,7 +41,7 @@ import {
   fetchPageContent,
   updatePageContent,
 } from "@/lib/content";
-import { uploadImage } from "@/lib/supabase";
+import { supabase, uploadImage } from "@/lib/supabase";
 import PageRouterManager from "./PageRouterManager";
 
 const ADMIN_EMAIL = "admin@gglau.com";
@@ -448,6 +448,16 @@ export default function AdminDashboard() {
     enabled: isAuthenticated && activeTab === 'content',
   });
 
+  const { data: pagesCount } = useQuery({
+    queryKey: ["pages-count"],
+    queryFn: async () => {
+      const { count, error } = await supabase.from("pages").select("*", { count: 'exact', head: true });
+      if (error) return 0;
+      return count;
+    },
+    enabled: isAuthenticated,
+  });
+
   const createMutation = useMutation({
     mutationFn: (payload: SeoPayload) => createSeoRecord(payload),
     onSuccess: () => {
@@ -845,7 +855,7 @@ export default function AdminDashboard() {
              </div>
 
              {/* Stats Cards */}
-             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 <Card className="bg-gradient-to-br from-blue-600 to-brand-navy text-white border-none shadow-lg hover:shadow-xl transition-shadow">
                   <CardContent className="p-6 flex items-center justify-between">
                      <div>
@@ -865,6 +875,17 @@ export default function AdminDashboard() {
                      </div>
                      <div className="p-3 bg-white/10 rounded-full">
                        <FileText className="h-6 w-6 text-white" />
+                     </div>
+                  </CardContent>
+                </Card>
+                <Card className="bg-gradient-to-br from-purple-600 to-indigo-700 text-white border-none shadow-lg hover:shadow-xl transition-shadow">
+                  <CardContent className="p-6 flex items-center justify-between">
+                     <div>
+                       <p className="text-purple-100 text-sm font-medium mb-1">Active Routes</p>
+                       <h3 className="text-3xl font-bold">{pagesCount || 0}</h3>
+                     </div>
+                     <div className="p-3 bg-white/10 rounded-full">
+                       <Route className="h-6 w-6 text-white" />
                      </div>
                   </CardContent>
                 </Card>
@@ -1373,11 +1394,11 @@ export default function AdminDashboard() {
               </CardContent>
             </Card>
           </div>
-        ) : (
+        ) : activeTab === 'router' ? (
           <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
             <PageRouterManager />
           </div>
-        )}
+        ) : null}
       </div>
       </main>
     </div>
