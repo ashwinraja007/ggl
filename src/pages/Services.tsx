@@ -17,6 +17,15 @@ const iconMap: { [key: string]: React.ReactNode } = {
   Warehouse: <Warehouse className="w-5 h-5" />,
 };
 
+const getIcon = (iconName: string) => {
+  if (!iconName) return iconMap.Plane;
+  // Try exact match
+  if (iconMap[iconName]) return iconMap[iconName];
+  // Try case-insensitive match
+  const key = Object.keys(iconMap).find(k => k.toLowerCase() === iconName.toLowerCase());
+  return key ? iconMap[key] : iconMap.Plane;
+};
+
 // Scroll to Top on Route Change
 const ScrollToTop = () => {
   const { pathname } = useLocation();
@@ -136,18 +145,26 @@ const Services = () => {
     }
   };
 
-  const heroRecord = pageContent?.find(r => r.section_key === 'hero');
-  const servicesRecord = pageContent?.find(r => r.section_key === 'services');
-  const whyChooseUsRecord = pageContent?.find(r => r.section_key === 'why-choose-us');
+  // Helper to find record with flexible matching
+  const findRecord = (key: string) => pageContent?.find(r => r.section_key.toLowerCase() === key.toLowerCase());
+
+  const heroRecord = findRecord('hero');
+  const servicesRecord = findRecord('services');
+  const whyChooseUsRecord = findRecord('why-choose-us');
+
+  const getServicesList = () => {
+    if (!servicesRecord?.content) return defaultData.services;
+    if (Array.isArray(servicesRecord.content)) return servicesRecord.content;
+    if (Array.isArray(servicesRecord.content.items)) return servicesRecord.content.items;
+    return defaultData.services;
+  };
 
   const data = {
     hero: {
       title: heroRecord?.content?.title || defaultData.hero.title,
       subtitle: heroRecord?.content?.subtitle || defaultData.hero.subtitle
     },
-    services: Array.isArray(servicesRecord?.content) 
-      ? servicesRecord?.content 
-      : (Array.isArray(servicesRecord?.content?.items) ? servicesRecord?.content?.items : defaultData.services),
+    services: getServicesList(),
     whyChooseUs: {
       title: whyChooseUsRecord?.content?.title || defaultData.whyChooseUs.title,
       subtitle: whyChooseUsRecord?.content?.subtitle || defaultData.whyChooseUs.subtitle,
@@ -199,7 +216,7 @@ const Services = () => {
                 <ServiceCard
                   key={service.title || index}
                   {...service}
-                  icon={iconMap[service.icon] || iconMap.Plane}
+                  icon={getIcon(service.icon)}
                 />
               ))}
             </div>
