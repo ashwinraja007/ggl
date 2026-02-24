@@ -145,7 +145,9 @@ const Services = () => {
       title: heroRecord?.content?.title || defaultData.hero.title,
       subtitle: heroRecord?.content?.subtitle || defaultData.hero.subtitle
     },
-    services: Array.isArray(servicesRecord?.content?.items) ? servicesRecord?.content?.items : defaultData.services,
+    services: Array.isArray(servicesRecord?.content) 
+      ? servicesRecord?.content 
+      : (Array.isArray(servicesRecord?.content?.items) ? servicesRecord?.content?.items : defaultData.services),
     whyChooseUs: {
       title: whyChooseUsRecord?.content?.title || defaultData.whyChooseUs.title,
       subtitle: whyChooseUsRecord?.content?.subtitle || defaultData.whyChooseUs.subtitle,
@@ -193,11 +195,11 @@ const Services = () => {
         <section className="py-8 md:py-12">
           <div className="container mx-auto px-4 max-w-5xl">
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-6">
-              {data?.services?.map(service => (
+              {data?.services?.map((service: any, index: number) => (
                 <ServiceCard
-                  key={service.title}
+                  key={service.title || index}
                   {...service}
-                  icon={iconMap[service.icon]}
+                  icon={iconMap[service.icon] || iconMap.Plane}
                 />
               ))}
             </div>
