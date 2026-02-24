@@ -308,8 +308,8 @@ const RecursiveFieldEditor = ({
           />
           {(type === 'images' || (typeof label === 'string' && (label.toLowerCase().includes('image') || label.toLowerCase().includes('icon') || label.toLowerCase().includes('background') || label.toLowerCase().includes('banner')))) && (
              <div className="flex flex-col gap-2 shrink-0">
-                 <input type="file" id={`file-${label}`} className="hidden" onChange={handleImageUpload} accept="image/*" />
-                 <Button type="button" variant="outline" size="icon" onClick={() => document.getElementById(`file-${label}`)?.click()} title="Upload Image"><Upload className="h-4 w-4" /></Button>
+                 <input type="file" id={`file-${uniqueId}`} className="hidden" onChange={handleImageUpload} accept="image/*" />
+                 <Button type="button" variant="outline" size="icon" onClick={() => document.getElementById(`file-${uniqueId}`)?.click()} title="Upload Image"><Upload className="h-4 w-4" /></Button>
                  {typeof value === 'string' && (value.startsWith('http') || value.startsWith('/')) && (
                    <div className="w-10 h-10 border rounded overflow-hidden bg-gray-100">
                       <img src={value} alt="preview" className="w-full h-full object-cover" />
@@ -744,7 +744,7 @@ export default function AdminDashboard() {
               Manage SEO metadata and page content.
             </p>
           </div>
-          <Button onClick={handleLogout} variant="outline">
+          <Button onClick={handleLogout} variant="outline" type="button">
             <LogOut className="mr-2 h-4 w-4" />
             Sign Out
           </Button>
@@ -755,12 +755,14 @@ export default function AdminDashboard() {
             <Button 
               variant={activeTab === 'seo' ? 'default' : 'ghost'} 
               onClick={() => setActiveTab('seo')}
+              type="button"
             >
               SEO Management
             </Button>
             <Button 
               variant={activeTab === 'content' ? 'default' : 'ghost'} 
               onClick={() => setActiveTab('content')}
+              type="button"
             >
               Page Content
             </Button>
@@ -921,12 +923,13 @@ export default function AdminDashboard() {
                         variant="ghost"
                         onClick={() => window.open(record.path, '_blank')}
                         title="View Page"
+                        type="button"
                       >
                         <Eye className="h-4 w-4" />
                       </Button>
                       <Dialog open={editingRecord?.id === record.id} onOpenChange={(open) => open ? setEditingRecord(record) : setEditingRecord(null)}>
                         <DialogTrigger asChild>
-                          <Button size="sm" variant="outline">
+                          <Button size="sm" variant="outline" type="button">
                             <Pencil className="mr-1 h-4 w-4" />
                             Edit
                           </Button>
@@ -1042,6 +1045,7 @@ export default function AdminDashboard() {
                             size="sm"
                             variant="destructive"
                             disabled={deleteMutation.isPending}
+                            type="button"
                           >
                             <Trash2 className="mr-1 h-4 w-4" />
                             Delete
@@ -1057,12 +1061,13 @@ export default function AdminDashboard() {
                           </DialogHeader>
                           <DialogFooter className="gap-2">
                             <DialogClose asChild>
-                              <Button variant="outline">Cancel</Button>
+                              <Button variant="outline" type="button">Cancel</Button>
                             </DialogClose>
                             <DialogClose asChild>
                               <Button
                                 variant="destructive"
                                 onClick={() => deleteMutation.mutate(record.id)}
+                                type="button"
                               >
                                 Delete
                               </Button>
@@ -1190,6 +1195,7 @@ export default function AdminDashboard() {
                             variant="ghost"
                             onClick={() => window.open(record.page_path, '_blank')}
                             title="View Page"
+                            type="button"
                           >
                             <Eye className="h-4 w-4" />
                           </Button>
@@ -1198,6 +1204,7 @@ export default function AdminDashboard() {
                             variant="ghost"
                             onClick={() => handleDuplicateContent(record)}
                             title="Duplicate Entry"
+                            type="button"
                           >
                             <Copy className="h-4 w-4" />
                           </Button>
@@ -1208,6 +1215,7 @@ export default function AdminDashboard() {
                               setEditingContent(record);
                               window.scrollTo({ top: 0, behavior: 'smooth' });
                             }}
+                            type="button"
                           >
                             <Pencil className="mr-1 h-4 w-4" />
                             Edit
@@ -1218,6 +1226,7 @@ export default function AdminDashboard() {
                                 size="sm"
                                 variant="destructive"
                                 disabled={deleteContentMutation.isPending}
+                                type="button"
                               >
                                 <Trash2 className="mr-1 h-4 w-4" />
                                 Delete
@@ -1232,12 +1241,13 @@ export default function AdminDashboard() {
                               </DialogHeader>
                               <DialogFooter className="gap-2">
                                 <DialogClose asChild>
-                                  <Button variant="outline">Cancel</Button>
+                                  <Button variant="outline" type="button">Cancel</Button>
                                 </DialogClose>
                                 <DialogClose asChild>
                                   <Button
                                     variant="destructive"
                                     onClick={() => deleteContentMutation.mutate(record.id)}
+                                    type="button"
                                   >
                                     Delete
                                   </Button>
