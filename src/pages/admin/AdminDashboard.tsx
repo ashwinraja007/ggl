@@ -21,6 +21,13 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -387,6 +394,20 @@ const DynamicJsonEditor = ({
   );
 };
 
+const pageTemplates: Record<string, Partial<PageContent>[]> = {
+  service: [
+    { section_key: "seo", content: { title: "Service Page Title", description: "Description of the service." }, images: {} },
+    { section_key: "hero", content: { title: "Service Title", subtitle: "Catchy subtitle for the service." }, images: { background: "/lovable-uploads/oceanfrieght.jpg" } },
+    { section_key: "main", content: { title: "Detailed Service Information", body: "<p>Start writing about the service here...</p>" }, images: {} },
+    { section_key: "features", content: { title: "Key Features", items: ["Feature 1", "Feature 2", "Feature 3"] }, images: {} },
+  ],
+  blog: [
+    { section_key: "seo", content: { title: "Blog Post Title", description: "A brief summary of the blog post." }, images: {} },
+    { section_key: "post_header", content: { title: "Blog Post Title", author: "Admin", date: new Date().toISOString().split('T')[0] }, images: { featured_image: "/lovable-uploads/placeholder.jpg" } },
+    { section_key: "post_body", content: { body: "<h2>Start writing your blog post here...</h2><p>Use HTML tags for formatting.</p>" }, images: {} },
+  ]
+};
+
 export default function AdminDashboard() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -681,12 +702,8 @@ export default function AdminDashboard() {
 
   const handleCreatePage = () => {
     setEditorPagePath("");
-    // Pre-fill with standard service page structure
-    setEditorSections([
-      { section_key: "seo", content: { title: "Page Title", description: "Description" }, images: {} },
-      { section_key: "hero", content: { title: "Hero Title", subtitle: "Hero Subtitle" }, images: { background: "/lovable-uploads/oceanfrieght.jpg" } },
-      { section_key: "main", content: { title: "Main Heading", body: "<p>Content goes here...</p>" }, images: {} },
-    ]);
+    // Pre-fill with default service page template
+    setEditorSections(pageTemplates.service);
     setIsPageEditorOpen(true);
   };
 
@@ -726,7 +743,11 @@ export default function AdminDashboard() {
       }
 
       if (updates.length > 0) {
-        await Promise.all(updates);
+        const results = await Promise.all(updates);
+        const errors = results.filter((r) => r.error);
+        if (errors.length > 0) {
+          throw new Error(`Failed to update ${errors.length} sections. First error: ${errors[0].error?.message}`);
+        }
       }
 
       queryClient.invalidateQueries({ queryKey: ["page-content"] });
@@ -755,6 +776,10 @@ export default function AdminDashboard() {
       newSections.splice(index, 1);
       setEditorSections(newSections);
     }
+  };
+
+  const handleTemplateChange = (templateKey: string) => {
+    if (templateKey in pageTemplates) setEditorSections(pageTemplates[templateKey]);
   };
 
   if (!isAuthenticated) {
@@ -1375,14 +1400,29 @@ export default function AdminDashboard() {
                       <CardHeader>
                         <CardTitle>Page Configuration</CardTitle>
                       </CardHeader>
-                      <CardContent>
-                        <Label>Page Path</Label>
-                        <Input 
-                          placeholder="/services/new-service" 
-                          value={editorPagePath} 
-                          onChange={(e) => setEditorPagePath(e.target.value)} 
-                          className="mt-2"
-                        />
+                      <CardContent className="grid md:grid-cols-2 gap-6">
+                        <div className="space-y-2">
+                          <Label htmlFor="page-path-input">Page Path</Label>
+                          <Input 
+                            id="page-path-input"
+                            placeholder="/services/new-service" 
+                            value={editorPagePath} 
+                            onChange={(e) => setEditorPagePath(e.target.value)} 
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="template-selector">Page Template</Label>
+                          <Select onValueChange={handleTemplateChange} defaultValue="service">
+                            <SelectTrigger id="template-selector">
+                              <SelectValue placeholder="Select a template" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="service">Service Page</SelectItem>
+                              <SelectItem value="blog">Blog Post</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <p className="text-xs text-muted-foreground">Select a template to pre-fill sections.</p>
+                        </div>
                       </CardContent>
                     </Card>
                   )}
