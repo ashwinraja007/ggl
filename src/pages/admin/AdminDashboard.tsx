@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState, useId } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { LogOut, Pencil, Plus, Trash2, Image as ImageIcon, Bold, Italic, Link as LinkIcon, X, Upload, Copy, ChevronDown, ChevronRight, Eye, Search } from "lucide-react";
+import { LogOut, Pencil, Plus, Trash2, Image as ImageIcon, Bold, Italic, Link as LinkIcon, X, Upload, Copy, ChevronDown, ChevronRight, Eye, Search, FileText, Menu, LayoutDashboard } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -400,6 +400,7 @@ export default function AdminDashboard() {
   const [editFormState, setEditFormState] = useState<FormState>(emptyFormState);
   
   const [activeTab, setActiveTab] = useState<'seo' | 'content'>('seo');
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [contentFormState, setContentFormState] = useState({
     page_path: "",
@@ -690,97 +691,194 @@ export default function AdminDashboard() {
 
   if (!isAuthenticated) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-muted/40 p-4">
-        <Card className="w-full max-w-md">
-          <CardHeader>
-            <CardTitle>Admin Login</CardTitle>
-            <CardDescription>Sign in to manage SEO content.</CardDescription>
+      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-brand-navy to-slate-900 p-4">
+        <Card className="w-full max-w-md shadow-2xl border-brand-gold/20 bg-white/95 backdrop-blur">
+          <CardHeader className="text-center space-y-2 pb-6">
+            <div className="mx-auto bg-white p-3 rounded-full w-fit mb-2 shadow-md">
+               <img src="/lovable-uploads/ggl-logo.png" alt="GGL" className="h-10 w-auto" />
+            </div>
+            <CardTitle className="text-2xl font-bold text-brand-navy">Admin Portal</CardTitle>
+            <CardDescription>Secure access for GGL administrators</CardDescription>
           </CardHeader>
           <CardContent>
             <form className="space-y-4" onSubmit={handleLogin}>
               <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="email" className="text-brand-navy font-medium">Email Address</Label>
                 <Input
                   id="email"
                   type="email"
                   autoComplete="username"
+                  placeholder="admin@gglau.com"
                   value={credentials.email}
                   onChange={(event) =>
                     setCredentials((prev) => ({ ...prev, email: event.target.value }))
                   }
                   required
+                  className="border-gray-300 focus:border-brand-gold focus:ring-brand-gold"
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
+                <Label htmlFor="password" className="text-brand-navy font-medium">Password</Label>
                 <Input
                   id="password"
                   type="password"
                   autoComplete="current-password"
+                  placeholder="••••••••"
                   value={credentials.password}
                   onChange={(event) =>
                     setCredentials((prev) => ({ ...prev, password: event.target.value }))
                   }
                   required
+                  className="border-gray-300 focus:border-brand-gold focus:ring-brand-gold"
                 />
               </div>
-              <Button className="w-full" type="submit">
+              <Button className="w-full bg-brand-navy hover:bg-brand-navy/90 text-white font-semibold py-5 mt-4" type="submit">
                 Sign In
               </Button>
             </form>
           </CardContent>
+          <CardFooter className="justify-center border-t pt-4">
+            <p className="text-xs text-gray-500">© {new Date().getFullYear()} GGL Australia</p>
+          </CardFooter>
         </Card>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-muted/40 p-6">
-      <div className="mx-auto flex max-w-6xl flex-col gap-6">
-        <header className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <h1 className="text-3xl font-semibold">SEO Admin Dashboard</h1>
-            <p className="text-muted-foreground text-sm">
-              Manage SEO metadata and page content.
-            </p>
-          </div>
-          <Button onClick={handleLogout} variant="outline" type="button">
-            <LogOut className="mr-2 h-4 w-4" />
-            Sign Out
-          </Button>
+    <div className="min-h-screen bg-gray-50 flex font-sans">
+      {/* Sidebar - Desktop */}
+      <aside className="hidden md:flex w-64 flex-col bg-brand-navy text-white fixed h-full z-20 shadow-xl">
+        <div className="p-6 flex items-center gap-3 border-b border-white/10 bg-brand-navy/50">
+           <div className="bg-white p-1.5 rounded-md">
+             <img src="/lovable-uploads/ggl-logo.png" className="h-6 w-auto" alt="Logo" />
+           </div>
+           <span className="font-bold tracking-wider text-lg">ADMIN</span>
+        </div>
+        <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
+           <div className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 px-2">Modules</div>
+           <Button 
+             variant={activeTab === 'seo' ? 'secondary' : 'ghost'} 
+             className={`w-full justify-start ${activeTab === 'seo' ? 'bg-brand-gold text-brand-navy hover:bg-brand-gold/90' : 'text-gray-300 hover:text-white hover:bg-white/10'}`} 
+             onClick={() => setActiveTab('seo')}
+             type="button"
+           >
+             <Search className="mr-3 h-4 w-4" /> SEO Management
+           </Button>
+           <Button 
+             variant={activeTab === 'content' ? 'secondary' : 'ghost'} 
+             className={`w-full justify-start ${activeTab === 'content' ? 'bg-brand-gold text-brand-navy hover:bg-brand-gold/90' : 'text-gray-300 hover:text-white hover:bg-white/10'}`} 
+             onClick={() => setActiveTab('content')}
+             type="button"
+           >
+             <FileText className="mr-3 h-4 w-4" /> Page Content
+           </Button>
+        </nav>
+        <div className="p-4 border-t border-white/10 bg-black/20">
+           <Button variant="ghost" className="w-full justify-start text-red-300 hover:text-red-100 hover:bg-red-900/30 transition-colors" onClick={handleLogout} type="button">
+             <LogOut className="mr-2 h-4 w-4" /> Sign Out
+           </Button>
+        </div>
+      </aside>
+
+      {/* Main Content */}
+      <main className="flex-1 md:ml-64 flex flex-col min-h-screen transition-all duration-300">
+        {/* Mobile Header */}
+        <header className="md:hidden bg-brand-navy text-white p-4 flex justify-between items-center sticky top-0 z-30 shadow-md">
+           <div className="flex items-center gap-2">
+             <div className="bg-white p-1 rounded">
+               <img src="/lovable-uploads/ggl-logo.png" className="h-5 w-auto" alt="Logo" />
+             </div>
+             <span className="font-bold">Admin Portal</span>
+           </div>
+           <Button variant="ghost" size="icon" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} type="button" className="hover:bg-white/10">
+             {isMobileMenuOpen ? <X /> : <Menu />}
+           </Button>
         </header>
 
-        <div className="flex flex-col sm:flex-row gap-4 justify-between items-end sm:items-center border-b pb-4">
-          <div className="flex gap-2">
-            <Button 
-              variant={activeTab === 'seo' ? 'default' : 'ghost'} 
-              onClick={() => setActiveTab('seo')}
-              type="button"
-            >
-              SEO Management
-            </Button>
-            <Button 
-              variant={activeTab === 'content' ? 'default' : 'ghost'} 
-              onClick={() => setActiveTab('content')}
-              type="button"
-            >
-              Page Content
-            </Button>
+        {/* Mobile Menu Overlay */}
+        {isMobileMenuOpen && (
+          <div className="md:hidden fixed inset-0 z-20 bg-brand-navy/95 pt-20 px-4 space-y-4 backdrop-blur-sm animate-in fade-in slide-in-from-top-5">
+             <Button variant={activeTab === 'seo' ? 'secondary' : 'ghost'} className="w-full justify-start text-white hover:bg-white/10" onClick={() => { setActiveTab('seo'); setIsMobileMenuOpen(false); }} type="button">
+               <Search className="mr-2 h-4 w-4" /> SEO Management
+             </Button>
+             <Button variant={activeTab === 'content' ? 'secondary' : 'ghost'} className="w-full justify-start text-white hover:bg-white/10" onClick={() => { setActiveTab('content'); setIsMobileMenuOpen(false); }} type="button">
+               <FileText className="mr-2 h-4 w-4" /> Page Content
+             </Button>
+             <div className="h-px bg-white/10 my-2"></div>
+             <Button variant="ghost" className="w-full justify-start text-red-300 hover:bg-red-900/20" onClick={handleLogout} type="button">
+               <LogOut className="mr-2 h-4 w-4" /> Sign Out
+             </Button>
           </div>
-          <div className="relative w-full sm:w-64">
-            <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-8"
-            />
-          </div>
-        </div>
+        )}
+
+        <div className="p-6 space-y-8 max-w-7xl mx-auto w-full">
+           {/* Dashboard Header & Stats */}
+           <div className="flex flex-col gap-6">
+             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+               <div>
+                 <h1 className="text-3xl font-bold text-gray-900 tracking-tight">{activeTab === 'seo' ? 'SEO Management' : 'Content Management'}</h1>
+                 <p className="text-gray-500 mt-1">Manage your website's {activeTab === 'seo' ? 'metadata and search visibility' : 'dynamic content and images'}.</p>
+               </div>
+               {/* Search Bar */}
+               <div className="relative w-full sm:w-72 group">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 group-focus-within:text-brand-gold transition-colors" />
+                  <Input 
+                    placeholder="Search entries..." 
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-9 bg-white shadow-sm border-gray-200 focus:border-brand-gold focus:ring-brand-gold transition-all"
+                  />
+               </div>
+             </div>
+
+             {/* Stats Cards */}
+             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <Card className="bg-gradient-to-br from-blue-600 to-brand-navy text-white border-none shadow-lg hover:shadow-xl transition-shadow">
+                  <CardContent className="p-6 flex items-center justify-between">
+                     <div>
+                       <p className="text-blue-100 text-sm font-medium mb-1">Total SEO Entries</p>
+                       <h3 className="text-3xl font-bold">{data?.length || 0}</h3>
+                     </div>
+                     <div className="p-3 bg-white/10 rounded-full">
+                       <Search className="h-6 w-6 text-white" />
+                     </div>
+                  </CardContent>
+                </Card>
+                <Card className="bg-gradient-to-br from-amber-500 to-orange-600 text-white border-none shadow-lg hover:shadow-xl transition-shadow">
+                  <CardContent className="p-6 flex items-center justify-between">
+                     <div>
+                       <p className="text-amber-100 text-sm font-medium mb-1">Content Sections</p>
+                       <h3 className="text-3xl font-bold">{contentData?.length || 0}</h3>
+                     </div>
+                     <div className="p-3 bg-white/10 rounded-full">
+                       <FileText className="h-6 w-6 text-white" />
+                     </div>
+                  </CardContent>
+                </Card>
+                <Card className="bg-white border-gray-100 shadow-md hover:shadow-lg transition-shadow">
+                  <CardContent className="p-6 flex items-center justify-between">
+                     <div>
+                       <p className="text-gray-500 text-sm font-medium mb-1">System Status</p>
+                       <div className="flex items-center gap-2">
+                         <span className="relative flex h-3 w-3">
+                           <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                           <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+                         </span>
+                         <span className="text-green-700 font-bold text-lg">Online</span>
+                       </div>
+                     </div>
+                     <div className="p-3 bg-green-50 rounded-full">
+                       <LayoutDashboard className="h-6 w-6 text-green-600" />
+                     </div>
+                  </CardContent>
+                </Card>
+             </div>
+           </div>
 
         {activeTab === 'seo' ? (
-          <>
-        <Card>
+          <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+        <Card className="border-t-4 border-t-blue-600 shadow-md">
           <CardHeader>
             <CardTitle>Create new SEO entry</CardTitle>
             <CardDescription>
@@ -855,7 +953,7 @@ export default function AdminDashboard() {
                 </p>
               </div>
               <CardFooter className="px-0">
-                <Button disabled={createMutation.isPending} type="submit">
+                <Button disabled={createMutation.isPending} type="submit" className="bg-blue-600 hover:bg-blue-700">
                   {createMutation.isPending && (
                     <span className="mr-2 inline-flex h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
                   )}
@@ -867,7 +965,7 @@ export default function AdminDashboard() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="shadow-md border-gray-200">
           <CardHeader>
             <CardTitle>Existing SEO entries</CardTitle>
             <CardDescription>
@@ -1082,10 +1180,10 @@ export default function AdminDashboard() {
             </Table>
           </CardContent>
         </Card>
-          </>
+          </div>
         ) : (
-          <>
-            <Card>
+          <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <Card className="border-t-4 border-t-amber-500 shadow-md">
               <CardHeader>
                 <CardTitle>{editingContent ? "Edit Content Entry" : "Create New Content Entry"}</CardTitle>
                 <CardDescription>
@@ -1142,7 +1240,7 @@ export default function AdminDashboard() {
                     <Button 
                       disabled={createContentMutation.isPending || updateContentMutation.isPending} 
                       type="submit"
-                      className={editingContent ? "" : "w-full sm:w-auto"}
+                      className={`${editingContent ? "bg-amber-600 hover:bg-amber-700" : "w-full sm:w-auto bg-amber-500 hover:bg-amber-600"} text-white`}
                     >
                       {(createContentMutation.isPending || updateContentMutation.isPending) && (
                         <span className="mr-2 inline-flex h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
@@ -1155,7 +1253,7 @@ export default function AdminDashboard() {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="shadow-md border-gray-200">
               <CardHeader>
                 <CardTitle>Existing Content Entries</CardTitle>
                 <CardDescription>
@@ -1262,9 +1360,10 @@ export default function AdminDashboard() {
                 </Table>
               </CardContent>
             </Card>
-          </>
+          </div>
         )}
       </div>
+      </main>
     </div>
   );
 }
