@@ -2,11 +2,50 @@ import React from 'react';
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { motion } from 'framer-motion';
-import { FileCheck, ShieldCheck, Lightbulb, Globe } from "lucide-react";
+import { FileCheck, ShieldCheck, Lightbulb, Globe, Loader2 } from "lucide-react";
 import { Link } from 'react-router-dom';
 import SEO from '@/components/SEO';
+import { useQuery } from '@tanstack/react-query';
+import { fetchPageContent } from '@/lib/content';
+
+const iconMap: { [key: string]: React.ReactNode } = {
+  FileCheck: <FileCheck className="h-16 w-16 text-white" />,
+  ShieldCheck: <ShieldCheck className="h-16 w-16 text-white" />,
+  Lightbulb: <Lightbulb className="h-16 w-16 text-white" />,
+  Globe: <Globe className="h-5 w-5 text-brand-gold" />,
+};
+
+const getIcon = (iconName: string) => {
+  if (!iconName) return iconMap.FileCheck;
+  if (iconMap[iconName]) return iconMap[iconName];
+  const key = Object.keys(iconMap).find(k => k.toLowerCase() === iconName.toLowerCase());
+  return key ? iconMap[key] : iconMap.FileCheck;
+};
 
 const CustomsClearance = () => {
+  const { data: pageContent, isLoading } = useQuery({
+    queryKey: ["page-content", "/services/customs-clearance"],
+    queryFn: () => fetchPageContent("/services/customs-clearance"),
+  });
+
+  const getContent = (sectionKey: string) => {
+    const record = pageContent?.find(r => r.section_key === sectionKey);
+    if (!record?.content) return null;
+    let content = record.content;
+    if (typeof content === 'string') {
+      try { content = JSON.parse(content); } catch (e) { console.error("Error parsing content", e); }
+    }
+    return { content, images: record.images };
+  };
+
+  const heroRecord = getContent('hero');
+  const mainRecord = getContent('main');
+  const featuresRecord = getContent('features');
+  const subServicesRecord = getContent('sub_services');
+
+  const features = (featuresRecord?.content?.items && Array.isArray(featuresRecord.content.items)) ? featuresRecord.content.items : [];
+  const subServices = (subServicesRecord?.content?.items && Array.isArray(subServicesRecord.content.items)) ? subServicesRecord.content.items : [];
+
   return (
     <div className="min-h-screen flex flex-col">
       {/* ✅ Page SEO */}
@@ -21,6 +60,11 @@ const CustomsClearance = () => {
 
       <Header />
       
+      {isLoading ? (
+        <div className="flex-grow flex items-center justify-center min-h-[50vh]">
+          <Loader2 className="w-8 h-8 animate-spin text-brand-gold" />
+        </div>
+      ) : (
       <main className="flex-grow pt-24">
         {/* Hero Section */}
         <section className="bg-gradient-to-br from-blue-50 to-blue-100 py-12 md:py-16">
@@ -33,7 +77,7 @@ const CustomsClearance = () => {
                   transition={{ duration: 0.5 }}
                   className="text-3xl md:text-4xl font-bold mb-4 text-gray-900"
                 >
-                  Customs Clearance Services
+                  {heroRecord?.content?.title || "Customs Clearance Services"}
                 </motion.h1>
                 <motion.p
                   initial={{ opacity: 0, y: 20 }}
@@ -41,7 +85,7 @@ const CustomsClearance = () => {
                   transition={{ duration: 0.5, delay: 0.1 }}
                   className="text-lg text-gray-700 mb-6"
                 >
-                  Expert solutions for seamless border crossings
+                  {heroRecord?.content?.subtitle || "Expert solutions for seamless border crossings"}
                 </motion.p>
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
@@ -64,7 +108,7 @@ const CustomsClearance = () => {
                   className="rounded-xl overflow-hidden shadow-xl"
                 >
                   <img
-                    src="/lovable-uploads/cc.jpg"
+                    src={heroRecord?.images?.background || "/lovable-uploads/cc.jpg"}
                     alt="Customs Clearance Service"
                     className="w-full h-auto object-cover"
                   />
@@ -79,78 +123,50 @@ const CustomsClearance = () => {
           <div className="container mx-auto px-4">
             <div className="max-w-3xl mx-auto mb-12">
               <h2 className="text-2xl md:text-3xl font-bold mb-6 text-center text-gray-800">
-                Seamless Customs Clearance Solutions
+                {mainRecord?.content?.title || "Seamless Customs Clearance Solutions"}
               </h2>
               <div className="w-24 h-1 bg-brand-gold mx-auto mb-8"></div>
-              <p className="text-gray-700 mb-6 text-justify">
-                Navigating the complexities of global trade is simplified with our expert customs clearance services. We ensure your shipments move smoothly across borders, handling all aspects of the process from accurate documentation and tariff classification to regulatory compliance and specialized cargo handling.
-              </p>
-              <p className="text-gray-700 text-justify">
-                Our experienced team stays abreast of evolving regulations, leverages advanced technology for expedited clearance, and maintains strong relationships with customs authorities worldwide. We prioritize transparency and open communication, providing real-time updates and peace of mind, allowing you to focus on your core business. Trust us to manage your import and export needs, minimizing delays and ensuring your shipments reach their destinations efficiently and compliantly.
-              </p>
+              <div 
+                className="prose max-w-none text-gray-700 text-justify"
+                dangerouslySetInnerHTML={{ __html: mainRecord?.content?.body || "<p>Navigating the complexities of global trade is simplified with our expert customs clearance services. We ensure your shipments move smoothly across borders, handling all aspects of the process from accurate documentation and tariff classification to regulatory compliance and specialized cargo handling.</p><p>Our experienced team stays abreast of evolving regulations, leverages advanced technology for expedited clearance, and maintains strong relationships with customs authorities worldwide. We prioritize transparency and open communication, providing real-time updates and peace of mind, allowing you to focus on your core business. Trust us to manage your import and export needs, minimizing delays and ensuring your shipments reach their destinations efficiently and compliantly.</p>" }}
+              />
             </div>
             
             {/* Features Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+              {(features.length > 0 ? features : [
+                { title: "Documentation Expertise", description: "Our team ensures all your customs documentation is accurate, complete, and submitted correctly, preventing delays and ensuring compliance with international regulations.", icon: "FileCheck", color: "blue" },
+                { title: "Regulatory Compliance", description: "Stay compliant with constantly evolving international trade regulations. We keep up-to-date with changes to ensure your shipments meet all legal requirements.", icon: "ShieldCheck", color: "green" },
+                { title: "Expert Consultation", description: "Our customs experts provide guidance on duty and tax implications, helping you make informed decisions and optimize your international shipping strategy.", icon: "Lightbulb", color: "amber" }
+              ]).map((feature: any, index: number) => (
               <motion.div
+                key={index}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
                 viewport={{ once: true }}
                 className="bg-white rounded-lg overflow-hidden shadow-md border border-gray-100"
               >
-                <div className="h-48 bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
-                  <FileCheck className="h-16 w-16 text-white" />
+                <div className={`h-48 bg-gradient-to-br from-${feature.color || 'blue'}-500 to-${feature.color || 'blue'}-600 flex items-center justify-center`}>
+                  {typeof feature.icon === 'string' ? getIcon(feature.icon) : feature.icon}
                 </div>
                 <div className="p-6">
-                  <h3 className="text-xl font-semibold mb-3 text-gray-800">Documentation Expertise</h3>
-                  <p className="text-gray-600 text-justify">
-                    Our team ensures all your customs documentation is accurate, complete, and submitted correctly, preventing delays and ensuring compliance with international regulations.
-                  </p>
+                  <h3 className="text-xl font-semibold mb-3 text-gray-800">{feature.title}</h3>
+                  <p className="text-gray-600 text-justify">{feature.description}</p>
                 </div>
               </motion.div>
-              
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.1 }}
-                viewport={{ once: true }}
-                className="bg-white rounded-lg overflow-hidden shadow-md border border-gray-100"
-              >
-                <div className="h-48 bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center">
-                  <ShieldCheck className="h-16 w-16 text-white" />
-                </div>
-                <div className="p-6">
-                  <h3 className="text-xl font-semibold mb-3 text-gray-800">Regulatory Compliance</h3>
-                  <p className="text-gray-600 text-justify">
-                    Stay compliant with constantly evolving international trade regulations. We keep up-to-date with changes to ensure your shipments meet all legal requirements.
-                  </p>
-                </div>
-              </motion.div>
-              
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.2 }}
-                viewport={{ once: true }}
-                className="bg-white rounded-lg overflow-hidden shadow-md border border-gray-100"
-              >
-                <div className="h-48 bg-gradient-to-br from-amber-500 to-amber-600 flex items-center justify-center">
-                  <Lightbulb className="h-16 w-16 text-white" />
-                </div>
-                <div className="p-6">
-                  <h3 className="text-xl font-semibold mb-3 text-gray-800">Expert Consultation</h3>
-                  <p className="text-gray-600 text-justify">
-                    Our customs experts provide guidance on duty and tax implications, helping you make informed decisions and optimize your international shipping strategy.
-                  </p>
-                </div>
-              </motion.div>
+              ))}
             </div>
             
             {/* Additional Services */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+              {(subServices.length > 0 ? subServices : [
+                { title: "Import Clearance", description: "Our import clearance services streamline the process of bringing goods into the country, ensuring compliance with local regulations and minimizing delays.", list: ["Duty and tax calculation", "Entry preparation and filing", "Tariff classification", "Customs examination support"] },
+                { title: "Export Clearance", description: "Our export clearance services ensure your goods leave the country efficiently, with all necessary documentation and compliance requirements met.", list: ["Export documentation preparation", "License and permit management", "Security filing and compliance", "Electronic export information filing"] }
+              ]).map((service: any, index: number) => (
               <motion.div
-                initial={{ opacity: 0, x: -20 }}
+                key={index}
+                initial={{ opacity: 0, x: index % 2 === 0 ? -20 : 20 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.5 }}
                 viewport={{ once: true }}
@@ -158,40 +174,18 @@ const CustomsClearance = () => {
               >
                 <h3 className="text-xl font-semibold mb-4 text-gray-800 flex items-center gap-2">
                   <Globe className="h-5 w-5 text-brand-gold" />
-                  Import Clearance
+                  {service.title}
                 </h3>
-                <p className="text-gray-600 mb-4">
-                  Our import clearance services streamline the process of bringing goods into the country, ensuring compliance with local regulations and minimizing delays.
-                </p>
+                <p className="text-gray-600 mb-4">{service.description}</p>
+                {service.list && (
                 <ul className="list-disc list-inside text-gray-600 space-y-2">
-                  <li>Duty and tax calculation</li>
-                  <li>Entry preparation and filing</li>
-                  <li>Tariff classification</li>
-                  <li>Customs examination support</li>
+                  {service.list.map((item: string, i: number) => (
+                    <li key={i}>{item}</li>
+                  ))}
                 </ul>
+                )}
               </motion.div>
-              
-              <motion.div
-                initial={{ opacity: 0, x: 20 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.5 }}
-                viewport={{ once: true }}
-                className="bg-white rounded-lg p-6 shadow-md border border-gray-100"
-              >
-                <h3 className="text-xl font-semibold mb-4 text-gray-800 flex items-center gap-2">
-                  <Globe className="h-5 w-5 text-brand-gold" />
-                  Export Clearance
-                </h3>
-                <p className="text-gray-600 mb-4">
-                  Our export clearance services ensure your goods leave the country efficiently, with all necessary documentation and compliance requirements met.
-                </p>
-                <ul className="list-disc list-inside text-gray-600 space-y-2">
-                  <li>Export documentation preparation</li>
-                  <li>License and permit management</li>
-                  <li>Security filing and compliance</li>
-                  <li>Electronic export information filing</li>
-                </ul>
-              </motion.div>
+              ))}
             </div>
             
             {/* CTA Section */}
@@ -216,6 +210,7 @@ const CustomsClearance = () => {
           </div>
         </section>
       </main>
+      )}
       
       <Footer />
     </div>

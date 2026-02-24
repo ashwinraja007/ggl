@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { LogOut, Pencil, Plus, Trash2, Image as ImageIcon, Bold, Italic, Link as LinkIcon, X, Upload, Copy, ChevronDown, ChevronRight } from "lucide-react";
+import { LogOut, Pencil, Plus, Trash2, Image as ImageIcon, Bold, Italic, Link as LinkIcon, X, Upload, Copy, ChevronDown, ChevronRight, Eye } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -1141,6 +1141,14 @@ export default function AdminDashboard() {
                           {JSON.stringify(record.content)}
                         </TableCell>
                         <TableCell className="flex items-center justify-end gap-2">
+                          <Button 
+                            size="sm" 
+                            variant="ghost"
+                            onClick={() => window.open(record.page_path, '_blank')}
+                            title="View Page"
+                          >
+                            <Eye className="h-4 w-4" />
+                          </Button>
                           <Button 
                             size="sm" 
                             variant="outline"
