@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { LogOut, Pencil, Plus, Trash2, Image as ImageIcon, Bold, Italic, Link as LinkIcon, X, Upload } from "lucide-react";
+import { LogOut, Pencil, Plus, Trash2, Image as ImageIcon, Bold, Italic, Link as LinkIcon, X, Upload, Copy, ChevronDown, ChevronRight, Eye } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -145,72 +145,38 @@ function formatTimestamp(value?: string | null) {
   }
 }
 
-const DynamicJsonEditor = ({
+const RecursiveFieldEditor = ({
   value,
   onChange,
-  type
+  label,
+  onRemove,
+  type,
+  depth = 0
 }: {
-  value: string;
-  onChange: (val: string) => void;
+  value: any;
+  onChange: (val: any) => void;
+  label?: string;
+  onRemove?: () => void;
   type: 'content' | 'images';
+  depth?: number;
 }) => {
-  const [parsed, setParsed] = useState<Record<string, any>>({});
-  const [error, setError] = useState<string | null>(null);
-  const [mode, setMode] = useState<'visual' | 'raw'>('visual');
+  const { toast } = useToast();
+  const [isCollapsed, setIsCollapsed] = useState(depth > 1);
 
-  useEffect(() => {
-    try {
-      const p = JSON.parse(value || '{}');
-      setParsed(p || {});
-      setError(null);
-    } catch (e) {
-      setError("Invalid JSON");
-      setMode('raw');
-    }
-  }, [value]);
-
-  const handleFieldChange = (key: string, val: any) => {
-    const newParsed = { ...parsed, [key]: val };
-    setParsed(newParsed);
-    onChange(JSON.stringify(newParsed, null, 2));
-  };
-
-  const handleAddKey = () => {
-    const key = prompt("Enter new key:");
-    if (key && !parsed[key]) {
-      handleFieldChange(key, "");
-    }
-  };
-
-  const handleRemoveKey = (key: string) => {
-    if (confirm(`Remove field '${key}'?`)) {
-      const newParsed = { ...parsed };
-      delete newParsed[key];
-      setParsed(newParsed);
-      onChange(JSON.stringify(newParsed, null, 2));
-    }
-  };
-
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, key: string) => {
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     try {
       const url = await uploadImage(file);
-      if (type === 'images') {
-        handleFieldChange(key, url);
-      } else {
-        // For content, append image tag
-        const currentVal = parsed[key] || "";
-        handleFieldChange(key, currentVal + `\n<img src="${url}" alt="Image" class="w-full rounded-lg my-4" />\n`);
-      }
+      onChange(url);
       toast({ title: "Image uploaded successfully" });
     } catch (err) {
       toast({ title: "Upload failed", description: (err as Error).message, variant: "destructive" });
     }
   };
 
-  const insertTag = (tagStart: string, tagEnd: string, key: string) => {
-    const textarea = document.getElementById(`textarea-${key}`) as HTMLTextAreaElement;
+  const insertTag = (tagStart: string, tagEnd: string) => {
+    const textarea = document.getElementById(`textarea-${label}`) as HTMLTextAreaElement;
     if (!textarea) return;
     
     const start = textarea.selectionStart;
@@ -221,13 +187,167 @@ const DynamicJsonEditor = ({
     const after = text.substring(end);
     
     const newVal = before + tagStart + selection + tagEnd + after;
-    handleFieldChange(key, newVal);
+    onChange(newVal);
     
-    // Restore focus (timeout needed for React render cycle)
     setTimeout(() => {
       textarea.focus();
       textarea.setSelectionRange(start + tagStart.length, end + tagStart.length);
     }, 0);
+  };
+
+  if (Array.isArray(value)) {
+    return (
+      <div className={`border rounded-md bg-slate-50/50 ${depth > 0 ? 'mt-2' : ''}`}>
+        <div className="flex justify-between items-center p-2 bg-slate-100 rounded-t-md border-b">
+          <div className="flex items-center gap-2 cursor-pointer" onClick={() => setIsCollapsed(!isCollapsed)}>
+            {isCollapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+            <span className="text-xs font-bold uppercase text-muted-foreground">{label || 'List'} <span className="font-normal normal-case">({value.length} items)</span></span>
+          </div>
+          <div className="flex gap-1">
+            <Button variant="ghost" size="sm" onClick={() => onChange([...value, {}])}><Plus className="w-3 h-3 mr-1" /> Add Item</Button>
+            {onRemove && <Button variant="ghost" size="icon" className="h-6 w-6 text-red-400" onClick={onRemove}><X className="w-3 h-3" /></Button>}
+          </div>
+        </div>
+        {!isCollapsed && (
+          <div className="p-2 space-y-2">
+            {value.map((item, idx) => (
+              <div key={idx} className="relative group">
+                <RecursiveFieldEditor
+                  label={`Item ${idx + 1}`}
+                  value={item}
+                  onChange={(newItem) => {
+                    const newArr = [...value];
+                    newArr[idx] = newItem;
+                    onChange(newArr);
+                  }}
+                  onRemove={() => {
+                    const newArr = value.filter((_, i) => i !== idx);
+                    onChange(newArr);
+                  }}
+                  type={type}
+                  depth={depth + 1}
+                />
+                <div className="absolute top-2 right-12 opacity-0 group-hover:opacity-100 transition-opacity">
+                   <Button variant="secondary" size="icon" className="h-6 w-6" onClick={() => {
+                      const newArr = [...value];
+                      newArr.splice(idx + 1, 0, JSON.parse(JSON.stringify(item)));
+                      onChange(newArr);
+                   }} title="Duplicate"><Copy className="w-3 h-3" /></Button>
+                </div>
+              </div>
+            ))}
+            {value.length === 0 && <p className="text-xs text-muted-foreground text-center py-2">Empty list</p>}
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  if (typeof value === 'object' && value !== null) {
+    return (
+      <div className={`border rounded-md bg-white shadow-sm ${depth > 0 ? 'mt-2' : ''}`}>
+        <div className="flex justify-between items-center p-2 bg-gray-50 rounded-t-md border-b">
+           <div className="flex items-center gap-2 cursor-pointer" onClick={() => setIsCollapsed(!isCollapsed)}>
+             {isCollapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+             <Label className="font-mono text-blue-600 cursor-pointer">{label || 'Object'}</Label>
+           </div>
+           <div className="flex gap-1">
+             <Button variant="ghost" size="sm" onClick={() => {
+                const key = prompt("Enter new key:");
+                if (key && !value[key]) onChange({ ...value, [key]: "" });
+             }}><Plus className="w-3 h-3" /></Button>
+             {onRemove && <Button variant="ghost" size="icon" className="h-6 w-6 text-red-400" onClick={onRemove}><X className="w-3 h-3" /></Button>}
+           </div>
+        </div>
+        {!isCollapsed && (
+          <div className="p-2 space-y-2">
+            {Object.entries(value).map(([key, val]) => (
+              <RecursiveFieldEditor
+                key={key}
+                label={key}
+                value={val}
+                onChange={(newVal) => onChange({ ...value, [key]: newVal })}
+                onRemove={() => {
+                   const newObj = { ...value };
+                   delete newObj[key];
+                   onChange(newObj);
+                }}
+                type={type}
+                depth={depth + 1}
+              />
+            ))}
+            {Object.keys(value).length === 0 && <p className="text-xs text-muted-foreground text-center py-2">Empty object</p>}
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-1 mt-2">
+       <div className="flex justify-between items-center">
+          {label && <Label className="text-xs font-semibold text-gray-700">{label}</Label>}
+          {onRemove && <Button variant="ghost" size="icon" className="h-6 w-6 text-red-400" onClick={onRemove}><X className="w-3 h-3" /></Button>}
+       </div>
+       
+       {type === 'content' && typeof value === 'string' && (
+          <div className="flex gap-1 mb-1">
+            <Button type="button" variant="ghost" size="sm" className="h-6 px-2" onClick={() => insertTag('<b>', '</b>')}><Bold className="h-3 w-3" /></Button>
+            <Button type="button" variant="ghost" size="sm" className="h-6 px-2" onClick={() => insertTag('<i>', '</i>')}><Italic className="h-3 w-3" /></Button>
+            <Button type="button" variant="ghost" size="sm" className="h-6 px-2" onClick={() => insertTag('<a href="#">', '</a>')}><LinkIcon className="h-3 w-3" /></Button>
+          </div>
+       )}
+
+       <div className="flex gap-2">
+          <Textarea 
+            id={`textarea-${label}`}
+            value={String(value || '')} 
+            onChange={(e) => onChange(e.target.value)} 
+            className="text-sm min-h-[60px] font-sans" 
+          />
+          {(type === 'images' || (typeof label === 'string' && (label.toLowerCase().includes('image') || label.toLowerCase().includes('icon') || label.toLowerCase().includes('background') || label.toLowerCase().includes('banner')))) && (
+             <div className="flex flex-col gap-2 shrink-0">
+                 <input type="file" id={`file-${label}`} className="hidden" onChange={handleImageUpload} accept="image/*" />
+                 <Button type="button" variant="outline" size="icon" onClick={() => document.getElementById(`file-${label}`)?.click()} title="Upload Image"><Upload className="h-4 w-4" /></Button>
+                 {typeof value === 'string' && (value.startsWith('http') || value.startsWith('/')) && (
+                   <div className="w-10 h-10 border rounded overflow-hidden bg-gray-100">
+                      <img src={value} alt="preview" className="w-full h-full object-cover" />
+                   </div>
+                 )}
+             </div>
+          )}
+       </div>
+    </div>
+  );
+};
+
+const DynamicJsonEditor = ({
+  value,
+  onChange,
+  type
+}: {
+  value: string;
+  onChange: (val: string) => void;
+  type: 'content' | 'images';
+}) => {
+  const [parsed, setParsed] = useState<any>({});
+  const [error, setError] = useState<string | null>(null);
+  const [mode, setMode] = useState<'visual' | 'raw'>('visual');
+
+  useEffect(() => {
+    try {
+      const p = JSON.parse(value || '{}');
+      setParsed(p);
+      setError(null);
+    } catch (e) {
+      setError("Invalid JSON");
+      setMode('raw');
+    }
+  }, [value]);
+
+  const handleRecursiveChange = (newVal: any) => {
+    setParsed(newVal);
+    onChange(JSON.stringify(newVal, null, 2));
   };
 
   if (mode === 'raw') {
@@ -247,50 +367,81 @@ const DynamicJsonEditor = ({
   }
 
   return (
-    <div className="space-y-4 border rounded-md p-4 bg-slate-50/50">
+    <div className="space-y-4">
       <div className="flex justify-between items-center">
-        <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">{type} Fields</span>
+        <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">{type} Editor</span>
         <div className="flex gap-2">
-          <Button variant="secondary" size="sm" onClick={handleAddKey}><Plus className="w-3 h-3 mr-1" /> Add Field</Button>
+          <Button variant="ghost" size="sm" onClick={() => setMode('raw')}>Raw JSON</Button>
         </div>
       </div>
       
-      {Object.entries(parsed).map(([key, val]) => (
-        <div key={key} className="space-y-1 bg-white p-3 rounded border shadow-sm">
-          <div className="flex justify-between items-center mb-2">
-            <Label className="text-xs font-mono text-blue-600">{key}</Label>
-            <Button variant="ghost" size="icon" className="h-6 w-6 text-red-400 hover:text-red-600" onClick={() => handleRemoveKey(key)}>
-              <X className="h-3 w-3" />
-            </Button>
-          </div>
-          
-          {type === 'content' && (
-            <div className="flex gap-1 mb-1 border-b pb-1">
-              <Button type="button" variant="ghost" size="sm" className="h-7 px-2" onClick={() => insertTag('<b>', '</b>', key)}><Bold className="h-3 w-3" /></Button>
-              <Button type="button" variant="ghost" size="sm" className="h-7 px-2" onClick={() => insertTag('<i>', '</i>', key)}><Italic className="h-3 w-3" /></Button>
-              <Button type="button" variant="ghost" size="sm" className="h-7 px-2" onClick={() => insertTag('<a href="#">', '</a>', key)}><LinkIcon className="h-3 w-3" /></Button>
-              <div className="relative">
-                <input type="file" id={`file-${key}`} className="hidden" onChange={(e) => handleImageUpload(e, key)} accept="image/*" />
-                <Button type="button" variant="ghost" size="sm" className="h-7 px-2" onClick={() => document.getElementById(`file-${key}`)?.click()}><ImageIcon className="h-3 w-3" /></Button>
-              </div>
-            </div>
-          )}
-          
-          <div className="flex gap-2">
-            <Textarea id={`textarea-${key}`} value={typeof val === 'object' && val !== null ? JSON.stringify(val) : (val || '')} onChange={(e) => handleFieldChange(key, e.target.value)} className="text-sm min-h-[80px]" />
-            {type === 'images' && (
-              <div className="flex flex-col gap-2">
-                 <input type="file" id={`file-${key}`} className="hidden" onChange={(e) => handleImageUpload(e, key)} accept="image/*" />
-                 <Button type="button" variant="outline" size="icon" onClick={() => document.getElementById(`file-${key}`)?.click()} title="Upload Image"><Upload className="h-4 w-4" /></Button>
-                 {val && <img src={val} alt="preview" className="w-10 h-10 object-cover rounded border" />}
-              </div>
-            )}
-          </div>
-        </div>
-      ))}
-      {Object.keys(parsed).length === 0 && <p className="text-sm text-muted-foreground text-center py-4">No fields yet.</p>}
+      <RecursiveFieldEditor 
+        value={parsed} 
+        onChange={handleRecursiveChange} 
+        type={type} 
+        label="Root"
+      />
     </div>
   );
+};
+
+const ContentPreview = ({ contentStr, imagesStr }: { contentStr: string, imagesStr: string }) => {
+  try {
+    const content = JSON.parse(contentStr || '{}');
+    const images = JSON.parse(imagesStr || '{}');
+
+    // 1. Hero Pattern (Title + Subtitle + Background)
+    if (content.title && content.subtitle && !content.items) {
+      return (
+        <div className="border rounded-lg overflow-hidden shadow-sm">
+          <div className="relative h-64 bg-slate-900 flex items-center justify-center text-center p-8 text-white">
+            {images.background && (
+              <img src={images.background} alt="bg" className="absolute inset-0 w-full h-full object-cover opacity-40" />
+            )}
+            <div className="relative z-10 max-w-2xl">
+              <h2 className="text-3xl font-bold mb-3">{content.title}</h2>
+              <p className="text-lg text-gray-200">{content.subtitle}</p>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // 2. List Pattern (e.g. Services, Features)
+    if (content.items && Array.isArray(content.items)) {
+      return (
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 bg-slate-50 rounded-lg">
+          {content.items.map((item: any, i: number) => (
+            <div key={i} className="bg-white border rounded-lg overflow-hidden shadow-sm">
+              {item.image && <img src={item.image} alt={item.title} className="w-full h-40 object-cover" />}
+              <div className="p-4">
+                {item.title && <h3 className="font-bold text-lg mb-2">{item.title}</h3>}
+                {item.description && <p className="text-sm text-gray-600">{item.description}</p>}
+              </div>
+            </div>
+          ))}
+        </div>
+      );
+    }
+
+    // 3. HTML Body Pattern
+    if (content.body) {
+      return (
+        <div className="prose max-w-none p-6 border rounded-lg bg-white shadow-sm">
+           <div dangerouslySetInnerHTML={{ __html: content.body }} />
+        </div>
+      );
+    }
+
+    // Fallback: JSON View
+    return (
+      <div className="bg-slate-950 text-slate-50 p-4 rounded-lg overflow-auto max-h-[400px] font-mono text-xs">
+        <pre>{JSON.stringify({ content, images }, null, 2)}</pre>
+      </div>
+    );
+  } catch (e) {
+    return <div className="text-red-500">Invalid JSON data for preview</div>;
+  }
 };
 
 export default function AdminDashboard() {
@@ -986,16 +1137,32 @@ export default function AdminDashboard() {
                       type="images"
                     />
                   </div>
-                  <CardFooter className="px-0 flex justify-between">
+                  <CardFooter className="px-0 flex flex-col sm:flex-row gap-3 justify-between">
                     {editingContent && (
                       <Button type="button" variant="outline" onClick={() => setEditingContent(null)}>
                         Cancel Edit
                       </Button>
                     )}
+                    
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <Button type="button" variant="secondary" className="w-full sm:w-auto">
+                          <Eye className="mr-2 h-4 w-4" /> Preview
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+                        <DialogHeader>
+                          <DialogTitle>Content Preview</DialogTitle>
+                          <DialogDescription>Visual approximation of the content.</DialogDescription>
+                        </DialogHeader>
+                        <ContentPreview contentStr={contentFormState.content} imagesStr={contentFormState.images} />
+                      </DialogContent>
+                    </Dialog>
+
                     <Button 
                       disabled={createContentMutation.isPending || updateContentMutation.isPending} 
                       type="submit"
-                      className={editingContent ? "ml-auto" : "w-full sm:w-auto"}
+                      className={editingContent ? "" : "w-full sm:w-auto"}
                     >
                       {(createContentMutation.isPending || updateContentMutation.isPending) && (
                         <span className="mr-2 inline-flex h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
