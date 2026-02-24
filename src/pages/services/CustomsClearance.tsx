@@ -29,7 +29,7 @@ const CustomsClearance = () => {
   });
 
   const getContent = (sectionKey: string) => {
-    const record = pageContent?.find(r => r.section_key === sectionKey);
+    const record = pageContent?.find(r => r.section_key.toLowerCase() === sectionKey.toLowerCase());
     if (!record?.content) return null;
     let content = record.content;
     if (typeof content === 'string') {

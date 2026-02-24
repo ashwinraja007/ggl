@@ -2,12 +2,60 @@ import React from 'react';
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { motion } from 'framer-motion';
-import { Plane, Clock, Globe, Headset } from "lucide-react";
+import { Plane, Clock, Globe, Headset, Loader2 } from "lucide-react";
 import { Link } from 'react-router-dom';
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import SEO from '@/components/SEO';
+import { useQuery } from '@tanstack/react-query';
+import { fetchPageContent } from '@/lib/content';
+
+const iconMap: { [key: string]: React.ReactNode } = {
+  Clock: <Clock className="h-10 w-10 text-brand-gold" />,
+  Plane: <Plane className="h-10 w-10 text-brand-gold" />,
+  Globe: <Globe className="h-10 w-10 text-brand-gold" />,
+  Headset: <Headset className="h-10 w-10 text-brand-gold" />,
+};
+
+const getIcon = (iconName: string) => {
+  if (!iconName) return iconMap.Plane;
+  if (iconMap[iconName]) return iconMap[iconName];
+  // Case insensitive lookup
+  const key = Object.keys(iconMap).find(k => k.toLowerCase() === iconName.toLowerCase());
+  return key ? iconMap[key] : iconMap.Plane;
+};
 
 const AirFreight = () => {
+  const { data: pageContent, isLoading } = useQuery({
+    queryKey: ["page-content", "/services/air-freight"],
+    queryFn: () => fetchPageContent("/services/air-freight"),
+  });
+
+  // Helper to safely get content
+  const getContent = (sectionKey: string) => {
+    const record = pageContent?.find(r => r.section_key.toLowerCase() === sectionKey.toLowerCase());
+    if (!record?.content) return null;
+    let content = record.content;
+    if (typeof content === 'string') {
+      try { content = JSON.parse(content); } catch (e) { console.error("Error parsing content", e); }
+    }
+    return { content, images: record.images };
+  };
+
+  const heroRecord = getContent('hero');
+  const mainRecord = getContent('main');
+  const featuresRecord = getContent('features');
+  const subServicesRecord = getContent('sub_services');
+
+  const data = {
+    heroTitle: heroRecord?.content?.title || "Air Freight Solutions",
+    heroSubtitle: heroRecord?.content?.subtitle || "Tailored air freight solutions to meet your unique requirements",
+    heroImage: heroRecord?.images?.background || "/airfreight2.jpg",
+    mainTitle: mainRecord?.content?.title || "Comprehensive Air Freight Services",
+    mainBody: mainRecord?.content?.body || `<p class="text-gray-700 mb-6 font-normal text-justify">Tailored air freight solutions to meet your unique requirements. We understand that every shipment is different. That's why we offer flexible air freight solutions designed to meet your specific needs. Whether you're shipping time-sensitive documents or large-scale cargo, we have the expertise and resources to handle it efficiently.</p><p class="text-gray-700 text-justify">Our comprehensive services include air imports, exports, and express deliveries, all with the convenience of door-to-door service. We pride ourselves on our competitive pricing and our unwavering commitment to providing exceptional customer support. Let us optimize your air freight logistics and ensure your shipments reach their destinations seamlessly.</p>`,
+    features: (featuresRecord?.content?.items && Array.isArray(featuresRecord.content.items)) ? featuresRecord.content.items : [],
+    subServices: (subServicesRecord?.content?.items && Array.isArray(subServicesRecord.content.items)) ? subServicesRecord.content.items : []
+  };
+
   return (
     <div className="min-h-screen flex flex-col">
       {/* ✅ Page SEO */}
@@ -22,6 +70,11 @@ const AirFreight = () => {
 
       <Header />
       
+      {isLoading ? (
+        <div className="flex-grow flex items-center justify-center min-h-[50vh]">
+          <Loader2 className="w-8 h-8 animate-spin text-brand-gold" />
+        </div>
+      ) : (
       <main className="flex-grow pt-24">
         {/* Hero Section */}
         <section className="bg-gradient-to-br from-blue-50 to-blue-100 py-12 md:py-16">
@@ -34,7 +87,7 @@ const AirFreight = () => {
                   transition={{ duration: 0.5 }} 
                   className="text-3xl md:text-4xl font-bold mb-4 text-gray-900"
                 >
-                  Air Freight Solutions
+                  {data.heroTitle}
                 </motion.h1>
                 <motion.p 
                   initial={{ opacity: 0, y: 20 }} 
@@ -42,7 +95,7 @@ const AirFreight = () => {
                   transition={{ duration: 0.5, delay: 0.1 }} 
                   className="text-lg text-gray-700 mb-6"
                 >
-                  Tailored air freight solutions to meet your unique requirements
+                  {data.heroSubtitle}
                 </motion.p>
                 <motion.div 
                   initial={{ opacity: 0, y: 20 }} 
@@ -63,7 +116,7 @@ const AirFreight = () => {
                 >
                   <AspectRatio ratio={16/9}>
                     <img 
-                      src="/airfreight2.jpg" 
+                      src={data.heroImage} 
                       alt="Air Freight Service" 
                       className="w-full h-full object-cover" 
                     />
@@ -79,23 +132,23 @@ const AirFreight = () => {
           <div className="container mx-auto px-4">
             <div className="max-w-3xl mx-auto mb-12">
               <h2 className="text-2xl md:text-3xl font-bold mb-6 text-center text-gray-800">
-                Comprehensive Air Freight Services
+                {data.mainTitle}
               </h2>
               <div className="w-24 h-1 bg-brand-gold mx-auto mb-8"></div>
-              <p className="text-gray-700 mb-6 font-normal text-justify">Tailored air freight solutions to meet your unique requirements. We understand that every shipment is different. That's why we offer flexible air freight solutions designed to meet your specific needs. Whether you're shipping time-sensitive documents or large-scale cargo, we have the expertise and resources to handle it efficiently.</p>
-              <p className="text-gray-700 text-justify">
-                Our comprehensive services include air imports, exports, and express deliveries, all with the convenience of door-to-door service. We pride ourselves on our competitive pricing and our unwavering commitment to providing exceptional customer support. Let us optimize your air freight logistics and ensure your shipments reach their destinations seamlessly.
-              </p>
+              <div 
+                className="prose max-w-none"
+                dangerouslySetInnerHTML={{ __html: data.mainBody }}
+              />
             </div>
             
             {/* Features Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-              {[
+              {(data.features.length > 0 ? data.features : [
                 { icon: <Clock className="h-10 w-10 text-brand-gold" />, title: "Time-sensitive Delivery", description: "Fast and reliable delivery for urgent shipments" },
                 { icon: <Plane className="h-10 w-10 text-brand-gold" />, title: "Global Air Network", description: "Extensive network covering all major destinations" },
                 { icon: <Globe className="h-10 w-10 text-brand-gold" />, title: "Door-to-Door", description: "Complete service from pickup to final delivery" },
                 { icon: <Headset className="h-10 w-10 text-brand-gold" />, title: "24/7 Support", description: "Round-the-clock assistance for your shipments" }
-              ].map((feature, index) => (
+              ]).map((feature: any, index: number) => (
                 <motion.div
                   key={index}
                   initial={{ opacity: 0, y: 20 }}
@@ -104,7 +157,9 @@ const AirFreight = () => {
                   viewport={{ once: true }}
                   className="bg-white rounded-lg p-6 shadow-md hover:shadow-lg transition-shadow border border-gray-100"
                 >
-                  <div className="mb-4 bg-blue-50 p-3 rounded-full inline-block">{feature.icon}</div>
+                  <div className="mb-4 bg-blue-50 p-3 rounded-full inline-block">
+                    {typeof feature.icon === 'string' ? getIcon(feature.icon) : feature.icon}
+                  </div>
                   <h3 className="text-xl font-semibold mb-2 text-gray-800">{feature.title}</h3>
                   <p className="text-gray-600">{feature.description}</p>
                 </motion.div>
@@ -113,8 +168,13 @@ const AirFreight = () => {
             
             {/* Additional Services */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
-              <motion.div 
-                initial={{ opacity: 0, x: -20 }} 
+              {(data.subServices.length > 0 ? data.subServices : [
+                { title: "Air Import", description: "Our air import services ensure your international purchases reach you efficiently. We handle all documentation, customs clearance, and final delivery to your doorstep.", image: "/lovable-uploads/warehouse.jpg" },
+                { title: "Air Export", description: "When sending your products worldwide, our air export services provide the speed and reliability you need. We manage the entire process from pickup to delivery at the final destination.", image: "/lovable-uploads/airimport.png" }
+              ]).map((service: any, index: number) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, x: index % 2 === 0 ? -20 : 20 }} 
                 whileInView={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.5 }} 
                 viewport={{ once: true }} 
@@ -123,45 +183,20 @@ const AirFreight = () => {
                 <div className="h-48 sm:h-56 relative">
                   <AspectRatio ratio={16/9} className="h-full">
                     <img 
-                      src="/lovable-uploads/warehouse.jpg" 
-                      alt="Air Import" 
+                      src={service.image} 
+                      alt={service.title} 
                       className="w-full h-full object-cover" 
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent flex items-end">
-                      <h3 className="text-white text-xl font-bold p-6">Air Import</h3>
+                      <h3 className="text-white text-xl font-bold p-6">{service.title}</h3>
                     </div>
                   </AspectRatio>
                 </div>
                 <div className="p-6">
-                  <p className="text-gray-600 text-justify">Our air import services ensure your international purchases reach you efficiently. We handle all documentation, customs clearance, and final delivery to your doorstep.</p>
+                  <p className="text-gray-600 text-justify">{service.description}</p>
                 </div>
               </motion.div>
-              
-              <motion.div 
-                initial={{ opacity: 0, x: 20 }} 
-                whileInView={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.5 }} 
-                viewport={{ once: true }} 
-                className="bg-white rounded-lg shadow-md overflow-hidden border border-gray-100"
-              >
-                <div className="h-48 sm:h-56 relative">
-                  <AspectRatio ratio={16/9} className="h-full">
-                    <img 
-                      src="/lovable-uploads/airimport.png" 
-                      alt="Air Export" 
-                      className="w-full h-full object-cover" 
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent flex items-end">
-                      <h3 className="text-white text-xl font-bold p-6">Air Export</h3>
-                    </div>
-                  </AspectRatio>
-                </div>
-                <div className="p-6">
-                  <p className="text-gray-600 text-justify">
-                    When sending your products worldwide, our air export services provide the speed and reliability you need. We manage the entire process from pickup to delivery at the final destination.
-                  </p>
-                </div>
-              </motion.div>
+              ))}
             </div>
             
             {/* CTA Section */}
@@ -183,6 +218,7 @@ const AirFreight = () => {
           </div>
         </section>
       </main>
+      )}
       
       <Footer />
     </div>

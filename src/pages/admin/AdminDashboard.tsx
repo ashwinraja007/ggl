@@ -648,6 +648,7 @@ export default function AdminDashboard() {
         payload.page_path = '/' + payload.page_path;
       }
       payload.page_path = payload.page_path.toLowerCase();
+      payload.section_key = payload.section_key.toLowerCase();
 
       if (editingContent) {
         updateContentMutation.mutate({ id: editingContent.id, payload });
