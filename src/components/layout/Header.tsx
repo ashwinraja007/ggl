@@ -28,6 +28,8 @@ export const Header = () => {
         .from("headers")
         .select("content")
         .eq("is_active", true)
+        .order("created_at", { ascending: false })
+        .limit(1)
         .maybeSingle();
       
       if (error) {
