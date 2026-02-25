@@ -635,6 +635,7 @@ export default function AdminDashboard() {
     onSuccess: (_, path) => {
         queryClient.invalidateQueries({ queryKey: ["page-content"] });
         queryClient.invalidateQueries({ queryKey: ["pages-count"] });
+        queryClient.invalidateQueries({ queryKey: ["pages"] });
         queryClient.invalidateQueries({ queryKey: ["content-paths"] });
         toast({ title: `Page "${path}" deleted successfully` });
         setIsPageEditorOpen(false);
@@ -853,9 +854,13 @@ export default function AdminDashboard() {
       const { data: existingPage } = await supabase.from('pages').select('id').eq('path', formattedPath).maybeSingle();
       
       if (existingPage) {
-        await supabase.from('pages').update(pagePayload).eq('id', existingPage.id);
+        const { error } = await supabase.from('pages').update(pagePayload).eq('id', existingPage.id);
+        if (error) throw error;
       } else {
-        await supabase.from('pages').insert([pagePayload]);
+        const { error } = await supabase.from('pages').insert([pagePayload]);
+        if (error) {
+          throw new Error(`Failed to create page route: ${error.message}. Check database permissions.`);
+        }
       }
 
       // 2. Save Content Sections
