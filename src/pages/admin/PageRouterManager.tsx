@@ -12,7 +12,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Loader2, PlusCircle, Edit, Trash2 } from "lucide-react";
+import { Loader2, PlusCircle, Edit, Trash2, Eye } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 
 type Page = {
@@ -62,6 +62,7 @@ const PageRouterManager = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["pages"] });
       queryClient.invalidateQueries({ queryKey: ["dynamic-pages"] }); // Invalidate router query
+      queryClient.invalidateQueries({ queryKey: ["router-pages"] });
       setIsDialogOpen(false);
       setEditingPage(null);
     },
@@ -163,6 +164,9 @@ const PageRouterManager = () => {
                   </span>
                 </TableCell>
                 <TableCell className="text-right">
+                  <Button variant="ghost" size="icon" onClick={() => window.open(page.path, '_blank')} title="View Page">
+                    <Eye className="h-4 w-4" />
+                  </Button>
                   <Button variant="ghost" size="icon" onClick={() => openEditDialog(page)}>
                     <Edit className="h-4 w-4" />
                   </Button>

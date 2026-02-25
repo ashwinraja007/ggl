@@ -52,6 +52,7 @@ const PageCreator: React.FC<PageCreatorProps> = ({ onPageCreated }) => {
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["pages"] });
+      queryClient.invalidateQueries({ queryKey: ["dynamic-pages"] });
       toast({ title: "Page Route Created", description: `Route for ${data.path} has been successfully created.` });
       onPageCreated(data.path);
     },
