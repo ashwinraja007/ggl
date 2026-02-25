@@ -675,8 +675,23 @@ export default function AdminDashboard() {
   }, [data, searchTerm]);
 
 
-  const handleLogin = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleLogin = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    
+    // 1. Try Supabase Auth Login (Best Practice)
+    const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+      email: credentials.email,
+      password: credentials.password,
+    });
+
+    if (!authError && authData.user) {
+      setIsAuthenticated(true);
+      if (typeof window !== "undefined") window.localStorage.setItem(AUTH_STORAGE_KEY, "true");
+      toast({ title: "Welcome back", description: "Authenticated via Supabase" });
+      return;
+    }
+
+    // 2. Fallback to Hardcoded Check (If Supabase Auth user doesn't exist)
     if (
       credentials.email.trim().toLowerCase() === ADMIN_EMAIL &&
       credentials.password === ADMIN_PASSWORD
@@ -685,7 +700,7 @@ export default function AdminDashboard() {
       if (typeof window !== "undefined") {
         window.localStorage.setItem(AUTH_STORAGE_KEY, "true");
       }
-      toast({ title: "Welcome back" });
+      toast({ title: "Welcome back", description: "Local admin access granted" });
     } else {
       toast({
         title: "Invalid credentials",

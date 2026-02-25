@@ -116,7 +116,10 @@ const HeaderManager = () => {
 
       // If setting this header to active, deactivate all others first
       if (isActive) {
-        await supabase.from("headers").update({ is_active: false }).neq('id', 0);
+        const { error: deactivateError } = await supabase.from("headers").update({ is_active: false }).neq('id', 0);
+        if (deactivateError) {
+          console.error("Error deactivating other headers:", deactivateError);
+        }
       }
 
       if (editingHeader) {
