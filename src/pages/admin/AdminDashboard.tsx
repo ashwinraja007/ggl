@@ -1662,18 +1662,36 @@ export default function AdminDashboard() {
                             <p className="text-xs text-muted-foreground">Must start with /</p>
                           )}
                         </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="template-selector">Page Template</Label>
-                          <Select onValueChange={handleTemplateChange} defaultValue="service">
-                            <SelectTrigger id="template-selector">
-                              <SelectValue placeholder="Select a template" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="service">Service Page</SelectItem>
-                              <SelectItem value="blog">Blog Post</SelectItem>
-                            </SelectContent>
-                          </Select>
-                          <p className="text-xs text-muted-foreground">Select a template to pre-fill sections.</p>
+                        <div className="space-y-4">
+                          <div className="space-y-2">
+                            <Label htmlFor="component-selector">Component</Label>
+                            <Select onValueChange={setEditorComponentKey} value={editorComponentKey}>
+                              <SelectTrigger id="component-selector">
+                                <SelectValue placeholder="Select a component" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {componentKeys.map((key) => (
+                                  <SelectItem key={key} value={key}>
+                                    {key}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                            <p className="text-xs text-muted-foreground">Select the React component to render this page.</p>
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="template-selector">Page Template</Label>
+                            <Select onValueChange={handleTemplateChange} defaultValue="service">
+                              <SelectTrigger id="template-selector">
+                                <SelectValue placeholder="Select a template" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="service">Service Page</SelectItem>
+                                <SelectItem value="blog">Blog Post</SelectItem>
+                              </SelectContent>
+                            </Select>
+                            <p className="text-xs text-muted-foreground">Select a template to pre-fill sections.</p>
+                          </div>
                         </div>
                       </CardContent>
                     </Card>

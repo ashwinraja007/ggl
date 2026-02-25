@@ -101,9 +101,10 @@ const ServiceCard = ({
 };
 
 const Services = () => {
+  const location = useLocation();
   const { data: rawPageContent, isLoading } = useQuery({
-    queryKey: ["page-content", "/services"],
-    queryFn: () => fetchPageContent("/services"),
+    queryKey: ["page-content", location.pathname],
+    queryFn: () => fetchPageContent(location.pathname),
   });
 
   const pageData = useMemo(() => processPageContent(rawPageContent), [rawPageContent]);
