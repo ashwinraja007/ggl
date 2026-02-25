@@ -2,13 +2,13 @@ import { lazy } from 'react';
 
 // --- Static Pages ---
 // Components that are not driven by the database content model.
-const Home = lazy(() => import('./pages/Home'));
+const Home = lazy(() => import('./pages/Index'));
 const About = lazy(() => import('./pages/About'));
 const Services = lazy(() => import('./pages/Services'));
 const GlobalPresence = lazy(() => import('./pages/GlobalPresence'));
 const Contact = lazy(() => import('./pages/Contact'));
 const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'));
-const TermsAndConditions = lazy(() => import('./pages/TermsAndConditions'));
+const TermsAndConditions = lazy(() => import('./pages/TermsOfUse'));
 
 // --- Legacy Service Pages ---
 // Kept for existing routes until they are migrated to the dynamic system.
