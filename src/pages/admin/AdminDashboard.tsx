@@ -55,7 +55,6 @@ import { componentKeys } from "@/componentMap";
 import PageRouterManager from "./PageRouterManager";
 import HeaderManager from "./HeaderManager";
 import LocationsManager from "./LocationsManager";
-import PageCreator from "./PageCreator";
 
 const ADMIN_EMAIL = "admin@gglau.com";
 const ADMIN_PASSWORD = "GGLAU@2025";
@@ -439,7 +438,7 @@ export default function AdminDashboard() {
 
   const [editFormState, setEditFormState] = useState<FormState>(emptyFormState);
   
-  const [activeTab, setActiveTab] = useState<'seo' | 'content' | 'router' | 'header' | 'locations' | 'creator'>('seo');
+  const [activeTab, setActiveTab] = useState<'seo' | 'content' | 'router' | 'header' | 'locations'>('seo');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   
@@ -821,8 +820,8 @@ export default function AdminDashboard() {
     setEditorPagePath("");
     // Pre-fill with default service page template
     setEditorSections(pageTemplates.service);
-    const defaultComponent = componentKeys.includes("DynamicPage") ? "DynamicPage" : componentKeys[0];
-    setEditorComponentKey(defaultComponent);
+    // Always default to DynamicPage for new pages as per requirement
+    setEditorComponentKey("DynamicPage");
     setPathExistsWarning(false);
     setIsPageEditorOpen(true);
   };
@@ -966,12 +965,43 @@ export default function AdminDashboard() {
     const formattedNewPath = newPath.startsWith('/') ? newPath : `/${newPath}`;
 
     try {
-      const { error } = await supabase.rpc('clone_page', {
-        old_path: originalPath,
-        new_path: formattedNewPath
-      });
+      // 1. Get original page details
+      const { data: pageData, error: pageError } = await supabase
+        .from('pages')
+        .select('*')
+        .eq('path', originalPath)
+        .single();
+      
+      if (pageError) throw new Error(`Original page not found: ${pageError.message}`);
 
-      if (error) throw error;
+      // 2. Create new page entry
+      const { error: createError } = await supabase
+        .from('pages')
+        .insert([{
+          path: formattedNewPath,
+          title: `${pageData.title} (Copy)`,
+          component_key: pageData.component_key
+        }]);
+      
+      if (createError) throw new Error(`Failed to create new page: ${createError.message}`);
+
+      // 3. Fetch and duplicate content
+      const { data: contentData } = await supabase
+        .from('content')
+        .select('*')
+        .eq('page_path', originalPath);
+
+      if (contentData && contentData.length > 0) {
+        const newContent = contentData.map(item => ({
+          page_path: formattedNewPath,
+          section_key: item.section_key,
+          content: item.content,
+          images: item.images
+        }));
+
+        const { error: contentError } = await supabase.from('content').insert(newContent);
+        if (contentError) throw new Error(`Failed to copy content: ${contentError.message}`);
+      }
 
       queryClient.invalidateQueries({ queryKey: ["page-content"] });
       queryClient.invalidateQueries({ queryKey: ["pages-count"] });
@@ -1127,15 +1157,6 @@ export default function AdminDashboard() {
            >
              <MapPin className="mr-3 h-4 w-4" /> Locations
            </Button>
-           <div className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 mt-4 px-2">Tools</div>
-           <Button 
-             variant={activeTab === 'creator' ? 'secondary' : 'ghost'} 
-             className={`w-full justify-start ${activeTab === 'creator' ? 'bg-brand-gold text-brand-navy hover:bg-brand-gold/90' : 'text-gray-300 hover:text-white hover:bg-white/10'}`} 
-             onClick={() => setActiveTab('creator')}
-             type="button"
-           >
-             <Plus className="mr-3 h-4 w-4" /> Page Creator
-           </Button>
         </nav>
         <div className="p-4 border-t border-white/10 bg-black/20">
            <Button variant="ghost" className="w-full justify-start text-red-300 hover:text-red-100 hover:bg-red-900/30 transition-colors" onClick={handleLogout} type="button">
@@ -1177,9 +1198,6 @@ export default function AdminDashboard() {
              <Button variant={activeTab === 'locations' ? 'secondary' : 'ghost'} className="w-full justify-start text-white hover:bg-white/10" onClick={() => { setActiveTab('locations'); setIsMobileMenuOpen(false); }} type="button">
                <MapPin className="mr-2 h-4 w-4" /> Locations
              </Button>
-             <Button variant={activeTab === 'creator' ? 'secondary' : 'ghost'} className="w-full justify-start text-white hover:bg-white/10" onClick={() => { setActiveTab('creator'); setIsMobileMenuOpen(false); }} type="button">
-               <Plus className="mr-2 h-4 w-4" /> Page Creator
-             </Button>
              <div className="h-px bg-white/10 my-2"></div>
              <Button variant="ghost" className="w-full justify-start text-red-300 hover:bg-red-900/20" onClick={handleLogout} type="button">
                <LogOut className="mr-2 h-4 w-4" /> Sign Out
@@ -1192,8 +1210,8 @@ export default function AdminDashboard() {
            <div className="flex flex-col gap-6">
              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                <div>
-                 <h1 className="text-3xl font-bold text-gray-900 tracking-tight">{activeTab === 'seo' ? 'SEO Management' : activeTab === 'content' ? 'Page Content' : activeTab === 'router' ? 'Page Router' : activeTab === 'header' ? 'Header Management' : activeTab === 'locations' ? 'Locations Management' : 'Page Creator'}</h1>
-                 <p className="text-gray-500 mt-1">Manage your website's {activeTab === 'seo' ? 'metadata and search visibility' : activeTab === 'content' ? 'dynamic content and images' : activeTab === 'router' ? 'page routes' : activeTab === 'header' ? 'global header configuration' : activeTab === 'locations' ? 'global office locations' : 'Create new dynamic pages'}.</p>
+                 <h1 className="text-3xl font-bold text-gray-900 tracking-tight">{activeTab === 'seo' ? 'SEO Management' : activeTab === 'content' ? 'Page Content' : activeTab === 'router' ? 'Page Router' : activeTab === 'header' ? 'Header Management' : 'Locations Management'}</h1>
+                 <p className="text-gray-500 mt-1">Manage your website's {activeTab === 'seo' ? 'metadata and search visibility' : activeTab === 'content' ? 'dynamic content and images' : activeTab === 'router' ? 'page routes' : activeTab === 'header' ? 'global header configuration' : 'global office locations'}.</p>
                </div>
                {/* Search Bar */}
                <div className="relative w-full sm:w-72 group">
@@ -1738,22 +1756,6 @@ export default function AdminDashboard() {
                         </div>
                         <div className="space-y-4">
                           <div className="space-y-2">
-                            <Label htmlFor="component-selector">Component</Label>
-                            <Select onValueChange={setEditorComponentKey} value={editorComponentKey}>
-                              <SelectTrigger id="component-selector">
-                                <SelectValue placeholder="Select a component" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                {componentKeys.map((key) => (
-                                  <SelectItem key={key} value={key}>
-                                    {key}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                            <p className="text-xs text-muted-foreground">Select the React component to render this page.</p>
-                          </div>
-                          <div className="space-y-2">
                             <Label htmlFor="template-selector">Page Template</Label>
                             <Select onValueChange={handleTemplateChange} defaultValue="service">
                               <SelectTrigger id="template-selector">
@@ -1844,10 +1846,6 @@ export default function AdminDashboard() {
         ) : activeTab === 'locations' ? (
           <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
             <LocationsManager />
-          </div>
-        ) : activeTab === 'creator' ? (
-          <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <PageCreator onPageCreated={handlePageCreated} />
           </div>
         ) : null}
       </div>
