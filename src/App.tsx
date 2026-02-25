@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider, useQuery } from "@tanstack/react-query";
-import { useEffect } from "react";
+import { Suspense, useEffect } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { supabase } from "./lib/supabase"; // Assuming you have this
 import { Loader2 } from "lucide-react";
@@ -56,23 +56,25 @@ const DynamicRoutes = () => {
   }
 
   return (
-    <Routes>
-      {/* Static routes that are always present */}
-      <Route path="/admin" element={<AdminDashboard />} />
+    <Suspense fallback={<div className="w-full h-screen flex items-center justify-center"><Loader2 className="w-8 h-8 animate-spin text-brand-gold" /></div>}>
+      <Routes>
+        {/* Static routes that are always present */}
+        <Route path="/admin" element={<AdminDashboard />} />
 
-      {/* Render routes from the database */}
-      {pages?.map(({ path, component_key }) => {
-        const Component = componentMap[component_key];
-        if (!Component) {
-          console.warn(`Component for key "${component_key}" not found.`);
-          return null;
-        }
-        return <Route key={path} path={path} element={<Component />} />;
-      })}
+        {/* Render routes from the database */}
+        {pages?.map(({ path, component_key }) => {
+          const Component = componentMap[component_key] as React.ComponentType | undefined;
+          if (!Component) {
+            console.warn(`Component for key "${component_key}" not found.`);
+            return null;
+          }
+          return <Route key={path} path={path} element={<Component />} />;
+        })}
 
-      {/* Fallback 404 route */}
-      <Route path="*" element={<NotFound />} />
-    </Routes>
+        {/* Fallback 404 route */}
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </Suspense>
   );
 };
 

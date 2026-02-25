@@ -1,59 +1,123 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import { useLocation } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { fetchPageContent } from '@/lib/content';
+import { supabase } from '@/lib/supabase';
+import { useSEO, SeoRecord } from '@/seo';
+
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { Loader2 } from 'lucide-react';
-import SEO from '@/components/SEO';
-import { SeoRecord } from '@/seo';
+import NotFound from './NotFound';
 
-// A generic component to render a section's content
-const GenericSection = ({ section }: { section: any }) => {
-  // This is a basic renderer. You can expand this to be more sophisticated.
-  return (
-    <section className="py-8 md:py-12 border-b">
-      <div className="container mx-auto px-4">
-        <h2 className="text-3xl font-bold mb-4 capitalize">{section.content?.title || section.section_key.replace(/_/g, ' ')}</h2>
-        {section.content?.body && <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: section.content.body }} />}
-        
-        {/* For debugging and to show all data, we can render the raw JSON. */}
-        <details className="mt-4">
-          <summary className="text-xs text-gray-500 cursor-pointer">View Raw Section Data</summary>
-          <pre className="bg-gray-100 p-4 rounded-md text-xs mt-2">
-            {JSON.stringify(section, null, 2)}
-          </pre>
-        </details>
-      </div>
-    </section>
-  );
+// Define the structure of your content and images
+interface PageContent {
+  id: number;
+  page_path: string;
+  section_key: string;
+  content: any; // Can be object, string, array
+  images: any; // Can be object with image URLs
+}
+
+// Helper function to fetch page data from Supabase
+const fetchPageData = async (path: string): Promise<PageContent[]> => {
+  const { data, error } = await supabase
+    .from('content')
+    .select('*')
+    .eq('page_path', path);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+  return data || [];
 };
 
-const DynamicPage = () => {
+// A generic component to render different sections
+const SectionRenderer = ({ section }: { section: PageContent }) => {
+  const { section_key, content, images } = section;
+
+  // Basic Hero Section
+  if (section_key === 'hero') {
+    return (
+      <div 
+        className="relative bg-cover bg-center text-white py-32 px-4 text-center" 
+        style={{ backgroundImage: `url(${images?.background || ''})` }}
+      >
+        <div className="absolute inset-0 bg-black opacity-50"></div>
+        <div className="relative">
+          <h1 className="text-4xl md:text-6xl font-bold">{content?.title}</h1>
+          <p className="text-xl mt-4">{content?.subtitle}</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Main content section with HTML rendering
+  if (section_key === 'main' || section_key === 'post_body') {
+    return (
+      <div className="max-w-4xl mx-auto py-12 px-4">
+        <h2 className="text-3xl font-bold mb-6">{content?.title}</h2>
+        <div className="prose lg:prose-xl" dangerouslySetInnerHTML={{ __html: content?.body || '' }} />
+      </div>
+    );
+  }
+
+  // Features section
+  if (section_key === 'features') {
+    return (
+      <div className="bg-gray-100 py-12 px-4">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-3xl font-bold text-center mb-8">{content?.title}</h2>
+          <div className="grid md:grid-cols-3 gap-8">
+            {Array.isArray(content?.items) && content.items.map((item: any, index: number) => (
+              <div key={index} className="bg-white p-6 rounded-lg shadow-md">
+                <h3 className="font-semibold">{typeof item === 'string' ? item : item.title}</h3>
+                {typeof item === 'object' && <p className="text-sm text-gray-600 mt-2">{item.description}</p>}
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+  
+  // Default renderer for unknown sections - useful for debugging
+  return null;
+};
+
+
+const DynamicPage: React.FC = () => {
   const location = useLocation();
-  const { data: pageContent, isLoading } = useQuery({
-    queryKey: ["page-content", location.pathname],
-    queryFn: () => fetchPageContent(location.pathname),
+  const path = location.pathname;
+
+  const { data: sections, isLoading, isError } = useQuery({
+    queryKey: ['page-content', path],
+    queryFn: () => fetchPageData(path),
   });
 
-  const seoRecord = useMemo(() => pageContent?.find(s => s.section_key === 'seo')?.content as SeoRecord | null, [pageContent]);
-  const contentSections = useMemo(() => pageContent?.filter(s => s.section_key !== 'seo') || [], [pageContent]);
+  const seoSection = sections?.find(s => s.section_key === 'seo');
+  const seoRecord: SeoRecord | null = seoSection ? seoSection.content : null;
 
   useSEO(seoRecord);
 
   if (isLoading) {
-    return <div className="flex-grow flex items-center justify-center min-h-screen"><Loader2 className="w-8 h-8 animate-spin text-brand-gold" /></div>;
+    return (
+      <div className="w-full h-screen flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-brand-gold" />
+      </div>
+    );
   }
 
+  if (isError || !sections || sections.length === 0) {
+    return <NotFound />;
+  }
+
+  const renderableSections = sections.filter(s => s.section_key !== 'seo');
+
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="bg-white">
       <Header />
-      <main className="flex-grow pt-20">
-        {contentSections.length > 0 ? (
-          contentSections.map((section, index) => <GenericSection key={index} section={section} />)
-        ) : (
-          <div className="container mx-auto px-4 py-20 text-center"><h1 className="text-2xl font-bold">Content Not Found</h1><p className="text-gray-600 mt-2">This page exists, but no content has been added to it yet.</p></div>
-        )}
+      <main>
+        {renderableSections.map(section => <SectionRenderer key={section.id} section={section} />)}
       </main>
       <Footer />
     </div>
