@@ -918,10 +918,29 @@ export default function AdminDashboard() {
         await Promise.all(promises);
       }
 
-      queryClient.invalidateQueries({ queryKey: ["page-content"] });
-      queryClient.invalidateQueries({ queryKey: ["pages-count"] });
-      queryClient.invalidateQueries({ queryKey: ["pages"] });
-      queryClient.invalidateQueries({ queryKey: ["dynamic-pages"] });
+      await queryClient.invalidateQueries({ queryKey: ["page-content"] });
+      await queryClient.invalidateQueries({ queryKey: ["pages-count"] });
+      await queryClient.invalidateQueries({ queryKey: ["pages"] });
+      await queryClient.invalidateQueries({ queryKey: ["dynamic-pages"] });
+
+      // Refresh editor sections to get new IDs (prevents duplication on next save)
+      const { data: refreshedContent } = await supabase
+        .from('content')
+        .select('*')
+        .eq('page_path', formattedPath);
+
+      if (refreshedContent) {
+         const sortedSections = [...refreshedContent].sort((a, b) => {
+            const order = ['seo', 'hero', 'main', 'features', 'sub_services'];
+            const ia = order.indexOf(a.section_key);
+            const ib = order.indexOf(b.section_key);
+            if (ia !== -1 && ib !== -1) return ia - ib;
+            if (ia !== -1) return -1;
+            if (ib !== -1) return 1;
+            return a.section_key.localeCompare(b.section_key);
+         });
+         setEditorSections(sortedSections);
+      }
 
       toast({ 
         title: "Page saved successfully",
@@ -935,7 +954,6 @@ export default function AdminDashboard() {
           </Button>
         ),
       });
-      setIsPageEditorOpen(false);
     } catch (e) {
       toast({ title: "Error saving page", description: (e as Error).message, variant: "destructive" });
     }
@@ -1660,7 +1678,7 @@ export default function AdminDashboard() {
                       <Plus className="mr-2 h-4 w-4" /> Add Section
                     </Button>
                     <Button onClick={handleSavePage} className="bg-green-600 hover:bg-green-700 text-white">
-                      <Save className="mr-2 h-4 w-4" /> {isCreatingNewPage ? "Create Page" : "Save Changes"}
+                      <Save className="mr-2 h-4 w-4" /> Save
                     </Button>
                     {!isCreatingNewPage && (
                       <Dialog>
