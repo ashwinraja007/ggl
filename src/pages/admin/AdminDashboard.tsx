@@ -455,7 +455,6 @@ export default function AdminDashboard() {
   const [isPageEditorOpen, setIsPageEditorOpen] = useState(false);
   const [editorPagePath, setEditorPagePath] = useState("");
   const [editorSections, setEditorSections] = useState<Partial<PageContent>[]>([]);
-  const [editorComponentKey, setEditorComponentKey] = useState<string>("");
 
   const [pathExistsWarning, setPathExistsWarning] = useState(false);
 
@@ -807,11 +806,6 @@ export default function AdminDashboard() {
     });
     setEditorSections(JSON.parse(JSON.stringify(sections)));
     
-    // Fetch existing route config
-    const { data: pageData } = await supabase.from('pages').select('component_key').eq('path', path).maybeSingle();
-    if (pageData) {
-      setEditorComponentKey(pageData.component_key);
-    }
     setIsPageEditorOpen(true);
   };
 
@@ -820,8 +814,6 @@ export default function AdminDashboard() {
     setEditorPagePath("");
     // Pre-fill with default service page template
     setEditorSections(pageTemplates.service);
-    // Always default to DynamicPage for new pages as per requirement
-    setEditorComponentKey("DynamicPage");
     setPathExistsWarning(false);
     setIsPageEditorOpen(true);
   };
@@ -864,15 +856,8 @@ export default function AdminDashboard() {
       const seoSection = editorSections.find(s => s.section_key === 'seo');
       const pageTitle = (seoSection?.content as any)?.title || formattedPath;
       
-      const defaultComponent = componentKeys.includes("DynamicPage") ? "DynamicPage" : componentKeys[0];
-      const componentKey = editorComponentKey || defaultComponent;
-      if (!componentKey) {
-        throw new Error("Component key is required. Please select a component.");
-      }
-      
-      if (componentKey !== "DynamicPage" && !componentKeys.includes(componentKey)) {
-        throw new Error(`Invalid component key: "${componentKey}". Please select a valid component from the list.`);
-      }
+      // Always force DynamicPage component to ensure content from DB is rendered
+      const componentKey = "DynamicPage";
 
       const pagePayload = {
         path: formattedPath,
@@ -980,7 +965,7 @@ export default function AdminDashboard() {
         .insert([{
           path: formattedNewPath,
           title: `${pageData.title} (Copy)`,
-          component_key: pageData.component_key
+          component_key: "DynamicPage"
         }]);
       
       if (createError) throw new Error(`Failed to create new page: ${createError.message}`);
