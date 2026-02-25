@@ -870,6 +870,10 @@ export default function AdminDashboard() {
       if (!componentKey) {
         throw new Error("Component key is required. Please select a component.");
       }
+      
+      if (!componentKeys.includes(componentKey)) {
+        throw new Error(`Invalid component key: "${componentKey}". Please select a valid component from the list.`);
+      }
 
       const pagePayload = {
         path: formattedPath,

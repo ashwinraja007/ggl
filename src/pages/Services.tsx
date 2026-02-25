@@ -178,34 +178,17 @@ const Services = () => {
   const servicesRecord = pageData.services;
   const whyChooseUsRecord = pageData['why-choose-us'];
 
-  const getServicesList = () => {
-    if (!servicesRecord) return defaultData.services;
-    
-    let content = servicesRecord.content;
-    // Handle case where content might be a string (e.g. double stringified)
-    if (typeof content === 'string') {
-      try { content = JSON.parse(content); } catch (e) { console.error("Error parsing content", e); }
-    }
-
-    if (!content) return defaultData.services;
-    if (Array.isArray(content)) return content;
-    if ((content as any).items && Array.isArray((content as any).items)) return (content as any).items;
-    if ((content as any).services && Array.isArray((content as any).services)) return (content as any).services;
-    if ((content as any).cards && Array.isArray((content as any).cards)) return (content as any).cards;
-
-    // Fallback: find first array property
-    const firstArray = Object.values(content).find(val => Array.isArray(val));
-    if (firstArray) return firstArray as any[];
-
-    return defaultData.services;
-  };
+  // Simplified service list retrieval
+  const servicesList = (servicesRecord?.items && Array.isArray(servicesRecord.items) && servicesRecord.items.length > 0)
+    ? servicesRecord.items
+    : defaultData.services;
 
   const data = {
     hero: {
       title: heroRecord?.title || defaultData.hero.title,
       subtitle: heroRecord?.subtitle || defaultData.hero.subtitle
     },
-    services: getServicesList(),
+    services: servicesList,
     whyChooseUs: {
       title: whyChooseUsRecord?.title || defaultData.whyChooseUs.title,
       subtitle: whyChooseUsRecord?.subtitle || defaultData.whyChooseUs.subtitle,
