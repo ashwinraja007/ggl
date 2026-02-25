@@ -113,10 +113,15 @@ const PageRouterManager = () => {
   });
 
   const onSubmit = (values: z.infer<typeof pageSchema>) => {
+    const formattedValues = {
+      ...values,
+      path: values.path.trim().toLowerCase(),
+      title: values.title.trim(),
+    };
     if (editingPage) {
-      updatePageMutation.mutate(values);
+      updatePageMutation.mutate(formattedValues);
     } else {
-      createPageMutation.mutate(values);
+      createPageMutation.mutate(formattedValues);
     }
   };
 

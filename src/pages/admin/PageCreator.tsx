@@ -62,7 +62,12 @@ const PageCreator: React.FC<PageCreatorProps> = ({ onPageCreated }) => {
   });
 
   const onSubmit = (values: PageCreatorForm) => {
-    createRouteMutation.mutate(values);
+    const formattedValues = {
+      ...values,
+      path: values.path.trim().toLowerCase(),
+      title: values.title.trim(),
+    };
+    createRouteMutation.mutate(formattedValues);
   };
 
   return (

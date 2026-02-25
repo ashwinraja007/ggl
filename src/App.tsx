@@ -2,6 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider, useQuery } from "@tanstack/react-query";
+import { useEffect } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { supabase } from "./lib/supabase"; // Assuming you have this
 import { Loader2 } from "lucide-react";
@@ -34,6 +35,12 @@ const DynamicRoutes = () => {
     queryKey: ['dynamic-pages'],
     queryFn: fetchPages,
   });
+
+  useEffect(() => {
+    if (pages) {
+      console.log("Dynamic Router Loaded Pages:", pages);
+    }
+  }, [pages]);
 
   if (isLoading) {
     return (
