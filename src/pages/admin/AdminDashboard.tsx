@@ -943,23 +943,21 @@ export default function AdminDashboard() {
 
     const formattedNewPath = newPath.startsWith('/') ? newPath : `/${newPath}`;
 
-    // Get original page data
-    const originalSections = groupedPages[originalPath] || [];
-    const { data: pageData } = await supabase.from('pages').select('component_key, title').eq('path', originalPath).maybeSingle();
-
-    // Prepare for editor
-    setEditorPagePath(formattedNewPath);
-    setEditorComponentKey(pageData?.component_key || (componentKeys.includes("DynamicPage") ? "DynamicPage" : componentKeys[0]));
-    
-    // Copy sections, remove IDs to force creation
-    const newSections = originalSections.map(({ id, created_at, page_path, ...rest }) => rest);
-    
-    setEditorSections(newSections);
-    setPathExistsWarning(false);
-    setIsPageEditorOpen(true);
-
     try {
-      toast({ title: "Page Duplicated", description: `Now editing a new copy. Save to create the page at ${formattedNewPath}.` });
+      const { error } = await supabase.rpc('clone_page', {
+        old_path: originalPath,
+        new_path: formattedNewPath
+      });
+
+      if (error) throw error;
+
+      queryClient.invalidateQueries({ queryKey: ["page-content"] });
+      queryClient.invalidateQueries({ queryKey: ["pages-count"] });
+      queryClient.invalidateQueries({ queryKey: ["pages"] });
+      queryClient.invalidateQueries({ queryKey: ["router-pages"] });
+      queryClient.invalidateQueries({ queryKey: ["dynamic-pages"] });
+
+      toast({ title: "Page Duplicated", description: `Page successfully cloned to ${formattedNewPath}.` });
     } catch (e) {
       toast({ title: "Error duplicating page", description: (e as Error).message, variant: "destructive" });
     }
