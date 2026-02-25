@@ -870,7 +870,7 @@ export default function AdminDashboard() {
         throw new Error("Component key is required. Please select a component.");
       }
       
-      if (!componentKeys.includes(componentKey)) {
+      if (componentKey !== "DynamicPage" && !componentKeys.includes(componentKey)) {
         throw new Error(`Invalid component key: "${componentKey}". Please select a valid component from the list.`);
       }
 
