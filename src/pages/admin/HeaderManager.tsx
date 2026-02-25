@@ -85,6 +85,7 @@ const HeaderManager = () => {
   const mutationOptions = {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["headers"] });
+      queryClient.invalidateQueries({ queryKey: ["active-header"] });
       setIsDialogOpen(false);
       setEditingHeader(null);
       toast({ title: "Success", description: "Header saved successfully." });

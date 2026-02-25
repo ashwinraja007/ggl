@@ -34,6 +34,7 @@ type LocationRecord = {
   email: string | null;
   latitude: number | null;
   longitude: number | null;
+  display_order: number | null;
 };
 
 const LocationsManager = () => {
@@ -51,6 +52,7 @@ const LocationsManager = () => {
   const [email, setEmail] = useState("");
   const [latitude, setLatitude] = useState("");
   const [longitude, setLongitude] = useState("");
+  const [displayOrder, setDisplayOrder] = useState("");
 
   const { data: locations, isLoading } = useQuery({
     queryKey: ["locations"],
@@ -58,6 +60,7 @@ const LocationsManager = () => {
       const { data, error } = await supabase
         .from("locations")
         .select("*")
+        .order("display_order", { ascending: true, nulls: 'last' })
         .order("country_name", { ascending: true });
       if (error) throw error;
       return data as LocationRecord[];
@@ -74,6 +77,7 @@ const LocationsManager = () => {
       setEmail(editingLocation.email || "");
       setLatitude(editingLocation.latitude?.toString() || "");
       setLongitude(editingLocation.longitude?.toString() || "");
+      setDisplayOrder(editingLocation.display_order?.toString() || "");
     } else {
       setCountryCode("");
       setCountryName("");
@@ -83,6 +87,7 @@ const LocationsManager = () => {
       setEmail("");
       setLatitude("");
       setLongitude("");
+      setDisplayOrder("");
     }
   }, [editingLocation]);
 
@@ -121,6 +126,7 @@ const LocationsManager = () => {
         email: email || null,
         latitude: latitude ? parseFloat(latitude) : null,
         longitude: longitude ? parseFloat(longitude) : null,
+        display_order: displayOrder ? parseInt(displayOrder, 10) : null,
       };
 
       if (editingLocation) {
@@ -180,6 +186,7 @@ const LocationsManager = () => {
             <TableHeader>
               <TableRow>
                 <TableHead>Country</TableHead>
+                <TableHead>Order</TableHead>
                 <TableHead>City</TableHead>
                 <TableHead>Address</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
@@ -188,7 +195,7 @@ const LocationsManager = () => {
             <TableBody>
               {locations?.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={4} className="text-center py-8 text-gray-500">
+                  <TableCell colSpan={5} className="text-center py-8 text-gray-500">
                     No locations found. Create one to get started.
                   </TableCell>
                 </TableRow>
@@ -199,6 +206,9 @@ const LocationsManager = () => {
                       <div className="flex items-center gap-2">
                         {loc.country_name} ({loc.country_code})
                       </div>
+                    </TableCell>
+                    <TableCell className="font-mono text-center">
+                      {loc.display_order ?? 'N/A'}
                     </TableCell>
                     <TableCell>{loc.city_name}</TableCell>
                     <TableCell className="max-w-xs truncate text-xs text-gray-500">
@@ -261,7 +271,7 @@ const LocationsManager = () => {
                   value={countryCode}
                   onChange={(e) => setCountryCode(e.target.value)}
                   placeholder="e.g. au"
-                  maxLength={2}
+                  maxLength={3}
                 />
               </div>
             </div>
@@ -273,6 +283,17 @@ const LocationsManager = () => {
                 onChange={(e) => setCityName(e.target.value)}
                 placeholder="e.g. Melbourne"
               />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="displayOrder">Display Order</Label>
+              <Input
+                id="displayOrder"
+                type="number"
+                value={displayOrder}
+                onChange={(e) => setDisplayOrder(e.target.value)}
+                placeholder="e.g. 1 (lower numbers appear first)"
+              />
+              <p className="text-xs text-gray-500">Controls the order in the Global Presence list.</p>
             </div>
             <div className="grid gap-2">
               <Label htmlFor="address">Address</Label>
