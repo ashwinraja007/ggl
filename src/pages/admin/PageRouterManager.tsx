@@ -24,7 +24,7 @@ type Page = {
 
 const pageSchema = z.object({
   path: z.string().min(1, "Path is required").startsWith("/", "Path must start with /"),
-  component_key: z.enum(componentKeys, { required_error: "Component is required" }),
+  component_key: z.string().min(1, "Component is required"),
   title: z.string().min(1, "Title is required"),
 });
 
@@ -217,7 +217,7 @@ const PageRouterManager = () => {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Component</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Select a component" />

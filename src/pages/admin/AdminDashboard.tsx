@@ -844,10 +844,15 @@ export default function AdminDashboard() {
       const seoSection = editorSections.find(s => s.section_key === 'seo');
       const pageTitle = (seoSection?.content as any)?.title || formattedPath;
       
+      const componentKey = editorComponentKey || componentKeys[0];
+      if (!componentKey) {
+        throw new Error("Component key is required. Please select a component.");
+      }
+
       const pagePayload = {
         path: formattedPath,
         title: pageTitle,
-        component_key: editorComponentKey || componentKeys[0],
+        component_key: componentKey,
       };
 
       // Check if page exists to decide on insert vs update (or just upsert if ID known, but path is unique usually)
