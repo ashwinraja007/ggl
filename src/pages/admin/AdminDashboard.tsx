@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState, useId } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { LogOut, Pencil, Plus, Trash2, Image as ImageIcon, Bold, Italic, Link as LinkIcon, X, Upload, Copy, ChevronDown, ChevronRight, Eye, Search, FileText, Menu, LayoutDashboard, Route, Save, ArrowLeft, Layers, Loader2 } from "lucide-react";
+import { LogOut, Pencil, Plus, Trash2, Image as ImageIcon, Bold, Italic, Link as LinkIcon, X, Upload, Copy, ChevronDown, ChevronRight, Eye, Search, FileText, Menu, LayoutDashboard, Route, Save, ArrowLeft, Layers, Loader2, PanelTop, MapPin } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -53,6 +53,8 @@ import {
 import { supabase, uploadImage } from "@/lib/supabase";
 import { componentKeys } from "@/componentMap";
 import PageRouterManager from "./PageRouterManager";
+import HeaderManager from "./HeaderManager";
+import LocationsManager from "./LocationsManager";
 
 const ADMIN_EMAIL = "admin@gglau.com";
 const ADMIN_PASSWORD = "GGLAU@2025";
@@ -436,7 +438,7 @@ export default function AdminDashboard() {
 
   const [editFormState, setEditFormState] = useState<FormState>(emptyFormState);
   
-  const [activeTab, setActiveTab] = useState<'seo' | 'content' | 'router'>('seo');
+  const [activeTab, setActiveTab] = useState<'seo' | 'content' | 'router' | 'header' | 'locations'>('seo');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   
@@ -507,6 +509,25 @@ export default function AdminDashboard() {
     enabled: isAuthenticated,
   });
 
+  const { data: headersCount } = useQuery({
+    queryKey: ["headers-count"],
+    queryFn: async () => {
+      const { count, error } = await supabase.from("headers").select("*", { count: 'exact', head: true });
+      if (error) return 0;
+      return count;
+    },
+    enabled: isAuthenticated,
+  });
+
+  const { data: locationsCount } = useQuery({
+    queryKey: ["locations-count"],
+    queryFn: async () => {
+      const { count, error } = await supabase.from("locations").select("*", { count: 'exact', head: true });
+      if (error) return 0;
+      return count;
+    },
+    enabled: isAuthenticated,
+  });
 
   const createMutation = useMutation({
     mutationFn: (payload: SeoPayload) => createSeoRecord(payload),
@@ -848,7 +869,21 @@ export default function AdminDashboard() {
 
       queryClient.invalidateQueries({ queryKey: ["page-content"] });
       queryClient.invalidateQueries({ queryKey: ["pages-count"] });
-      toast({ title: "Page saved successfully" });
+      queryClient.invalidateQueries({ queryKey: ["pages"] });
+      queryClient.invalidateQueries({ queryKey: ["dynamic-pages"] });
+
+      toast({ 
+        title: "Page saved successfully",
+        action: (
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={() => window.open(formattedPath, '_blank')}
+          >
+            View Page
+          </Button>
+        ),
+      });
       setIsPageEditorOpen(false);
     } catch (e) {
       toast({ title: "Error saving page", description: (e as Error).message, variant: "destructive" });
@@ -1006,6 +1041,22 @@ export default function AdminDashboard() {
            >
              <Route className="mr-3 h-4 w-4" /> Page Router
            </Button>
+           <Button 
+             variant={activeTab === 'header' ? 'secondary' : 'ghost'} 
+             className={`w-full justify-start ${activeTab === 'header' ? 'bg-brand-gold text-brand-navy hover:bg-brand-gold/90' : 'text-gray-300 hover:text-white hover:bg-white/10'}`} 
+             onClick={() => setActiveTab('header')}
+             type="button"
+           >
+             <PanelTop className="mr-3 h-4 w-4" /> Header Manager
+           </Button>
+           <Button 
+             variant={activeTab === 'locations' ? 'secondary' : 'ghost'} 
+             className={`w-full justify-start ${activeTab === 'locations' ? 'bg-brand-gold text-brand-navy hover:bg-brand-gold/90' : 'text-gray-300 hover:text-white hover:bg-white/10'}`} 
+             onClick={() => setActiveTab('locations')}
+             type="button"
+           >
+             <MapPin className="mr-3 h-4 w-4" /> Locations
+           </Button>
         </nav>
         <div className="p-4 border-t border-white/10 bg-black/20">
            <Button variant="ghost" className="w-full justify-start text-red-300 hover:text-red-100 hover:bg-red-900/30 transition-colors" onClick={handleLogout} type="button">
@@ -1041,6 +1092,12 @@ export default function AdminDashboard() {
              <Button variant={activeTab === 'router' ? 'secondary' : 'ghost'} className="w-full justify-start text-white hover:bg-white/10" onClick={() => { setActiveTab('router'); setIsMobileMenuOpen(false); }} type="button">
                <Route className="mr-2 h-4 w-4" /> Page Router
              </Button>
+             <Button variant={activeTab === 'header' ? 'secondary' : 'ghost'} className="w-full justify-start text-white hover:bg-white/10" onClick={() => { setActiveTab('header'); setIsMobileMenuOpen(false); }} type="button">
+               <PanelTop className="mr-2 h-4 w-4" /> Header Manager
+             </Button>
+             <Button variant={activeTab === 'locations' ? 'secondary' : 'ghost'} className="w-full justify-start text-white hover:bg-white/10" onClick={() => { setActiveTab('locations'); setIsMobileMenuOpen(false); }} type="button">
+               <MapPin className="mr-2 h-4 w-4" /> Locations
+             </Button>
              <div className="h-px bg-white/10 my-2"></div>
              <Button variant="ghost" className="w-full justify-start text-red-300 hover:bg-red-900/20" onClick={handleLogout} type="button">
                <LogOut className="mr-2 h-4 w-4" /> Sign Out
@@ -1053,8 +1110,8 @@ export default function AdminDashboard() {
            <div className="flex flex-col gap-6">
              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                <div>
-                 <h1 className="text-3xl font-bold text-gray-900 tracking-tight">{activeTab === 'seo' ? 'SEO Management' : activeTab === 'content' ? 'Content Management' : 'Page Router'}</h1>
-                 <p className="text-gray-500 mt-1">Manage your website's {activeTab === 'seo' ? 'metadata and search visibility' : activeTab === 'content' ? 'dynamic content and images' : 'page routes'}.</p>
+                 <h1 className="text-3xl font-bold text-gray-900 tracking-tight">{activeTab === 'seo' ? 'SEO Management' : activeTab === 'content' ? 'Content Management' : activeTab === 'router' ? 'Page Router' : activeTab === 'header' ? 'Header Management' : 'Locations Management'}</h1>
+                 <p className="text-gray-500 mt-1">Manage your website's {activeTab === 'seo' ? 'metadata and search visibility' : activeTab === 'content' ? 'dynamic content and images' : activeTab === 'router' ? 'page routes' : activeTab === 'header' ? 'global header configuration' : 'global office locations'}.</p>
                </div>
                {/* Search Bar */}
                <div className="relative w-full sm:w-72 group">
@@ -1069,7 +1126,7 @@ export default function AdminDashboard() {
              </div>
 
              {/* Stats Cards */}
-             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
                 <Card className="bg-gradient-to-br from-blue-600 to-brand-navy text-white border-none shadow-lg hover:shadow-xl transition-shadow">
                   <CardContent className="p-6 flex items-center justify-between">
                      <div>
@@ -1103,20 +1160,25 @@ export default function AdminDashboard() {
                      </div>
                   </CardContent>
                 </Card>
-                <Card className="bg-white border-gray-100 shadow-md hover:shadow-lg transition-shadow">
+                <Card className="bg-gradient-to-br from-teal-500 to-emerald-600 text-white border-none shadow-lg hover:shadow-xl transition-shadow">
                   <CardContent className="p-6 flex items-center justify-between">
                      <div>
-                       <p className="text-gray-500 text-sm font-medium mb-1">System Status</p>
-                       <div className="flex items-center gap-2">
-                         <span className="relative flex h-3 w-3">
-                           <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                           <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
-                         </span>
-                         <span className="text-green-700 font-bold text-lg">Online</span>
-                       </div>
+                       <p className="text-teal-100 text-sm font-medium mb-1">Headers</p>
+                       <h3 className="text-3xl font-bold">{headersCount || 0}</h3>
                      </div>
-                     <div className="p-3 bg-green-50 rounded-full">
-                       <LayoutDashboard className="h-6 w-6 text-green-600" />
+                     <div className="p-3 bg-white/10 rounded-full">
+                       <PanelTop className="h-6 w-6 text-white" />
+                     </div>
+                  </CardContent>
+                </Card>
+                <Card className="bg-gradient-to-br from-indigo-500 to-purple-600 text-white border-none shadow-lg hover:shadow-xl transition-shadow">
+                  <CardContent className="p-6 flex items-center justify-between">
+                     <div>
+                       <p className="text-indigo-100 text-sm font-medium mb-1">Locations</p>
+                       <h3 className="text-3xl font-bold">{locationsCount || 0}</h3>
+                     </div>
+                     <div className="p-3 bg-white/10 rounded-full">
+                       <MapPin className="h-6 w-6 text-white" />
                      </div>
                   </CardContent>
                 </Card>
@@ -1667,6 +1729,14 @@ export default function AdminDashboard() {
         ) : activeTab === 'router' ? (
           <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
             <PageRouterManager />
+          </div>
+        ) : activeTab === 'header' ? (
+          <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <HeaderManager />
+          </div>
+        ) : activeTab === 'locations' ? (
+          <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <LocationsManager />
           </div>
         ) : null}
       </div>
