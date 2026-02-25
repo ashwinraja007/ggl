@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
-import { Loader2, PlusCircle, Edit, Trash2, MapPin } from "lucide-react";
+import { Loader2, PlusCircle, Edit, Trash2, MapPin, GripVertical } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -42,6 +42,7 @@ const LocationsManager = () => {
   const queryClient = useQueryClient();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingLocation, setEditingLocation] = useState<LocationRecord | null>(null);
+  const [draggedId, setDraggedId] = useState<number | null>(null);
 
   // Form state
   const [countryCode, setCountryCode] = useState("");
@@ -167,6 +168,46 @@ const LocationsManager = () => {
     setIsDialogOpen(true);
   };
 
+  const handleDragStart = (e: React.DragEvent, id: number) => {
+    setDraggedId(id);
+    e.dataTransfer.effectAllowed = "move";
+    // Optional: Set a drag image or style
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+  };
+
+  const handleDrop = async (e: React.DragEvent, targetId: number) => {
+    e.preventDefault();
+    if (draggedId === null || draggedId === targetId) return;
+
+    const items = [...(locations || [])];
+    const sourceIndex = items.findIndex((i) => i.id === draggedId);
+    const targetIndex = items.findIndex((i) => i.id === targetId);
+
+    if (sourceIndex === -1 || targetIndex === -1) return;
+
+    // Reorder locally
+    const [movedItem] = items.splice(sourceIndex, 1);
+    items.splice(targetIndex, 0, movedItem);
+
+    // Prepare updates for DB
+    const updates = items.map((item, index) => ({
+      id: item.id,
+      display_order: index + 1,
+    }));
+
+    // Optimistic update
+    queryClient.setQueryData(["locations"], items);
+    setDraggedId(null);
+
+    // Save to Supabase
+    await supabase.from("locations").upsert(updates);
+    queryClient.invalidateQueries({ queryKey: ["locations"] });
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -185,6 +226,7 @@ const LocationsManager = () => {
           <Table>
             <TableHeader>
               <TableRow>
+                <TableHead className="w-[50px]"></TableHead>
                 <TableHead>Country</TableHead>
                 <TableHead>Order</TableHead>
                 <TableHead>City</TableHead>
@@ -201,7 +243,17 @@ const LocationsManager = () => {
                 </TableRow>
               ) : (
                 locations?.map((loc) => (
-                  <TableRow key={loc.id}>
+                  <TableRow 
+                    key={loc.id}
+                    draggable
+                    onDragStart={(e) => handleDragStart(e, loc.id)}
+                    onDragOver={handleDragOver}
+                    onDrop={(e) => handleDrop(e, loc.id)}
+                    className={draggedId === loc.id ? "opacity-50 bg-gray-50" : "cursor-move hover:bg-gray-50"}
+                  >
+                    <TableCell>
+                      <GripVertical className="h-4 w-4 text-gray-400" />
+                    </TableCell>
                     <TableCell className="font-medium">
                       <div className="flex items-center gap-2">
                         {loc.country_name} ({loc.country_code})
