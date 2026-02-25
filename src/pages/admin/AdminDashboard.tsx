@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState, useId } from "react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient, QueryClient } from "@tanstack/react-query";
 import { LogOut, Pencil, Plus, Trash2, Image as ImageIcon, Bold, Italic, Link as LinkIcon, X, Upload, Copy, ChevronDown, ChevronRight, Eye, Search, FileText, Menu, LayoutDashboard, Route, Save, ArrowLeft, Layers, Loader2, PanelTop, MapPin } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -55,6 +55,7 @@ import { componentKeys } from "@/componentMap";
 import PageRouterManager from "./PageRouterManager";
 import HeaderManager from "./HeaderManager";
 import LocationsManager from "./LocationsManager";
+import PageCreator from "./PageCreator";
 
 const ADMIN_EMAIL = "admin@gglau.com";
 const ADMIN_PASSWORD = "GGLAU@2025";
@@ -438,7 +439,7 @@ export default function AdminDashboard() {
 
   const [editFormState, setEditFormState] = useState<FormState>(emptyFormState);
   
-  const [activeTab, setActiveTab] = useState<'seo' | 'content' | 'router' | 'header' | 'locations'>('seo');
+  const [activeTab, setActiveTab] = useState<'seo' | 'content' | 'router' | 'header' | 'locations' | 'creator'>('seo');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   
@@ -826,6 +827,12 @@ export default function AdminDashboard() {
     setIsPageEditorOpen(true);
   };
 
+  const handlePageCreated = (path: string) => {
+    queryClient.invalidateQueries({ queryKey: ["router-pages"] });
+    setActiveTab('content');
+    handleEditPage(path);
+  };
+
 
   const handlePathBlur = () => {
     let currentPath = editorPagePath.trim().toLowerCase();
@@ -930,26 +937,29 @@ export default function AdminDashboard() {
     }
   };
 
-  const handleDuplicatePage = async () => {
-    if (!editorPagePath) {
-      toast({ title: "Page path is required", variant: "destructive" });
-      return;
-    }
-
-    const originalPath = editorPagePath;
-    const newPath = prompt("Enter the new page path:", `${originalPath}-copy`);
-
+  const handleDuplicatePage = (originalPath: string, queryClient: QueryClient) => async () => {
+    const newPath = prompt("Enter the new path for the duplicated page:", `${originalPath}-copy`);
     if (!newPath) return;
 
-    try {
-      // Duplicate the page with a new path
-      const formattedPath = newPath.trim().toLowerCase();
-      if (!formattedPath.startsWith('/')) formattedPath = '/' + formattedPath;
-      setEditorPagePath(formattedPath);
-      handleCreatePage();
-      toast({ title: "Page duplicated successfully. Please edit the new page." });
-      setIsPageEditorOpen(true);
+    const formattedNewPath = newPath.startsWith('/') ? newPath : `/${newPath}`;
 
+    // Get original page data
+    const originalSections = groupedPages[originalPath] || [];
+    const { data: pageData } = await supabase.from('pages').select('component_key, title').eq('path', originalPath).maybeSingle();
+
+    // Prepare for editor
+    setEditorPagePath(formattedNewPath);
+    setEditorComponentKey(pageData?.component_key || (componentKeys.includes("DynamicPage") ? "DynamicPage" : componentKeys[0]));
+    
+    // Copy sections, remove IDs to force creation
+    const newSections = originalSections.map(({ id, created_at, page_path, ...rest }) => rest);
+    
+    setEditorSections(newSections);
+    setPathExistsWarning(false);
+    setIsPageEditorOpen(true);
+
+    try {
+      toast({ title: "Page Duplicated", description: `Now editing a new copy. Save to create the page at ${formattedNewPath}.` });
     } catch (e) {
       toast({ title: "Error duplicating page", description: (e as Error).message, variant: "destructive" });
     }
@@ -1071,7 +1081,7 @@ export default function AdminDashboard() {
              onClick={() => setActiveTab('content')}
              type="button"
            >
-             <FileText className="mr-3 h-4 w-4" /> Page Content
+             <FileText className="mr-3 h-4 w-4" /> Pages
            </Button>
            <Button 
              variant={activeTab === 'router' ? 'secondary' : 'ghost'} 
@@ -1096,6 +1106,15 @@ export default function AdminDashboard() {
              type="button"
            >
              <MapPin className="mr-3 h-4 w-4" /> Locations
+           </Button>
+           <div className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 mt-4 px-2">Tools</div>
+           <Button 
+             variant={activeTab === 'creator' ? 'secondary' : 'ghost'} 
+             className={`w-full justify-start ${activeTab === 'creator' ? 'bg-brand-gold text-brand-navy hover:bg-brand-gold/90' : 'text-gray-300 hover:text-white hover:bg-white/10'}`} 
+             onClick={() => setActiveTab('creator')}
+             type="button"
+           >
+             <Plus className="mr-3 h-4 w-4" /> Page Creator
            </Button>
         </nav>
         <div className="p-4 border-t border-white/10 bg-black/20">
@@ -1124,7 +1143,7 @@ export default function AdminDashboard() {
         {isMobileMenuOpen && (
           <div className="md:hidden fixed inset-0 z-20 bg-brand-navy/95 pt-20 px-4 space-y-4 backdrop-blur-sm animate-in fade-in slide-in-from-top-5">
              <Button variant={activeTab === 'seo' ? 'secondary' : 'ghost'} className="w-full justify-start text-white hover:bg-white/10" onClick={() => { setActiveTab('seo'); setIsMobileMenuOpen(false); }} type="button">
-               <Search className="mr-2 h-4 w-4" /> SEO Management
+               <Search className="mr-2 h-4 w-4" /> SEO
              </Button>
              <Button variant={activeTab === 'content' ? 'secondary' : 'ghost'} className="w-full justify-start text-white hover:bg-white/10" onClick={() => { setActiveTab('content'); setIsMobileMenuOpen(false); }} type="button">
                <FileText className="mr-2 h-4 w-4" /> Page Content
@@ -1138,6 +1157,9 @@ export default function AdminDashboard() {
              <Button variant={activeTab === 'locations' ? 'secondary' : 'ghost'} className="w-full justify-start text-white hover:bg-white/10" onClick={() => { setActiveTab('locations'); setIsMobileMenuOpen(false); }} type="button">
                <MapPin className="mr-2 h-4 w-4" /> Locations
              </Button>
+             <Button variant={activeTab === 'creator' ? 'secondary' : 'ghost'} className="w-full justify-start text-white hover:bg-white/10" onClick={() => { setActiveTab('creator'); setIsMobileMenuOpen(false); }} type="button">
+               <Plus className="mr-2 h-4 w-4" /> Page Creator
+             </Button>
              <div className="h-px bg-white/10 my-2"></div>
              <Button variant="ghost" className="w-full justify-start text-red-300 hover:bg-red-900/20" onClick={handleLogout} type="button">
                <LogOut className="mr-2 h-4 w-4" /> Sign Out
@@ -1150,8 +1172,8 @@ export default function AdminDashboard() {
            <div className="flex flex-col gap-6">
              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                <div>
-                 <h1 className="text-3xl font-bold text-gray-900 tracking-tight">{activeTab === 'seo' ? 'SEO Management' : activeTab === 'content' ? 'Content Management' : activeTab === 'router' ? 'Page Router' : activeTab === 'header' ? 'Header Management' : 'Locations Management'}</h1>
-                 <p className="text-gray-500 mt-1">Manage your website's {activeTab === 'seo' ? 'metadata and search visibility' : activeTab === 'content' ? 'dynamic content and images' : activeTab === 'router' ? 'page routes' : activeTab === 'header' ? 'global header configuration' : 'global office locations'}.</p>
+                 <h1 className="text-3xl font-bold text-gray-900 tracking-tight">{activeTab === 'seo' ? 'SEO Management' : activeTab === 'content' ? 'Page Content' : activeTab === 'router' ? 'Page Router' : activeTab === 'header' ? 'Header Management' : activeTab === 'locations' ? 'Locations Management' : 'Page Creator'}</h1>
+                 <p className="text-gray-500 mt-1">Manage your website's {activeTab === 'seo' ? 'metadata and search visibility' : activeTab === 'content' ? 'dynamic content and images' : activeTab === 'router' ? 'page routes' : activeTab === 'header' ? 'global header configuration' : activeTab === 'locations' ? 'global office locations' : 'Create new dynamic pages'}.</p>
                </div>
                {/* Search Bar */}
                <div className="relative w-full sm:w-72 group">
@@ -1602,6 +1624,13 @@ export default function AdminDashboard() {
                                 <Pencil className="mr-1 h-4 w-4" />
                                 Edit Page
                               </Button>
+                              <Button 
+                                size="sm" 
+                                variant="outline"
+                                onClick={handleDuplicatePage(path, queryClient)}
+                              >
+                                <Copy className="mr-1 h-4 w-4" />
+                              </Button>
                             </TableCell>
                           </TableRow>
                         ))}
@@ -1629,9 +1658,8 @@ export default function AdminDashboard() {
                       <Plus className="mr-2 h-4 w-4" /> Add Section
                     </Button>
                     <Button onClick={handleSavePage} className="bg-green-600 hover:bg-green-700 text-white">
-                      <Save className="mr-2 h-4 w-4" /> Save Page
+                      <Save className="mr-2 h-4 w-4" /> {isCreatingNewPage ? "Create Page" : "Save Changes"}
                     </Button>
-
                     {!isCreatingNewPage && (
                       <Dialog>
                         <DialogTrigger asChild>
@@ -1656,7 +1684,7 @@ export default function AdminDashboard() {
                       </Dialog>
                     )}
                      {!isCreatingNewPage && (
-                      <Button onClick={handleDuplicatePage} className="bg-blue-600 hover:bg-blue-700 text-white">Duplicate Page</Button>
+                      <Button onClick={handleDuplicatePage(editorPagePath, queryClient)} className="bg-blue-600 hover:bg-blue-700 text-white">Duplicate Page</Button>
                     )}
                   </div>
                 </div>
@@ -1796,6 +1824,10 @@ export default function AdminDashboard() {
         ) : activeTab === 'locations' ? (
           <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
             <LocationsManager />
+          </div>
+        ) : activeTab === 'creator' ? (
+          <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <PageCreator onPageCreated={handlePageCreated} />
           </div>
         ) : null}
       </div>
