@@ -53,7 +53,8 @@ const PageRouterManager = () => {
     if (editingPage) {
       form.reset(editingPage);
     } else {
-      form.reset({ path: "", component_key: undefined, title: "" });
+      const defaultComponent = componentKeys.includes("DynamicPage") ? "DynamicPage" : undefined;
+      form.reset({ path: "", component_key: defaultComponent, title: "" });
     }
   }, [editingPage, form]);
 

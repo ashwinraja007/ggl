@@ -499,6 +499,16 @@ export default function AdminDashboard() {
     enabled: isAuthenticated && activeTab === 'content',
   });
 
+  const { data: routerPages } = useQuery({
+    queryKey: ["router-pages"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("pages").select("path");
+      if (error) return [];
+      return data;
+    },
+    enabled: isAuthenticated && activeTab === 'content',
+  });
+
   const { data: pagesCount } = useQuery({
     queryKey: ["pages-count"],
     queryFn: async () => {
@@ -657,12 +667,15 @@ export default function AdminDashboard() {
 
 
   const filteredPagePaths = useMemo(() => {
-    let paths = Object.keys(groupedPages).sort();
+    const contentPaths = Object.keys(groupedPages);
+    const routePaths = routerPages?.map(p => p.path) || [];
+    let paths = Array.from(new Set([...contentPaths, ...routePaths])).sort();
+    
     if (searchTerm) {
       paths = paths.filter(p => p.toLowerCase().includes(searchTerm.toLowerCase()));
     }
     return paths;
-  }, [groupedPages, searchTerm]);
+  }, [groupedPages, routerPages, searchTerm]);
 
 
   const filteredRecords = useMemo(() => {
@@ -807,7 +820,8 @@ export default function AdminDashboard() {
     setEditorPagePath("");
     // Pre-fill with default service page template
     setEditorSections(pageTemplates.service);
-    setEditorComponentKey(componentKeys[0] || "DynamicPage");
+    const defaultComponent = componentKeys.includes("DynamicPage") ? "DynamicPage" : componentKeys[0];
+    setEditorComponentKey(defaultComponent);
     setPathExistsWarning(false);
     setIsPageEditorOpen(true);
   };
@@ -844,7 +858,8 @@ export default function AdminDashboard() {
       const seoSection = editorSections.find(s => s.section_key === 'seo');
       const pageTitle = (seoSection?.content as any)?.title || formattedPath;
       
-      const componentKey = editorComponentKey || componentKeys[0];
+      const defaultComponent = componentKeys.includes("DynamicPage") ? "DynamicPage" : componentKeys[0];
+      const componentKey = editorComponentKey || defaultComponent;
       if (!componentKey) {
         throw new Error("Component key is required. Please select a component.");
       }
@@ -1564,6 +1579,7 @@ export default function AdminDashboard() {
                                     {s.section_key}
                                   </span>
                                 ))}
+                                {!groupedPages[path] && <span className="text-xs text-muted-foreground italic">No content</span>}
                               </div>
                             </TableCell>
                             <TableCell className="flex items-center justify-end gap-2">
