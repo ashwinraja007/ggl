@@ -87,7 +87,8 @@ const SectionRenderer = ({ section }: { section: PageContent }) => {
 
 const DynamicPage: React.FC = () => {
   const location = useLocation();
-  const path = location.pathname;
+  // Normalize path: lowercase and remove trailing slash (unless it's root)
+  const path = location.pathname.toLowerCase().replace(/\/$/, "") || "/";
 
   const { data: sections, isLoading, isError } = useQuery({
     queryKey: ['page-content', path],
@@ -107,11 +108,12 @@ const DynamicPage: React.FC = () => {
     );
   }
 
-  if (isError || !sections || sections.length === 0) {
+  if (isError) {
     return <NotFound />;
   }
 
-  const renderableSections = sections.filter(s => s.section_key !== 'seo');
+  // If sections is undefined/empty, we render an empty page instead of 404
+  const renderableSections = sections?.filter(s => s.section_key !== 'seo') || [];
 
   return (
     <div className="bg-white">

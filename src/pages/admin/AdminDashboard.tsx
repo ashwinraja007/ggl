@@ -827,6 +827,10 @@ export default function AdminDashboard() {
 
   const handlePathBlur = () => {
     let currentPath = editorPagePath.trim().toLowerCase();
+    // Remove trailing slash if present (and not just root)
+    if (currentPath.length > 1 && currentPath.endsWith('/')) {
+        currentPath = currentPath.slice(0, -1);
+    }
     if (currentPath && !currentPath.startsWith('/')) {
         currentPath = '/' + currentPath;
         setEditorPagePath(currentPath);
@@ -849,6 +853,10 @@ export default function AdminDashboard() {
     }
 
     let formattedPath = editorPagePath.trim().toLowerCase();
+    // Remove trailing slash if present
+    if (formattedPath.length > 1 && formattedPath.endsWith('/')) {
+      formattedPath = formattedPath.slice(0, -1);
+    }
     if (!formattedPath.startsWith('/')) formattedPath = '/' + formattedPath;
 
     try {
@@ -947,7 +955,11 @@ export default function AdminDashboard() {
     const newPath = prompt("Enter the new path for the duplicated page:", `${originalPath}-copy`);
     if (!newPath) return;
 
-    const formattedNewPath = newPath.startsWith('/') ? newPath : `/${newPath}`;
+    let formattedNewPath = newPath.trim().toLowerCase();
+    if (formattedNewPath.length > 1 && formattedNewPath.endsWith('/')) {
+      formattedNewPath = formattedNewPath.slice(0, -1);
+    }
+    if (!formattedNewPath.startsWith('/')) formattedNewPath = '/' + formattedNewPath;
 
     try {
       // 1. Get original page details
