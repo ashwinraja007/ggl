@@ -886,28 +886,23 @@ export default function AdminDashboard() {
         }
       }
 
-      // 2. Save Content Sections
-      const promises = [];
-
-      for (const section of editorSections) {
-        if (!section.section_key) continue;
-        
-        const payload = {
+      // 2. Upsert Content Sections
+      // This will insert new sections or update existing ones based on the unique combination of page_path and section_key.
+      const sectionPayloads = editorSections
+        .filter(section => section.section_key) // Ensure section_key exists
+        .map(section => ({
           page_path: formattedPath,
-          section_key: section.section_key.toLowerCase(),
+          section_key: section.section_key!.toLowerCase(),
           content: section.content,
           images: section.images
-        };
+        }));
 
-        if (section.id && section.id > 0) {
-          promises.push(updatePageContent(section.id, payload));
-        } else {
-          promises.push(createPageContent(payload));
-        }
-      }
+      if (sectionPayloads.length > 0) {
+        const { error } = await supabase
+          .from('content')
+          .upsert(sectionPayloads, { onConflict: 'page_path, section_key' });
 
-      if (promises.length > 0) {
-        await Promise.all(promises);
+        if (error) throw error;
       }
 
       await queryClient.invalidateQueries({ queryKey: ["page-content"] });
