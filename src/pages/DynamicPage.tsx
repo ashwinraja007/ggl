@@ -88,17 +88,12 @@ const SectionRenderer = ({ section }: { section: PageContent }) => {
 const DynamicPage: React.FC = () => {
   const location = useLocation();
   // Normalize path: lowercase and remove trailing slash (unless it's root)
-  const path = location.pathname.toLowerCase().replace(/\/$/, "") || "/";
+  const path = decodeURIComponent(location.pathname).toLowerCase().replace(/\/$/, "") || "/";
 
   const { data: sections, isLoading, isError } = useQuery({
     queryKey: ['page-content', path],
     queryFn: () => fetchPageData(path),
   });
-
-  const seoSection = sections?.find(s => s.section_key === 'seo');
-  const seoRecord: SeoRecord | null = seoSection ? seoSection.content : null;
-
-  useSEO(seoRecord);
 
   if (isLoading) {
     return (
@@ -112,8 +107,17 @@ const DynamicPage: React.FC = () => {
     return <NotFound />;
   }
 
-  // If sections is undefined/empty, we render an empty page instead of 404
-  const renderableSections = sections?.filter(s => s.section_key !== 'seo') || [];
+  // After loading, if there are no sections, it's a 404.
+  if (!sections || sections.length === 0) {
+    return <NotFound />;
+  }
+
+  const seoSection = sections.find(s => s.section_key === 'seo');
+  const seoRecord: SeoRecord | null = seoSection ? seoSection.content : null;
+
+  useSEO(seoRecord);
+
+  const renderableSections = sections.filter(s => s.section_key !== 'seo');
 
   return (
     <div className="bg-white">
