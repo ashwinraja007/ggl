@@ -950,11 +950,25 @@ export default function AdminDashboard() {
 
         if (error) {
           if (error.code === '23505') {
-            throw new Error(`A section key conflict occurred. This can happen if you swap keys between sections. Please save after one key change before changing the second, or ensure all keys are unique.`);
+            // Conflict detected (likely swapping keys). 
+            // Fallback: Delete all for this page and re-insert to resolve conflicts while preserving IDs.
+            const { error: deleteError } = await supabase
+              .from('content')
+              .delete()
+              .eq('page_path', formattedPath);
+            
+            if (deleteError) throw new Error(`Failed to clear conflicting content: ${deleteError.message}`);
+
+            const { error: insertError } = await supabase
+              .from('content')
+              .insert(sectionPayloads);
+            
+            if (insertError) throw new Error(`Failed to re-save content after conflict: ${insertError.message}`);
+          } else {
+            throw error;
           }
-          throw error;
         }
-        if (!data || data.length === 0) {
+        else if (!data || data.length === 0) {
           console.warn(`Save may have failed silently due to database permissions (RLS).`);
         }
       }
