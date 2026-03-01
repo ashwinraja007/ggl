@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState, useId } from "react";
-import { useMutation, useQuery, useQueryClient, QueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { LogOut, Pencil, Plus, Trash2, Image as ImageIcon, Bold, Italic, Link as LinkIcon, X, Upload, Copy, ChevronDown, ChevronRight, Eye, Search, FileText, Menu, LayoutDashboard, Route, Save, ArrowLeft, Layers, Loader2, PanelTop, MapPin } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -355,10 +355,8 @@ const DynamicJsonEditor = ({
   const [parsed, setParsed] = useState<any>({});
   const [error, setError] = useState<string | null>(null);
   const [mode, setMode] = useState<'visual' | 'raw'>('visual');
-  const [rawValue, setRawValue] = useState(value);
 
   useEffect(() => {
-    setRawValue(value);
     try {
       const p = JSON.parse(value || '{}');
       setParsed(p);
@@ -370,22 +368,9 @@ const DynamicJsonEditor = ({
   }, [value]);
 
   const handleRecursiveChange = (newVal: any) => {
-    setParsed(newVal);
-    const jsonString = JSON.stringify(newVal, null, 2);
-    setRawValue(jsonString);
-    onChange(jsonString);
-  };
 
-  const handleRawChange = (val: string) => {
-    setRawValue(val);
-    try {
-      const p = JSON.parse(val);
-      setParsed(p);
-      setError(null);
-      onChange(val);
-    } catch (e) {
-      setError("Invalid JSON");
-    }
+    setParsed(newVal);
+    onChange(JSON.stringify(newVal, null, 2));
   };
 
   if (mode === 'raw') {
@@ -395,8 +380,8 @@ const DynamicJsonEditor = ({
           <Button type="button" variant="outline" size="sm" onClick={() => setMode('visual')} disabled={!!error}>Switch to Visual Editor</Button>
         </div>
         <Textarea
-          value={rawValue}
-          onChange={(e) => handleRawChange(e.target.value)}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
           className="font-mono text-xs min-h-[200px]"
         />
         {error && <p className="text-red-500 text-xs">{error}</p>}
@@ -470,8 +455,7 @@ export default function AdminDashboard() {
   const [isPageEditorOpen, setIsPageEditorOpen] = useState(false);
   const [editorPagePath, setEditorPagePath] = useState("");
   const [editorSections, setEditorSections] = useState<Partial<PageContent>[]>([]);
-  const [originalSections, setOriginalSections] = useState<Partial<PageContent>[]>([]);
-  const [isSaving, setIsSaving] = useState(false);
+  const [editorComponentKey, setEditorComponentKey] = useState<string>("");
 
   const [pathExistsWarning, setPathExistsWarning] = useState(false);
 
@@ -512,16 +496,6 @@ export default function AdminDashboard() {
 
     queryKey: ["page-content"],
     queryFn: () => fetchPageContent(),
-    enabled: isAuthenticated && activeTab === 'content',
-  });
-
-  const { data: routerPages } = useQuery({
-    queryKey: ["router-pages"],
-    queryFn: async () => {
-      const { data, error } = await supabase.from("pages").select("path");
-      if (error) return [];
-      return data;
-    },
     enabled: isAuthenticated && activeTab === 'content',
   });
 
@@ -661,7 +635,6 @@ export default function AdminDashboard() {
     onSuccess: (_, path) => {
         queryClient.invalidateQueries({ queryKey: ["page-content"] });
         queryClient.invalidateQueries({ queryKey: ["pages-count"] });
-        queryClient.invalidateQueries({ queryKey: ["pages"] });
         queryClient.invalidateQueries({ queryKey: ["content-paths"] });
         toast({ title: `Page "${path}" deleted successfully` });
         setIsPageEditorOpen(false);
@@ -683,15 +656,12 @@ export default function AdminDashboard() {
 
 
   const filteredPagePaths = useMemo(() => {
-    const contentPaths = Object.keys(groupedPages);
-    const routePaths = routerPages?.map(p => p.path) || [];
-    let paths = Array.from(new Set([...contentPaths, ...routePaths])).sort();
-    
+    let paths = Object.keys(groupedPages).sort();
     if (searchTerm) {
       paths = paths.filter(p => p.toLowerCase().includes(searchTerm.toLowerCase()));
     }
     return paths;
-  }, [groupedPages, routerPages, searchTerm]);
+  }, [groupedPages, searchTerm]);
 
 
   const filteredRecords = useMemo(() => {
@@ -821,10 +791,13 @@ export default function AdminDashboard() {
       if (ib !== -1) return 1;
       return a.section_key.localeCompare(b.section_key);
     });
-    const sectionsCopy = JSON.parse(JSON.stringify(sections));
-    setEditorSections(sectionsCopy);
-    setOriginalSections(sectionsCopy);
+    setEditorSections(JSON.parse(JSON.stringify(sections)));
     
+    // Fetch existing route config
+    const { data: pageData } = await supabase.from('pages').select('component_key').eq('path', path).maybeSingle();
+    if (pageData) {
+      setEditorComponentKey(pageData.component_key);
+    }
     setIsPageEditorOpen(true);
   };
 
@@ -833,24 +806,14 @@ export default function AdminDashboard() {
     setEditorPagePath("");
     // Pre-fill with default service page template
     setEditorSections(pageTemplates.service);
-    setOriginalSections([]);
+    setEditorComponentKey(componentKeys[0] || "DynamicPage");
     setPathExistsWarning(false);
     setIsPageEditorOpen(true);
-  };
-
-  const handlePageCreated = (path: string) => {
-    queryClient.invalidateQueries({ queryKey: ["router-pages"] });
-    setActiveTab('content');
-    handleEditPage(path);
   };
 
 
   const handlePathBlur = () => {
     let currentPath = editorPagePath.trim().toLowerCase();
-    // Remove trailing slash if present (and not just root)
-    if (currentPath.length > 1 && currentPath.endsWith('/')) {
-        currentPath = currentPath.slice(0, -1);
-    }
     if (currentPath && !currentPath.startsWith('/')) {
         currentPath = '/' + currentPath;
         setEditorPagePath(currentPath);
@@ -866,81 +829,63 @@ export default function AdminDashboard() {
 
 
   const handleSavePage = async () => {
-    if (isSaving) return;
-
     if (!editorPagePath) {
       toast({ title: "Page path is required", variant: "destructive" });
+      handlePathBlur(); // to show warning if empty
       return;
     }
 
-    setIsSaving(true);
     let formattedPath = editorPagePath.trim().toLowerCase();
-    if (formattedPath.length > 1 && formattedPath.endsWith('/')) {
-      formattedPath = formattedPath.slice(0, -1);
-    }
     if (!formattedPath.startsWith('/')) formattedPath = '/' + formattedPath;
 
     try {
-      // 1. Validate keys client-side
-      const sectionKeys = editorSections.map(s => s.section_key?.trim().toLowerCase()).filter(Boolean);
-      const duplicateKeys = sectionKeys.filter((key, index) => sectionKeys.indexOf(key) !== index);
-      if (duplicateKeys.length > 0) {
-        throw new Error(`Duplicate section keys found: ${duplicateKeys.join(', ')}. Keys must be unique.`);
-      }
-
-      // 2. Prepare payload for the RPC function
+      // 1. Ensure Route Exists in 'pages' table
       const seoSection = editorSections.find(s => s.section_key === 'seo');
       const pageTitle = (seoSection?.content as any)?.title || formattedPath;
       
-      const sectionPayloads = editorSections
-        .filter(section => section.section_key && section.section_key.trim())
-        .map(section => ({
-          section_key: section.section_key!.trim().toLowerCase(),
-          content: section.content || {},
-          images: section.images || {}
-        }));
+      const pagePayload = {
+        path: formattedPath,
+        title: pageTitle,
+        component_key: editorComponentKey || componentKeys[0],
+      };
 
-      const originalPath = originalSections.length > 0 ? originalSections[0].page_path : null;
-      const isRename = originalPath && originalPath !== formattedPath;
-
-      // 3. Call the transactional RPC function
-      const { data: refreshedContent, error } = await supabase.rpc('save_page_content', {
-        target_path: formattedPath,
-        page_title: pageTitle,
-        sections_payload: sectionPayloads,
-        original_path: isRename ? originalPath : null
-      });
-
-      if (error) {
-        // Provide a more helpful error message if RLS is the likely cause
-        if (error.message.includes('permission denied for function save_page_content')) {
-            throw new Error(`Database permission denied. Please run the required SQL script in your Supabase SQL Editor to grant permissions for the save function.`);
-        }
-        throw error;
+      // Check if page exists to decide on insert vs update (or just upsert if ID known, but path is unique usually)
+      const { data: existingPage } = await supabase.from('pages').select('id').eq('path', formattedPath).maybeSingle();
+      
+      if (existingPage) {
+        await supabase.from('pages').update(pagePayload).eq('id', existingPage.id);
+      } else {
+        await supabase.from('pages').insert([pagePayload]);
       }
 
-      // 4. Invalidate queries to refetch data in the background
-      await queryClient.invalidateQueries({ queryKey: ["page-content"] });
-      await queryClient.invalidateQueries({ queryKey: ["pages-count"] });
-      await queryClient.invalidateQueries({ queryKey: ["pages"] });
-      await queryClient.invalidateQueries({ queryKey: ["dynamic-pages"] });
-      await queryClient.invalidateQueries({ queryKey: ["router-pages"] });
-      await queryClient.invalidateQueries({ queryKey: ["content-paths"] });
+      // 2. Save Content Sections
+      const promises = [];
 
-      // 5. Update editor state with the fresh data returned from the RPC
-      setEditorPagePath(formattedPath);
+      for (const section of editorSections) {
+        if (!section.section_key) continue;
+        
+        const payload = {
+          page_path: formattedPath,
+          section_key: section.section_key.toLowerCase(),
+          content: section.content,
+          images: section.images
+        };
 
-      const sortedSections = [...(refreshedContent || [])].sort((a, b) => {
-        const order = ['seo', 'hero', 'main', 'features', 'sub_services'];
-        const ia = order.indexOf(a.section_key);
-        const ib = order.indexOf(b.section_key);
-        if (ia !== -1 && ib !== -1) return ia - ib;
-        if (ia !== -1) return -1;
-        if (ib !== -1) return 1;
-        return a.section_key.localeCompare(b.section_key);
-      });
-      setEditorSections(sortedSections);
-      setOriginalSections(sortedSections);
+        if (section.id && section.id > 0) {
+          promises.push(updatePageContent(section.id, payload));
+        } else {
+          promises.push(createPageContent(payload));
+        }
+      }
+
+      if (promises.length > 0) {
+        await Promise.all(promises);
+      }
+
+      queryClient.invalidateQueries({ queryKey: ["page-content"] });
+      queryClient.invalidateQueries({ queryKey: ["pages-count"] });
+      queryClient.invalidateQueries({ queryKey: ["pages"] });
+      queryClient.invalidateQueries({ queryKey: ["dynamic-pages"] });
 
       toast({ 
         title: "Page saved successfully",
@@ -954,70 +899,32 @@ export default function AdminDashboard() {
           </Button>
         ),
       });
+      setIsPageEditorOpen(false);
     } catch (e) {
-      console.error("Save error:", e);
       toast({ title: "Error saving page", description: (e as Error).message, variant: "destructive" });
-    } finally {
-      setIsSaving(false);
     }
   };
 
-  const handleDuplicatePage = (originalPath: string, queryClient: QueryClient) => async () => {
-    const newPath = prompt("Enter the new path for the duplicated page:", `${originalPath}-copy`);
+  const handleDuplicatePage = async () => {
+    if (!editorPagePath) {
+      toast({ title: "Page path is required", variant: "destructive" });
+      return;
+    }
+
+    const originalPath = editorPagePath;
+    const newPath = prompt("Enter the new page path:", `${originalPath}-copy`);
+
     if (!newPath) return;
 
-    let formattedNewPath = newPath.trim().toLowerCase();
-    if (formattedNewPath.length > 1 && formattedNewPath.endsWith('/')) {
-      formattedNewPath = formattedNewPath.slice(0, -1);
-    }
-    if (!formattedNewPath.startsWith('/')) formattedNewPath = '/' + formattedNewPath;
-
     try {
-      // 1. Get original page details
-      const { data: pageData, error: pageError } = await supabase
-        .from('pages')
-        .select('*')
-        .eq('path', originalPath)
-        .single();
-      
-      if (pageError) throw new Error(`Original page not found: ${pageError.message}`);
+      // Duplicate the page with a new path
+      const formattedPath = newPath.trim().toLowerCase();
+      if (!formattedPath.startsWith('/')) formattedPath = '/' + formattedPath;
+      setEditorPagePath(formattedPath);
+      handleCreatePage();
+      toast({ title: "Page duplicated successfully. Please edit the new page." });
+      setIsPageEditorOpen(true);
 
-      // 2. Create new page entry
-      const { error: createError } = await supabase
-        .from('pages')
-        .insert([{
-          path: formattedNewPath,
-          title: `${pageData.title} (Copy)`,
-          component_key: "DynamicPage"
-        }]);
-      
-      if (createError) throw new Error(`Failed to create new page: ${createError.message}`);
-
-      // 3. Fetch and duplicate content
-      const { data: contentData } = await supabase
-        .from('content')
-        .select('*')
-        .eq('page_path', originalPath);
-
-      if (contentData && contentData.length > 0) {
-        const newContent = contentData.map(item => ({
-          page_path: formattedNewPath,
-          section_key: item.section_key,
-          content: item.content,
-          images: item.images
-        }));
-
-        const { error: contentError } = await supabase.from('content').insert(newContent);
-        if (contentError) throw new Error(`Failed to copy content: ${contentError.message}`);
-      }
-
-      queryClient.invalidateQueries({ queryKey: ["page-content"] });
-      queryClient.invalidateQueries({ queryKey: ["pages-count"] });
-      queryClient.invalidateQueries({ queryKey: ["pages"] });
-      queryClient.invalidateQueries({ queryKey: ["router-pages"] });
-      queryClient.invalidateQueries({ queryKey: ["dynamic-pages"] });
-
-      toast({ title: "Page Duplicated", description: `Page successfully cloned to ${formattedNewPath}.` });
     } catch (e) {
       toast({ title: "Error duplicating page", description: (e as Error).message, variant: "destructive" });
     }
@@ -1031,18 +938,21 @@ export default function AdminDashboard() {
   };
 
   const handleAddSection = () => {
-    const newKey = `new_section_${Date.now()}`;
-    setEditorSections([...editorSections, { section_key: newKey, content: {}, images: {} }]);
+    setEditorSections([...editorSections, { section_key: "new_section", content: {}, images: {} }]);
   };
 
-  const handleRemoveSection = (index: number) => {
+  const handleRemoveSection = async (index: number) => {
     const section = editorSections[index];
-    const confirmMessage = section.id
-      ? "Are you sure you want to remove this section? It will be permanently deleted from the database when you save the page."
-      : "Are you sure you want to remove this new section?";
-
-    if (confirm(confirmMessage)) {
-      const newSections = editorSections.filter((_, i) => i !== index);
+    if (section.id) {
+      if (confirm("Are you sure you want to delete this section? This cannot be undone.")) {
+        await deleteContentMutation.mutateAsync(section.id);
+        const newSections = [...editorSections];
+        newSections.splice(index, 1);
+        setEditorSections(newSections);
+      }
+    } else {
+      const newSections = [...editorSections];
+      newSections.splice(index, 1);
       setEditorSections(newSections);
     }
   };
@@ -1136,7 +1046,7 @@ export default function AdminDashboard() {
              onClick={() => setActiveTab('content')}
              type="button"
            >
-             <FileText className="mr-3 h-4 w-4" /> Pages
+             <FileText className="mr-3 h-4 w-4" /> Page Content
            </Button>
            <Button 
              variant={activeTab === 'router' ? 'secondary' : 'ghost'} 
@@ -1189,7 +1099,7 @@ export default function AdminDashboard() {
         {isMobileMenuOpen && (
           <div className="md:hidden fixed inset-0 z-20 bg-brand-navy/95 pt-20 px-4 space-y-4 backdrop-blur-sm animate-in fade-in slide-in-from-top-5">
              <Button variant={activeTab === 'seo' ? 'secondary' : 'ghost'} className="w-full justify-start text-white hover:bg-white/10" onClick={() => { setActiveTab('seo'); setIsMobileMenuOpen(false); }} type="button">
-               <Search className="mr-2 h-4 w-4" /> SEO
+               <Search className="mr-2 h-4 w-4" /> SEO Management
              </Button>
              <Button variant={activeTab === 'content' ? 'secondary' : 'ghost'} className="w-full justify-start text-white hover:bg-white/10" onClick={() => { setActiveTab('content'); setIsMobileMenuOpen(false); }} type="button">
                <FileText className="mr-2 h-4 w-4" /> Page Content
@@ -1215,7 +1125,7 @@ export default function AdminDashboard() {
            <div className="flex flex-col gap-6">
              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                <div>
-                 <h1 className="text-3xl font-bold text-gray-900 tracking-tight">{activeTab === 'seo' ? 'SEO Management' : activeTab === 'content' ? 'Page Content' : activeTab === 'router' ? 'Page Router' : activeTab === 'header' ? 'Header Management' : 'Locations Management'}</h1>
+                 <h1 className="text-3xl font-bold text-gray-900 tracking-tight">{activeTab === 'seo' ? 'SEO Management' : activeTab === 'content' ? 'Content Management' : activeTab === 'router' ? 'Page Router' : activeTab === 'header' ? 'Header Management' : 'Locations Management'}</h1>
                  <p className="text-gray-500 mt-1">Manage your website's {activeTab === 'seo' ? 'metadata and search visibility' : activeTab === 'content' ? 'dynamic content and images' : activeTab === 'router' ? 'page routes' : activeTab === 'header' ? 'global header configuration' : 'global office locations'}.</p>
                </div>
                {/* Search Bar */}
@@ -1644,7 +1554,6 @@ export default function AdminDashboard() {
                                     {s.section_key}
                                   </span>
                                 ))}
-                                {!groupedPages[path] && <span className="text-xs text-muted-foreground italic">No content</span>}
                               </div>
                             </TableCell>
                             <TableCell className="flex items-center justify-end gap-2">
@@ -1666,13 +1575,6 @@ export default function AdminDashboard() {
                               >
                                 <Pencil className="mr-1 h-4 w-4" />
                                 Edit Page
-                              </Button>
-                              <Button 
-                                size="sm" 
-                                variant="outline"
-                                onClick={handleDuplicatePage(path, queryClient)}
-                              >
-                                <Copy className="mr-1 h-4 w-4" />
                               </Button>
                             </TableCell>
                           </TableRow>
@@ -1700,9 +1602,10 @@ export default function AdminDashboard() {
                     <Button variant="outline" onClick={handleAddSection}>
                       <Plus className="mr-2 h-4 w-4" /> Add Section
                     </Button>
-                    <Button onClick={handleSavePage} disabled={isSaving} className="bg-green-600 hover:bg-green-700 text-white">
-                      {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />} Save
+                    <Button onClick={handleSavePage} className="bg-green-600 hover:bg-green-700 text-white">
+                      <Save className="mr-2 h-4 w-4" /> Save Page
                     </Button>
+
                     {!isCreatingNewPage && (
                       <Dialog>
                         <DialogTrigger asChild>
@@ -1727,7 +1630,7 @@ export default function AdminDashboard() {
                       </Dialog>
                     )}
                      {!isCreatingNewPage && (
-                      <Button onClick={handleDuplicatePage(editorPagePath, queryClient)} className="bg-blue-600 hover:bg-blue-700 text-white">Duplicate Page</Button>
+                      <Button onClick={handleDuplicatePage} className="bg-blue-600 hover:bg-blue-700 text-white">Duplicate Page</Button>
                     )}
                   </div>
                 </div>
@@ -1760,6 +1663,22 @@ export default function AdminDashboard() {
                           )}
                         </div>
                         <div className="space-y-4">
+                          <div className="space-y-2">
+                            <Label htmlFor="component-selector">Component</Label>
+                            <Select onValueChange={setEditorComponentKey} value={editorComponentKey}>
+                              <SelectTrigger id="component-selector">
+                                <SelectValue placeholder="Select a component" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {componentKeys.map((key) => (
+                                  <SelectItem key={key} value={key}>
+                                    {key}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                            <p className="text-xs text-muted-foreground">Select the React component to render this page.</p>
+                          </div>
                           <div className="space-y-2">
                             <Label htmlFor="template-selector">Page Template</Label>
                             <Select onValueChange={handleTemplateChange} defaultValue="service">
@@ -1810,13 +1729,10 @@ export default function AdminDashboard() {
                           <DynamicJsonEditor
                             value={JSON.stringify(section.content || {}, null, 2)}
                             onChange={(val) => {
+                              const newSections = [...editorSections];
                               try {
-                                const parsed = JSON.parse(val);
-                                setEditorSections(prev => {
-                                  const newSections = [...prev];
-                                  newSections[index] = { ...newSections[index], content: parsed };
-                                  return newSections;
-                                });
+                                newSections[index].content = JSON.parse(val);
+                                setEditorSections(newSections);
                               } catch (e) { /* ignore invalid json while typing */ }
                             }}
                             type="content"
@@ -1827,13 +1743,10 @@ export default function AdminDashboard() {
                           <DynamicJsonEditor
                             value={JSON.stringify(section.images || {}, null, 2)}
                             onChange={(val) => {
+                              const newSections = [...editorSections];
                               try {
-                                const parsed = JSON.parse(val);
-                                setEditorSections(prev => {
-                                  const newSections = [...prev];
-                                  newSections[index] = { ...newSections[index], images: parsed };
-                                  return newSections;
-                                });
+                                newSections[index].images = JSON.parse(val);
+                                setEditorSections(newSections);
                               } catch (e) { /* ignore invalid json while typing */ }
                             }}
                             type="images"
