@@ -932,98 +932,30 @@ export default function AdminDashboard() {
       }
 
       // 2. Upsert Content Sections
-      // Split into updates (existing IDs) and inserts (new sections) to ensure reliable saving
-      let updates = editorSections
-        .filter(s => s.id && s.section_key && s.section_key.trim())
-        .map(s => ({
-          id: s.id!,
+      const sectionPayloads = editorSections
+        .filter(section => section.section_key && section.section_key.trim())
+        .map(section => ({
+          ...(section.id && { id: section.id }), // Conditionally add id if it exists
           page_path: formattedPath,
-          section_key: s.section_key!.trim().toLowerCase(),
-          content: s.content,
-          images: s.images
+          section_key: section.section_key!.trim().toLowerCase(),
+          content: section.content,
+          images: section.images
         }));
 
-      let inserts = editorSections
-        .filter(s => !s.id && s.section_key && s.section_key.trim())
-        .map(s => ({
-          page_path: formattedPath,
-          section_key: s.section_key!.trim().toLowerCase(),
-          content: s.content,
-          images: s.images
-        }));
-
-      // Pre-check inserts for existing keys in DB to avoid 409s if onConflict fails or keys exist
-      if (inserts.length > 0) {
-        const insertKeys = inserts.map(i => i.section_key);
-        const { data: existingConflicts } = await supabase
-          .from('content')
-          .select('id, section_key')
-          .eq('page_path', formattedPath)
-          .in('section_key', insertKeys);
-        
-        if (existingConflicts && existingConflicts.length > 0) {
-          const conflictMap = new Map(existingConflicts.map(e => [e.section_key, e.id]));
-          const trueInserts: typeof inserts = [];
-
-          inserts.forEach(ins => {
-            if (conflictMap.has(ins.section_key)) {
-              updates.push({
-                ...ins,
-                id: conflictMap.get(ins.section_key)!
-              });
-            } else {
-              trueInserts.push(ins);
-            }
-          });
-          inserts = trueInserts;
-        }
-      }
-
-      if (updates.length > 0) {
+      if (sectionPayloads.length > 0) {
         const { data, error } = await supabase
           .from('content')
-          .upsert(updates)
+          .upsert(sectionPayloads, { onConflict: 'page_path,section_key' })
           .select();
 
         if (error) {
-          // Check for unique constraint violation (Postgres error code for unique_violation)
           if (error.code === '23505') {
-            // Attempt to resolve swap conflict by using temporary keys
-            // This handles cases where keys are swapped (A->B, B->A) which causes unique constraint violations in a single batch
-            const tempUpdates = updates.map(u => ({
-              ...u,
-              section_key: `${u.section_key}_temp_${Math.random().toString(36).slice(2)}`
-            }));
-
-            const { error: tempError } = await supabase
-              .from('content')
-              .upsert(tempUpdates);
-
-            if (tempError) throw tempError;
-
-            // Retry original updates now that keys are moved out of the way
-            const { error: retryError } = await supabase
-              .from('content')
-              .upsert(updates);
-
-            if (retryError) throw retryError;
-          } else {
-            throw error;
+            throw new Error(`A section key conflict occurred. This can happen if you swap keys between sections. Please save after one key change before changing the second, or ensure all keys are unique.`);
           }
+          throw error;
         }
-        else if (!data || data.length === 0) {
-          console.warn(`Update for sections succeeded but no data was returned. This might indicate a Supabase RLS policy issue.`);
-        }
-      }
-
-      if (inserts.length > 0) {
-        const { data, error } = await supabase
-          .from('content')
-          .upsert(inserts, { onConflict: 'page_path,section_key' })
-          .select();
-        if (error) throw error;
         if (!data || data.length === 0) {
-          throw new Error("Insert succeeded but no data was returned. This usually indicates a permission issue (RLS). Ensure you are logged in via Supabase Auth.");
+          console.warn(`Save may have failed silently due to database permissions (RLS).`);
         }
       }
 
