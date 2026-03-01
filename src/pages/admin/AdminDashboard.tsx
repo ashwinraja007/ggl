@@ -864,6 +864,14 @@ export default function AdminDashboard() {
     if (!formattedPath.startsWith('/')) formattedPath = '/' + formattedPath;
 
     try {
+      // New check for duplicate keys before saving
+      const sectionKeys = editorSections.map(s => s.section_key?.trim().toLowerCase()).filter(Boolean);
+      const duplicateKeys = sectionKeys.filter((key, index) => sectionKeys.indexOf(key) !== index);
+
+      if (duplicateKeys.length > 0) {
+        throw new Error(`Duplicate section keys found: ${duplicateKeys.join(', ')}. Section keys must be unique for a page.`);
+      }
+
       // 0. Find and delete orphaned sections that were removed in the UI
       const originalIds = originalSections.map(s => s.id).filter((id): id is number => !!id);
       const currentIds = editorSections.map(s => s.id).filter((id): id is number => !!id);
@@ -907,10 +915,10 @@ export default function AdminDashboard() {
       // 2. Upsert Content Sections
       // This will insert new sections or update existing ones based on the unique combination of page_path and section_key.
       const sectionPayloads = editorSections
-        .filter(section => section.section_key) // Ensure section_key exists
+        .filter(section => section.section_key && section.section_key.trim()) // Ensure section_key exists and is not just whitespace
         .map(section => ({
           page_path: formattedPath,
-          section_key: section.section_key!.toLowerCase(),
+          section_key: section.section_key!.trim().toLowerCase(),
           content: section.content,
           images: section.images
         }));
@@ -918,7 +926,7 @@ export default function AdminDashboard() {
       if (sectionPayloads.length > 0) {
         const { error } = await supabase
           .from('content')
-          .upsert(sectionPayloads, { onConflict: 'page_path, section_key' });
+          .upsert(sectionPayloads, { onConflict: 'page_path, section_key', ignoreDuplicates: false });
 
         if (error) throw error;
       }
@@ -1035,7 +1043,8 @@ export default function AdminDashboard() {
   };
 
   const handleAddSection = () => {
-    setEditorSections([...editorSections, { section_key: "new_section", content: {}, images: {} }]);
+    const newKey = `new_section_${Date.now()}`;
+    setEditorSections([...editorSections, { section_key: newKey, content: {}, images: {} }]);
   };
 
   const handleRemoveSection = (index: number) => {
