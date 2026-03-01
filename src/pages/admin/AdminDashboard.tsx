@@ -932,8 +932,6 @@ export default function AdminDashboard() {
       }
 
       // 2. Clean Save Strategy: Delete all existing content for this page and re-insert.
-      // This prevents unique key conflicts when reordering/renaming and ensures the DB matches the UI exactly.
-      const { error: deleteError } = await supabase
       
       // A. Delete original rows by ID (ensures we remove what was edited, regardless of path changes)
       const originalIds = originalSections.map(s => s.id).filter((id): id is number => !!id);
@@ -958,8 +956,6 @@ export default function AdminDashboard() {
         .delete()
         .eq('page_path', formattedPath);
 
-      if (deleteError) {
-        throw new Error(`Failed to clear existing content: ${deleteError.message}`);
       if (deletePathError) {
         throw new Error(`Failed to clear target path: ${deletePathError.message}`);
       }
