@@ -870,98 +870,70 @@ export default function AdminDashboard() {
 
     if (!editorPagePath) {
       toast({ title: "Page path is required", variant: "destructive" });
-      handlePathBlur(); // to show warning if empty
       return;
     }
 
     setIsSaving(true);
     let formattedPath = editorPagePath.trim().toLowerCase();
-    // Remove trailing slash if present
     if (formattedPath.length > 1 && formattedPath.endsWith('/')) {
       formattedPath = formattedPath.slice(0, -1);
     }
     if (!formattedPath.startsWith('/')) formattedPath = '/' + formattedPath;
 
     try {
-      // 1. Check for duplicate keys in the editor
+      // 1. Validate keys client-side
       const sectionKeys = editorSections.map(s => s.section_key?.trim().toLowerCase()).filter(Boolean);
       const duplicateKeys = sectionKeys.filter((key, index) => sectionKeys.indexOf(key) !== index);
-
       if (duplicateKeys.length > 0) {
         throw new Error(`Duplicate section keys found: ${duplicateKeys.join(', ')}. Keys must be unique.`);
       }
 
-      // 2. Ensure Route Exists in 'pages' table
+      // 2. Prepare payload for the RPC function
       const seoSection = editorSections.find(s => s.section_key === 'seo');
       const pageTitle = (seoSection?.content as any)?.title || formattedPath;
-      const componentKey = "DynamicPage"; // Always force DynamicPage
-
-      const { data: existingPage } = await supabase.from('pages').select('id').eq('path', formattedPath).maybeSingle();
       
-      if (existingPage) {
-        const { error } = await supabase.from('pages').update({ title: pageTitle, component_key: componentKey }).eq('id', existingPage.id);
-        if (error) throw error;
-      } else {
-        const { error } = await supabase.from('pages').insert([{ path: formattedPath, title: pageTitle, component_key: componentKey }]);
-        if (error) {
-          throw new Error(`Failed to create page route: ${error.message}. Check database permissions.`);
-        }
-      }
-
-      // 3. Handle Rename: If the path changed, clean up the old path's content.
-      const originalPath = originalSections.length > 0 ? originalSections[0].page_path : null;
-      const isRename = originalPath && originalPath !== formattedPath;
-
-      if (isRename) {
-        await supabase.from('content').delete().eq('page_path', originalPath);
-        await supabase.from('pages').delete().eq('path', originalPath);
-      }
-
-      // 4. Clean Save Strategy: Delete ALL content at the target path to ensure a clean slate.
-      const { error: deleteError } = await supabase
-        .from('content')
-        .delete()
-        .eq('page_path', formattedPath);
-
-      if (deleteError) {
-        throw new Error(`Failed to clear existing content: ${deleteError.message}`);
-      }
-
-      // 5. Insert New Content
       const sectionPayloads = editorSections
         .filter(section => section.section_key && section.section_key.trim())
         .map(section => ({
-          page_path: formattedPath,
           section_key: section.section_key!.trim().toLowerCase(),
-          content: section.content,
-          images: section.images
+          content: section.content || {},
+          images: section.images || {}
         }));
 
-      if (sectionPayloads.length > 0) {
-        const { data, error } = await supabase
-          .from('content')
-          .insert(sectionPayloads)
-          .select();
+      const originalPath = originalSections.length > 0 ? originalSections[0].page_path : null;
+      const isRename = originalPath && originalPath !== formattedPath;
 
-        if (error) throw error;
-        
-        if (!data || data.length === 0) {
-          throw new Error("Save appeared to succeed but no data was returned. This is likely a Supabase RLS permission issue.");
+      // 3. Call the transactional RPC function
+      const { error } = await supabase.rpc('save_page_content', {
+        target_path: formattedPath,
+        page_title: pageTitle,
+        sections_payload: sectionPayloads,
+        original_path: isRename ? originalPath : null
+      });
+
+      if (error) {
+        // Provide a more helpful error message if RLS is the likely cause
+        if (error.message.includes('permission denied for function save_page_content')) {
+            throw new Error(`Database permission denied. Please run the required SQL script in your Supabase SQL Editor to grant permissions for the save function.`);
         }
+        throw error;
       }
 
+      // 4. Invalidate queries to refetch data
       await queryClient.invalidateQueries({ queryKey: ["page-content"] });
       await queryClient.invalidateQueries({ queryKey: ["pages-count"] });
       await queryClient.invalidateQueries({ queryKey: ["pages"] });
       await queryClient.invalidateQueries({ queryKey: ["dynamic-pages"] });
+      await queryClient.invalidateQueries({ queryKey: ["router-pages"] });
+      await queryClient.invalidateQueries({ queryKey: ["content-paths"] });
 
-      // 6. Refresh editor sections to get new IDs (prevents duplication on next save)
+      // 5. Refresh editor state with new data from the DB
       const { data: refreshedContent } = await supabase
         .from('content')
         .select('*')
         .eq('page_path', formattedPath);
 
-      // Update local state
+      // Update local state to reflect the save
       setEditorPagePath(formattedPath);
 
       if (refreshedContent) {
