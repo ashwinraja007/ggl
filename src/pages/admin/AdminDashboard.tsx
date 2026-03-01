@@ -891,20 +891,6 @@ export default function AdminDashboard() {
         throw new Error(`Duplicate section keys found: ${duplicateKeys.join(', ')}. Section keys must be unique for a page.`);
       }
 
-      // 0. Find and delete orphaned sections that were removed in the UI
-      const originalIds = originalSections.map(s => s.id).filter((id): id is number => !!id);
-      const currentIds = editorSections.map(s => s.id).filter((id): id is number => !!id);
-      const idsToDelete = originalIds.filter(id => !currentIds.includes(id));
-
-      if (idsToDelete.length > 0) {
-        const { error: deleteError } = await supabase
-          .from('content')
-          .delete()
-          .in('id', idsToDelete);
-        
-        if (deleteError) throw new Error(`Failed to delete removed sections: ${deleteError.message}`);
-      }
-
       // 1. Ensure Route Exists in 'pages' table
       const seoSection = editorSections.find(s => s.section_key === 'seo');
       const pageTitle = (seoSection?.content as any)?.title || formattedPath;
