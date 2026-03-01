@@ -961,11 +961,30 @@ export default function AdminDashboard() {
         if (error) {
           // Check for unique constraint violation (Postgres error code for unique_violation)
           if (error.code === '23505') {
-            throw new Error(`A section key conflict occurred. This can happen if you swap keys between sections. Please ensure all section keys are unique for this page before saving.`);
+            // Attempt to resolve swap conflict by using temporary keys
+            // This handles cases where keys are swapped (A->B, B->A) which causes unique constraint violations in a single batch
+            const tempUpdates = updates.map(u => ({
+              ...u,
+              section_key: `${u.section_key}_temp_${Math.random().toString(36).slice(2)}`
+            }));
+
+            const { error: tempError } = await supabase
+              .from('content')
+              .upsert(tempUpdates);
+
+            if (tempError) throw tempError;
+
+            // Retry original updates now that keys are moved out of the way
+            const { error: retryError } = await supabase
+              .from('content')
+              .upsert(updates);
+
+            if (retryError) throw retryError;
+          } else {
+            throw error;
           }
-          throw error;
         }
-        if (!data || data.length === 0) {
+        else if (!data || data.length === 0) {
           console.warn(`Update for sections succeeded but no data was returned. This might indicate a Supabase RLS policy issue.`);
         }
       }
