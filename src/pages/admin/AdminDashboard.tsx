@@ -933,17 +933,17 @@ export default function AdminDashboard() {
 
       // 2. Upsert Content Sections
       // Split into updates (existing IDs) and inserts (new sections) to ensure reliable saving
-      const updates = editorSections
+      let updates = editorSections
         .filter(s => s.id && s.section_key && s.section_key.trim())
         .map(s => ({
-          id: s.id,
+          id: s.id!,
           page_path: formattedPath,
           section_key: s.section_key!.trim().toLowerCase(),
           content: s.content,
           images: s.images
         }));
 
-      const inserts = editorSections
+      let inserts = editorSections
         .filter(s => !s.id && s.section_key && s.section_key.trim())
         .map(s => ({
           page_path: formattedPath,
@@ -951,6 +951,33 @@ export default function AdminDashboard() {
           content: s.content,
           images: s.images
         }));
+
+      // Pre-check inserts for existing keys in DB to avoid 409s if onConflict fails or keys exist
+      if (inserts.length > 0) {
+        const insertKeys = inserts.map(i => i.section_key);
+        const { data: existingConflicts } = await supabase
+          .from('content')
+          .select('id, section_key')
+          .eq('page_path', formattedPath)
+          .in('section_key', insertKeys);
+        
+        if (existingConflicts && existingConflicts.length > 0) {
+          const conflictMap = new Map(existingConflicts.map(e => [e.section_key, e.id]));
+          const trueInserts: typeof inserts = [];
+
+          inserts.forEach(ins => {
+            if (conflictMap.has(ins.section_key)) {
+              updates.push({
+                ...ins,
+                id: conflictMap.get(ins.section_key)!
+              });
+            } else {
+              trueInserts.push(ins);
+            }
+          });
+          inserts = trueInserts;
+        }
+      }
 
       if (updates.length > 0) {
         const { data, error } = await supabase
