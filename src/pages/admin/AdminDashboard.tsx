@@ -918,25 +918,21 @@ export default function AdminDashboard() {
       }
 
       // 2. Clean Save Strategy: Delete all existing content for this page and re-insert.
-      
-      // A. Delete original rows by ID (ensures we remove what was edited, regardless of path changes)
-      const originalIds = originalSections.map(s => s.id).filter((id): id is number => !!id);
-      
-      if (originalIds.length > 0) {
-        const { data: deletedData, error: deleteIdError } = await supabase
+      // We use a path-based approach which is more robust than ID-based when state might be stale.
+
+      // A. Detect Rename: If the path changed, we need to clean up the old path's content.
+      const originalPath = originalSections.length > 0 ? originalSections[0].page_path : null;
+      const isRename = originalPath && originalPath !== formattedPath;
+
+      if (isRename) {
+        const { error: deleteOldError } = await supabase
           .from('content')
           .delete()
-          .in('id', originalIds)
-          .select();
-
-        if (deleteIdError) throw new Error(`Failed to delete original sections: ${deleteIdError.message}`);
-        
-        if (!deletedData || deletedData.length === 0) {
-             throw new Error("Database delete failed (0 rows affected). This is likely due to Row Level Security (RLS) policies blocking the delete operation. Please check your Supabase policies.");
-        }
+          .eq('page_path', originalPath);
+        if (deleteOldError) console.warn("Failed to clean up old path content:", deleteOldError);
       }
 
-      // B. Delete any rows at the target path (ensures destination is clear of conflicts)
+      // B. Delete ALL content at the target path to ensure a clean slate.
       const { error: deletePathError } = await supabase
         .from('content')
         .delete()
@@ -967,7 +963,7 @@ export default function AdminDashboard() {
         
         // Critical Check: If no data returned, RLS blocked the write.
         if (!data || data.length === 0) {
-          throw new Error("Save appeared to succeed but no data was written. This indicates a Database Permission (RLS) issue. Please ensure you are logged in or the 'content' table allows anonymous writes.");
+          throw new Error("Save failed: No data was written to the database. This usually means Row Level Security (RLS) policies are blocking the insert. Please check your Supabase policies.");
         }
       }
 
@@ -981,6 +977,13 @@ export default function AdminDashboard() {
         .from('content')
         .select('*')
         .eq('page_path', formattedPath);
+
+      // If this was a rename, try to clean up the old page entry from the 'pages' table
+      if (isRename) {
+        await supabase.from('pages').delete().eq('path', originalPath);
+        // Also update the editor state to reflect the new path as "original" for next time
+        setEditorPagePath(formattedPath);
+      }
 
       if (refreshedContent) {
          const sortedSections = [...refreshedContent].sort((a, b) => {
