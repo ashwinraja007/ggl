@@ -471,6 +471,7 @@ export default function AdminDashboard() {
   const [editorPagePath, setEditorPagePath] = useState("");
   const [editorSections, setEditorSections] = useState<Partial<PageContent>[]>([]);
   const [originalSections, setOriginalSections] = useState<Partial<PageContent>[]>([]);
+  const [isSaving, setIsSaving] = useState(false);
 
   const [pathExistsWarning, setPathExistsWarning] = useState(false);
 
@@ -865,12 +866,15 @@ export default function AdminDashboard() {
 
 
   const handleSavePage = async () => {
+    if (isSaving) return;
+
     if (!editorPagePath) {
       toast({ title: "Page path is required", variant: "destructive" });
       handlePathBlur(); // to show warning if empty
       return;
     }
 
+    setIsSaving(true);
     let formattedPath = editorPagePath.trim().toLowerCase();
     // Remove trailing slash if present
     if (formattedPath.length > 1 && formattedPath.endsWith('/')) {
@@ -962,7 +966,7 @@ export default function AdminDashboard() {
       if (inserts.length > 0) {
         const { data, error } = await supabase
           .from('content')
-          .upsert(inserts, { onConflict: 'page_path, section_key' })
+          .upsert(inserts, { onConflict: 'page_path,section_key' })
           .select();
         if (error) throw error;
         if (!data || data.length === 0) {
@@ -1010,6 +1014,8 @@ export default function AdminDashboard() {
       });
     } catch (e) {
       toast({ title: "Error saving page", description: (e as Error).message, variant: "destructive" });
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -1751,8 +1757,8 @@ export default function AdminDashboard() {
                     <Button variant="outline" onClick={handleAddSection}>
                       <Plus className="mr-2 h-4 w-4" /> Add Section
                     </Button>
-                    <Button onClick={handleSavePage} className="bg-green-600 hover:bg-green-700 text-white">
-                      <Save className="mr-2 h-4 w-4" /> Save
+                    <Button onClick={handleSavePage} disabled={isSaving} className="bg-green-600 hover:bg-green-700 text-white">
+                      {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />} Save
                     </Button>
                     {!isCreatingNewPage && (
                       <Dialog>
