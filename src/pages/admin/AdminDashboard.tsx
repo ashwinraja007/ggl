@@ -953,13 +953,25 @@ export default function AdminDashboard() {
         }));
 
       if (updates.length > 0) {
-        const { data, error } = await supabase
-          .from('content')
-          .upsert(updates)
-          .select();
-        if (error) throw error;
-        if (!data || data.length === 0) {
-          throw new Error("Update succeeded but no data was returned. This usually indicates a permission issue (RLS). Ensure you are logged in via Supabase Auth.");
+        // Perform updates individually to get better error feedback and avoid batch failures on unique key conflicts.
+        for (const updatePayload of updates) {
+          const { id, ...payload } = updatePayload;
+          const { data, error } = await supabase
+            .from('content')
+            .update(payload)
+            .eq('id', id)
+            .select();
+
+          if (error) {
+            // Check for unique constraint violation (Postgres error code for unique_violation)
+            if (error.code === '23505') { 
+              throw new Error(`Error saving section "${payload.section_key}". A section with this key already exists on this page. Please use a unique key.`);
+            }
+            throw error;
+          }
+          if (!data || data.length === 0) {
+            throw new Error("Update for a section succeeded but no data was returned. This might indicate a permission issue (RLS).");
+          }
         }
       }
 
