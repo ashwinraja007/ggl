@@ -455,6 +455,7 @@ export default function AdminDashboard() {
   const [isPageEditorOpen, setIsPageEditorOpen] = useState(false);
   const [editorPagePath, setEditorPagePath] = useState("");
   const [editorSections, setEditorSections] = useState<Partial<PageContent>[]>([]);
+  const [originalSections, setOriginalSections] = useState<Partial<PageContent>[]>([]);
 
   const [pathExistsWarning, setPathExistsWarning] = useState(false);
 
@@ -804,7 +805,9 @@ export default function AdminDashboard() {
       if (ib !== -1) return 1;
       return a.section_key.localeCompare(b.section_key);
     });
-    setEditorSections(JSON.parse(JSON.stringify(sections)));
+    const sectionsCopy = JSON.parse(JSON.stringify(sections));
+    setEditorSections(sectionsCopy);
+    setOriginalSections(sectionsCopy);
     
     setIsPageEditorOpen(true);
   };
@@ -814,6 +817,7 @@ export default function AdminDashboard() {
     setEditorPagePath("");
     // Pre-fill with default service page template
     setEditorSections(pageTemplates.service);
+    setOriginalSections([]);
     setPathExistsWarning(false);
     setIsPageEditorOpen(true);
   };
@@ -860,6 +864,20 @@ export default function AdminDashboard() {
     if (!formattedPath.startsWith('/')) formattedPath = '/' + formattedPath;
 
     try {
+      // 0. Find and delete orphaned sections that were removed in the UI
+      const originalIds = originalSections.map(s => s.id).filter((id): id is number => !!id);
+      const currentIds = editorSections.map(s => s.id).filter((id): id is number => !!id);
+      const idsToDelete = originalIds.filter(id => !currentIds.includes(id));
+
+      if (idsToDelete.length > 0) {
+        const { error: deleteError } = await supabase
+          .from('content')
+          .delete()
+          .in('id', idsToDelete);
+        
+        if (deleteError) throw new Error(`Failed to delete removed sections: ${deleteError.message}`);
+      }
+
       // 1. Ensure Route Exists in 'pages' table
       const seoSection = editorSections.find(s => s.section_key === 'seo');
       const pageTitle = (seoSection?.content as any)?.title || formattedPath;
@@ -926,7 +944,9 @@ export default function AdminDashboard() {
             if (ib !== -1) return 1;
             return a.section_key.localeCompare(b.section_key);
          });
-         setEditorSections(sortedSections);
+         const sectionsCopy = JSON.parse(JSON.stringify(sortedSections));
+         setEditorSections(sectionsCopy);
+         setOriginalSections(sectionsCopy);
       }
 
       toast({ 
@@ -1018,18 +1038,14 @@ export default function AdminDashboard() {
     setEditorSections([...editorSections, { section_key: "new_section", content: {}, images: {} }]);
   };
 
-  const handleRemoveSection = async (index: number) => {
+  const handleRemoveSection = (index: number) => {
     const section = editorSections[index];
-    if (section.id) {
-      if (confirm("Are you sure you want to delete this section? This cannot be undone.")) {
-        await deleteContentMutation.mutateAsync(section.id);
-        const newSections = [...editorSections];
-        newSections.splice(index, 1);
-        setEditorSections(newSections);
-      }
-    } else {
-      const newSections = [...editorSections];
-      newSections.splice(index, 1);
+    const confirmMessage = section.id
+      ? "Are you sure you want to remove this section? It will be permanently deleted from the database when you save the page."
+      : "Are you sure you want to remove this new section?";
+
+    if (confirm(confirmMessage)) {
+      const newSections = editorSections.filter((_, i) => i !== index);
       setEditorSections(newSections);
     }
   };
