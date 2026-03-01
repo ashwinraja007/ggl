@@ -904,7 +904,7 @@ export default function AdminDashboard() {
       const isRename = originalPath && originalPath !== formattedPath;
 
       // 3. Call the transactional RPC function
-      const { error } = await supabase.rpc('save_page_content', {
+      const { data: refreshedContent, error } = await supabase.rpc('save_page_content', {
         target_path: formattedPath,
         page_title: pageTitle,
         sections_payload: sectionPayloads,
@@ -919,7 +919,7 @@ export default function AdminDashboard() {
         throw error;
       }
 
-      // 4. Invalidate queries to refetch data
+      // 4. Invalidate queries to refetch data in the background
       await queryClient.invalidateQueries({ queryKey: ["page-content"] });
       await queryClient.invalidateQueries({ queryKey: ["pages-count"] });
       await queryClient.invalidateQueries({ queryKey: ["pages"] });
@@ -927,28 +927,20 @@ export default function AdminDashboard() {
       await queryClient.invalidateQueries({ queryKey: ["router-pages"] });
       await queryClient.invalidateQueries({ queryKey: ["content-paths"] });
 
-      // 5. Refresh editor state with new data from the DB
-      const { data: refreshedContent } = await supabase
-        .from('content')
-        .select('*')
-        .eq('page_path', formattedPath);
-
-      // Update local state to reflect the save
+      // 5. Update editor state with the fresh data returned from the RPC
       setEditorPagePath(formattedPath);
 
-      if (refreshedContent) {
-         const sortedSections = [...refreshedContent].sort((a, b) => {
-            const order = ['seo', 'hero', 'main', 'features', 'sub_services'];
-            const ia = order.indexOf(a.section_key);
-            const ib = order.indexOf(b.section_key);
-            if (ia !== -1 && ib !== -1) return ia - ib;
-            if (ia !== -1) return -1;
-            if (ib !== -1) return 1;
-            return a.section_key.localeCompare(b.section_key);
-         });
-         setEditorSections(sortedSections);
-         setOriginalSections(sortedSections);
-      }
+      const sortedSections = [...(refreshedContent || [])].sort((a, b) => {
+        const order = ['seo', 'hero', 'main', 'features', 'sub_services'];
+        const ia = order.indexOf(a.section_key);
+        const ib = order.indexOf(b.section_key);
+        if (ia !== -1 && ib !== -1) return ia - ib;
+        if (ia !== -1) return -1;
+        if (ib !== -1) return 1;
+        return a.section_key.localeCompare(b.section_key);
+      });
+      setEditorSections(sortedSections);
+      setOriginalSections(sortedSections);
 
       toast({ 
         title: "Page saved successfully",
