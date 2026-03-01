@@ -931,11 +931,22 @@ export default function AdminDashboard() {
         }
       }
 
-      // 2. Upsert Content Sections
+      // 2. Clean Save Strategy: Delete all existing content for this page and re-insert.
+      // This prevents unique key conflicts when reordering/renaming and ensures the DB matches the UI exactly.
+      const { error: deleteError } = await supabase
+        .from('content')
+        .delete()
+        .eq('page_path', formattedPath);
+
+      if (deleteError) {
+        throw new Error(`Failed to clear existing content: ${deleteError.message}`);
+      }
+
+      // 3. Insert New Content
       const sectionPayloads = editorSections
         .filter(section => section.section_key && section.section_key.trim())
         .map(section => ({
-          ...(section.id && { id: section.id }), // Conditionally add id if it exists
+          // We do NOT include ID here. We let the DB generate new IDs for the new rows.
           page_path: formattedPath,
           section_key: section.section_key!.trim().toLowerCase(),
           content: section.content,
@@ -945,31 +956,14 @@ export default function AdminDashboard() {
       if (sectionPayloads.length > 0) {
         const { data, error } = await supabase
           .from('content')
-          .upsert(sectionPayloads, { onConflict: 'page_path,section_key' })
+          .insert(sectionPayloads)
           .select();
 
-        if (error) {
-          if (error.code === '23505') {
-            // Conflict detected (likely swapping keys). 
-            // Fallback: Delete all for this page and re-insert to resolve conflicts while preserving IDs.
-            const { error: deleteError } = await supabase
-              .from('content')
-              .delete()
-              .eq('page_path', formattedPath);
-            
-            if (deleteError) throw new Error(`Failed to clear conflicting content: ${deleteError.message}`);
-
-            const { error: insertError } = await supabase
-              .from('content')
-              .insert(sectionPayloads);
-            
-            if (insertError) throw new Error(`Failed to re-save content after conflict: ${insertError.message}`);
-          } else {
-            throw error;
-          }
-        }
-        else if (!data || data.length === 0) {
-          console.warn(`Save may have failed silently due to database permissions (RLS).`);
+        if (error) throw error;
+        
+        // Critical Check: If no data returned, RLS blocked the write.
+        if (!data || data.length === 0) {
+          throw new Error("Save appeared to succeed but no data was written. This indicates a Database Permission (RLS) issue. Please ensure you are logged in or the 'content' table allows anonymous writes.");
         }
       }
 
