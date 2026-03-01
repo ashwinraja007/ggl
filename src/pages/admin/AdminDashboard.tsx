@@ -913,21 +913,39 @@ export default function AdminDashboard() {
       }
 
       // 2. Upsert Content Sections
-      // This will insert new sections or update existing ones based on the unique combination of page_path and section_key.
-      const sectionPayloads = editorSections
-        .filter(section => section.section_key && section.section_key.trim()) // Ensure section_key exists and is not just whitespace
-        .map(section => ({
+      // Split into updates (existing IDs) and inserts (new sections) to ensure reliable saving
+      const updates = editorSections
+        .filter(s => s.id && s.section_key && s.section_key.trim())
+        .map(s => ({
+          id: s.id,
           page_path: formattedPath,
-          section_key: section.section_key!.trim().toLowerCase(),
-          content: section.content,
-          images: section.images
+          section_key: s.section_key!.trim().toLowerCase(),
+          content: s.content,
+          images: s.images
         }));
 
-      if (sectionPayloads.length > 0) {
+      const inserts = editorSections
+        .filter(s => !s.id && s.section_key && s.section_key.trim())
+        .map(s => ({
+          page_path: formattedPath,
+          section_key: s.section_key!.trim().toLowerCase(),
+          content: s.content,
+          images: s.images
+        }));
+
+      if (updates.length > 0) {
         const { error } = await supabase
           .from('content')
-          .upsert(sectionPayloads, { onConflict: 'page_path, section_key', ignoreDuplicates: false });
+          .upsert(updates)
+          .select();
+        if (error) throw error;
+      }
 
+      if (inserts.length > 0) {
+        const { error } = await supabase
+          .from('content')
+          .upsert(inserts, { onConflict: 'page_path, section_key' })
+          .select();
         if (error) throw error;
       }
 
