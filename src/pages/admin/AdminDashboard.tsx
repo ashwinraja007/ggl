@@ -883,70 +883,54 @@ export default function AdminDashboard() {
     if (!formattedPath.startsWith('/')) formattedPath = '/' + formattedPath;
 
     try {
-      // New check for duplicate keys before saving
+      // 1. Check for duplicate keys in the editor
       const sectionKeys = editorSections.map(s => s.section_key?.trim().toLowerCase()).filter(Boolean);
       const duplicateKeys = sectionKeys.filter((key, index) => sectionKeys.indexOf(key) !== index);
 
       if (duplicateKeys.length > 0) {
-        throw new Error(`Duplicate section keys found: ${duplicateKeys.join(', ')}. Section keys must be unique for a page.`);
+        throw new Error(`Duplicate section keys found: ${duplicateKeys.join(', ')}. Keys must be unique.`);
       }
 
-      // 1. Ensure Route Exists in 'pages' table
+      // 2. Ensure Route Exists in 'pages' table
       const seoSection = editorSections.find(s => s.section_key === 'seo');
       const pageTitle = (seoSection?.content as any)?.title || formattedPath;
-      
-      // Always force DynamicPage component to ensure content from DB is rendered
-      const componentKey = "DynamicPage";
+      const componentKey = "DynamicPage"; // Always force DynamicPage
 
-      const pagePayload = {
-        path: formattedPath,
-        title: pageTitle,
-        component_key: componentKey,
-      };
-
-      // Check if page exists to decide on insert vs update (or just upsert if ID known, but path is unique usually)
       const { data: existingPage } = await supabase.from('pages').select('id').eq('path', formattedPath).maybeSingle();
       
       if (existingPage) {
-        const { error } = await supabase.from('pages').update(pagePayload).eq('id', existingPage.id);
+        const { error } = await supabase.from('pages').update({ title: pageTitle, component_key: componentKey }).eq('id', existingPage.id);
         if (error) throw error;
       } else {
-        const { error } = await supabase.from('pages').insert([pagePayload]);
+        const { error } = await supabase.from('pages').insert([{ path: formattedPath, title: pageTitle, component_key: componentKey }]);
         if (error) {
           throw new Error(`Failed to create page route: ${error.message}. Check database permissions.`);
         }
       }
 
-      // 2. Clean Save Strategy: Delete all existing content for this page and re-insert.
-      // We use a path-based approach which is more robust than ID-based when state might be stale.
-
-      // A. Detect Rename: If the path changed, we need to clean up the old path's content.
+      // 3. Handle Rename: If the path changed, clean up the old path's content.
       const originalPath = originalSections.length > 0 ? originalSections[0].page_path : null;
       const isRename = originalPath && originalPath !== formattedPath;
 
       if (isRename) {
-        const { error: deleteOldError } = await supabase
-          .from('content')
-          .delete()
-          .eq('page_path', originalPath);
-        if (deleteOldError) console.warn("Failed to clean up old path content:", deleteOldError);
+        await supabase.from('content').delete().eq('page_path', originalPath);
+        await supabase.from('pages').delete().eq('path', originalPath);
       }
 
-      // B. Delete ALL content at the target path to ensure a clean slate.
-      const { error: deletePathError } = await supabase
+      // 4. Clean Save Strategy: Delete ALL content at the target path to ensure a clean slate.
+      const { error: deleteError } = await supabase
         .from('content')
         .delete()
         .eq('page_path', formattedPath);
 
-      if (deletePathError) {
-        throw new Error(`Failed to clear target path: ${deletePathError.message}`);
+      if (deleteError) {
+        throw new Error(`Failed to clear existing content: ${deleteError.message}`);
       }
 
-      // 3. Insert New Content
+      // 5. Insert New Content
       const sectionPayloads = editorSections
         .filter(section => section.section_key && section.section_key.trim())
         .map(section => ({
-          // We do NOT include ID here. We let the DB generate new IDs for the new rows.
           page_path: formattedPath,
           section_key: section.section_key!.trim().toLowerCase(),
           content: section.content,
@@ -961,9 +945,8 @@ export default function AdminDashboard() {
 
         if (error) throw error;
         
-        // Critical Check: If no data returned, RLS blocked the write.
         if (!data || data.length === 0) {
-          throw new Error("Save failed: No data was written to the database. This usually means Row Level Security (RLS) policies are blocking the insert. Please check your Supabase policies.");
+          throw new Error("Save appeared to succeed but no data was returned. This is likely a Supabase RLS permission issue.");
         }
       }
 
@@ -972,18 +955,14 @@ export default function AdminDashboard() {
       await queryClient.invalidateQueries({ queryKey: ["pages"] });
       await queryClient.invalidateQueries({ queryKey: ["dynamic-pages"] });
 
-      // Refresh editor sections to get new IDs (prevents duplication on next save)
+      // 6. Refresh editor sections to get new IDs (prevents duplication on next save)
       const { data: refreshedContent } = await supabase
         .from('content')
         .select('*')
         .eq('page_path', formattedPath);
 
-      // If this was a rename, try to clean up the old page entry from the 'pages' table
-      if (isRename) {
-        await supabase.from('pages').delete().eq('path', originalPath);
-        // Also update the editor state to reflect the new path as "original" for next time
-        setEditorPagePath(formattedPath);
-      }
+      // Update local state
+      setEditorPagePath(formattedPath);
 
       if (refreshedContent) {
          const sortedSections = [...refreshedContent].sort((a, b) => {
@@ -995,9 +974,8 @@ export default function AdminDashboard() {
             if (ib !== -1) return 1;
             return a.section_key.localeCompare(b.section_key);
          });
-         const sectionsCopy = JSON.parse(JSON.stringify(sortedSections));
-         setEditorSections(sectionsCopy);
-         setOriginalSections(sectionsCopy);
+         setEditorSections(sortedSections);
+         setOriginalSections(sortedSections);
       }
 
       toast({ 
@@ -1013,6 +991,7 @@ export default function AdminDashboard() {
         ),
       });
     } catch (e) {
+      console.error("Save error:", e);
       toast({ title: "Error saving page", description: (e as Error).message, variant: "destructive" });
     } finally {
       setIsSaving(false);
