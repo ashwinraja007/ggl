@@ -953,23 +953,20 @@ export default function AdminDashboard() {
         }));
 
       if (updates.length > 0) {
-        // Perform updates individually to get better error feedback and avoid batch failures on unique key conflicts.
-        for (const updatePayload of updates) {
-          const { data, error } = await supabase
-            .from('content')
-            .upsert(updatePayload)
-            .select();
+        const { data, error } = await supabase
+          .from('content')
+          .upsert(updates)
+          .select();
 
-          if (error) {
-            // Check for unique constraint violation (Postgres error code for unique_violation)
-            if (error.code === '23505') { 
-              throw new Error(`Error saving section "${updatePayload.section_key}". A section with this key already exists on this page. Please use a unique key.`);
-            }
-            throw error;
+        if (error) {
+          // Check for unique constraint violation (Postgres error code for unique_violation)
+          if (error.code === '23505') {
+            throw new Error(`A section key conflict occurred. This can happen if you swap keys between sections. Please ensure all section keys are unique for this page before saving.`);
           }
-          if (!data || data.length === 0) {
-            console.warn(`Section "${updatePayload.section_key}" saved, but no data returned. This usually indicates a Supabase RLS policy issue.`);
-          }
+          throw error;
+        }
+        if (!data || data.length === 0) {
+          console.warn(`Update for sections succeeded but no data was returned. This might indicate a Supabase RLS policy issue.`);
         }
       }
 
