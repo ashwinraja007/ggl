@@ -355,8 +355,10 @@ const DynamicJsonEditor = ({
   const [parsed, setParsed] = useState<any>({});
   const [error, setError] = useState<string | null>(null);
   const [mode, setMode] = useState<'visual' | 'raw'>('visual');
+  const [rawValue, setRawValue] = useState(value);
 
   useEffect(() => {
+    setRawValue(value);
     try {
       const p = JSON.parse(value || '{}');
       setParsed(p);
@@ -368,9 +370,22 @@ const DynamicJsonEditor = ({
   }, [value]);
 
   const handleRecursiveChange = (newVal: any) => {
-
     setParsed(newVal);
-    onChange(JSON.stringify(newVal, null, 2));
+    const jsonString = JSON.stringify(newVal, null, 2);
+    setRawValue(jsonString);
+    onChange(jsonString);
+  };
+
+  const handleRawChange = (val: string) => {
+    setRawValue(val);
+    try {
+      const p = JSON.parse(val);
+      setParsed(p);
+      setError(null);
+      onChange(val);
+    } catch (e) {
+      setError("Invalid JSON");
+    }
   };
 
   if (mode === 'raw') {
@@ -380,8 +395,8 @@ const DynamicJsonEditor = ({
           <Button type="button" variant="outline" size="sm" onClick={() => setMode('visual')} disabled={!!error}>Switch to Visual Editor</Button>
         </div>
         <Textarea
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
+          value={rawValue}
+          onChange={(e) => handleRawChange(e.target.value)}
           className="font-mono text-xs min-h-[200px]"
         />
         {error && <p className="text-red-500 text-xs">{error}</p>}
@@ -934,19 +949,25 @@ export default function AdminDashboard() {
         }));
 
       if (updates.length > 0) {
-        const { error } = await supabase
+        const { data, error } = await supabase
           .from('content')
           .upsert(updates)
           .select();
         if (error) throw error;
+        if (!data || data.length === 0) {
+          throw new Error("Update succeeded but no data was returned. This usually indicates a permission issue (RLS). Ensure you are logged in via Supabase Auth.");
+        }
       }
 
       if (inserts.length > 0) {
-        const { error } = await supabase
+        const { data, error } = await supabase
           .from('content')
           .upsert(inserts, { onConflict: 'page_path, section_key' })
           .select();
         if (error) throw error;
+        if (!data || data.length === 0) {
+          throw new Error("Insert succeeded but no data was returned. This usually indicates a permission issue (RLS). Ensure you are logged in via Supabase Auth.");
+        }
       }
 
       await queryClient.invalidateQueries({ queryKey: ["page-content"] });
@@ -1840,10 +1861,13 @@ export default function AdminDashboard() {
                           <DynamicJsonEditor
                             value={JSON.stringify(section.content || {}, null, 2)}
                             onChange={(val) => {
-                              const newSections = [...editorSections];
                               try {
-                                newSections[index].content = JSON.parse(val);
-                                setEditorSections(newSections);
+                                const parsed = JSON.parse(val);
+                                setEditorSections(prev => {
+                                  const newSections = [...prev];
+                                  newSections[index] = { ...newSections[index], content: parsed };
+                                  return newSections;
+                                });
                               } catch (e) { /* ignore invalid json while typing */ }
                             }}
                             type="content"
@@ -1854,10 +1878,13 @@ export default function AdminDashboard() {
                           <DynamicJsonEditor
                             value={JSON.stringify(section.images || {}, null, 2)}
                             onChange={(val) => {
-                              const newSections = [...editorSections];
                               try {
-                                newSections[index].images = JSON.parse(val);
-                                setEditorSections(newSections);
+                                const parsed = JSON.parse(val);
+                                setEditorSections(prev => {
+                                  const newSections = [...prev];
+                                  newSections[index] = { ...newSections[index], images: parsed };
+                                  return newSections;
+                                });
                               } catch (e) { /* ignore invalid json while typing */ }
                             }}
                             type="images"
