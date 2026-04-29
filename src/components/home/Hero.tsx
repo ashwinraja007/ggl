@@ -7,8 +7,10 @@ import {
   Ship,
   Box,
   Globe,
+  Menu,
+  X,
 } from "lucide-react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
 import { useIsMobile } from "@/hooks/use-mobile";
 
@@ -29,7 +31,9 @@ export const Hero = ({
   consolamateLink,
   contactPath = "/contact",
 }: HeroProps) => {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const isMobile = useIsMobile();
 
   useEffect(() => {
@@ -37,36 +41,47 @@ export const Hero = ({
     return () => clearTimeout(timer);
   }, []);
 
-  // ✅ Updated links
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth > 768 && isMobileMenuOpen)
+        setIsMobileMenuOpen(false);
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, [isMobileMenuOpen]);
+
+  useEffect(() => {
+    document.body.style.overflow = isMobileMenuOpen ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isMobileMenuOpen]);
+
+  // ✅ UPDATED LINKS
   const portalLinks = [
     {
       icon: <Users className="w-5 h-5" />,
       title: "Customer Portal",
-      description: "Access shipping dashboard",
       url: "https://consolmate.com/auth/login/14",
     },
     {
       icon: <UserCircle className="w-5 h-5" />,
       title: "Partner Portal",
-      description: "Manage partnership",
       url: "https://pp.onlinetracking.co/auth/login/14",
     },
     {
       icon: <SearchCode className="w-5 h-5" />,
       title: "Tracking",
-      description: "Track your shipment",
       url: "http://ec2-13-229-38-56.ap-southeast-1.compute.amazonaws.com:8081/ords/f?p=107:102:::::P0_GROUP_RID:280",
     },
     {
       icon: <Ship className="w-5 h-5" />,
       title: "Sailing Schedule",
-      description: "View schedules",
       url: "http://ec2-13-229-38-56.ap-southeast-1.compute.amazonaws.com:8081/ords/f?p=107:104:::::P0_GROUP_RID:280",
     },
     {
       icon: <Box className="w-5 h-5" />,
       title: "Online Quote",
-      description: "Request quotation",
       url: contactPath,
     },
   ];
@@ -74,6 +89,16 @@ export const Hero = ({
   return (
     <section className="relative min-h-[75vh] md:min-h-[90vh] overflow-hidden pt-8 md:pt-16">
       
+      {/* Mobile Menu Button */}
+      <div className="fixed top-4 left-4 z-50 md:hidden">
+        <button
+          onClick={() => setIsMobileMenuOpen((v) => !v)}
+          className="rounded-md border border-white/20 bg-brand-navy/70 text-white px-3 py-2"
+        >
+          {isMobileMenuOpen ? <X /> : <Menu />}
+        </button>
+      </div>
+
       {/* Background */}
       <motion.div className="absolute inset-0">
         <img
@@ -90,60 +115,50 @@ export const Hero = ({
       {/* Content */}
       <div className="absolute inset-0 flex items-center">
         <div className="container mx-auto px-6">
-          <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            animate={isVisible ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.8 }}
-            className="max-w-2xl text-white space-y-5"
-          >
+          <div className="max-w-2xl text-white space-y-5">
             <div className="flex items-center gap-3">
-              <Globe className="text-brand-gold w-8 h-8" />
-              <span className="bg-brand-gold/20 px-4 py-1 rounded-full text-sm border border-brand-gold/30">
+              <Globe className="text-yellow-400 w-8 h-8" />
+              <span className="bg-yellow-400/20 px-4 py-1 rounded-full text-sm">
                 {badgeText || "Beyond Logistics, a Complete Solution"}
               </span>
             </div>
 
             <h1
-              className="text-5xl font-bold text-white"
+              className="text-5xl font-bold"
               dangerouslySetInnerHTML={{
                 __html:
                   headline ||
-                  'Delivering Excellence in <span class="text-[#f6b100]">Global Logistics</span> Solutions',
+                  'Delivering Excellence in <span class="text-yellow-400">Global Logistics</span>',
               }}
             />
 
-            <p className="text-lg text-white/90">
+            <p className="text-lg text-white/80">
               {subheadline ||
-                "GGL brings over 25 years of expertise in international logistics, offering comprehensive solutions tailored to your business needs."}
+                "GGL brings over 25 years of expertise in international logistics."}
             </p>
-          </motion.div>
+
+            <div className="flex gap-4">
+
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* ✅ Bottom 5 Buttons (hero colors) */}
+      {/* ✅ BOTTOM 5 BUTTONS */}
       <div className="hidden md:flex absolute bottom-10 left-0 w-full justify-center z-20">
-        <div className="flex gap-4 bg-brand-navy/80 backdrop-blur-md p-4 rounded-xl border border-brand-gold/30 shadow-lg">
+        <div className="flex gap-4 bg-white/10 backdrop-blur-lg p-3 rounded-xl border border-white/20 shadow-lg">
           {portalLinks.map((link, index) => (
             <a
               key={index}
               href={link.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-3 px-6 py-4 rounded-lg hover:bg-white/10 transition"
+              className="flex items-center gap-2 px-6 py-4 bg-white rounded-lg shadow hover:shadow-xl transition"
             >
-              <span className="text-brand-gold">
-                {link.icon}
+              <span className="text-yellow-500">{link.icon}</span>
+              <span className="text-sm font-medium text-gray-800">
+                {link.title}
               </span>
-
-              <div className="text-left">
-                <div className="text-white font-medium">
-                  {link.title}
-                </div>
-
-                <div className="text-xs text-white/70">
-                  {link.description}
-                </div>
-              </div>
             </a>
           ))}
         </div>
