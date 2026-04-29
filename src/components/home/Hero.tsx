@@ -114,7 +114,7 @@ export const Hero = ({
             </div>
 
             <h1
-              className="text-5xl font-bold"
+              className="text-5xl font-bold text-white"
               dangerouslySetInnerHTML={{
                 __html:
                   headline ||
