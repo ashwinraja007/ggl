@@ -57,7 +57,7 @@ export const Hero = ({
     };
   }, [isMobileMenuOpen]);
 
-  // ✅ UPDATED LINKS
+  // ✅ Updated links only (no style change)
   const portalLinks = [
     {
       icon: <Users className="w-5 h-5" />,
@@ -89,16 +89,6 @@ export const Hero = ({
   return (
     <section className="relative min-h-[75vh] md:min-h-[90vh] overflow-hidden pt-8 md:pt-16">
       
-      {/* Mobile Menu Button */}
-      <div className="fixed top-4 left-4 z-50 md:hidden">
-        <button
-          onClick={() => setIsMobileMenuOpen((v) => !v)}
-          className="rounded-md border border-white/20 bg-brand-navy/70 text-white px-3 py-2"
-        >
-          {isMobileMenuOpen ? <X /> : <Menu />}
-        </button>
-      </div>
-
       {/* Background */}
       <motion.div className="absolute inset-0">
         <img
@@ -117,8 +107,8 @@ export const Hero = ({
         <div className="container mx-auto px-6">
           <div className="max-w-2xl text-white space-y-5">
             <div className="flex items-center gap-3">
-              <Globe className="text-yellow-400 w-8 h-8" />
-              <span className="bg-yellow-400/20 px-4 py-1 rounded-full text-sm">
+              <Globe className="text-brand-gold w-8 h-8" />
+              <span className="bg-brand-gold/20 px-4 py-1 rounded-full text-sm border border-brand-gold/30">
                 {badgeText || "Beyond Logistics, a Complete Solution"}
               </span>
             </div>
@@ -128,44 +118,35 @@ export const Hero = ({
               dangerouslySetInnerHTML={{
                 __html:
                   headline ||
-                  'Delivering Excellence in <span class="text-yellow-400">Global Logistics</span>',
+                  'Delivering Excellence in <span class="text-[#f6b100]">Global Logistics</span> Solutions',
               }}
             />
 
-            <p className="text-lg text-white/80">
+            <p className="text-lg text-white/90">
               {subheadline ||
-                "GGL brings over 25 years of expertise in international logistics."}
+                "GGL brings over 25 years of expertise in international logistics, offering comprehensive solutions tailored to your business needs."}
             </p>
 
             <div className="flex gap-4">
-              <Link to={contactPath}>
-                <Button>Get A Quote</Button>
-              </Link>
-
-              <a
-                href="https://consolmate.com/auth/login/14"
-                target="_blank"
-              >
-                <Button>Customer Portal</Button>
-              </a>
+          
             </div>
           </div>
         </div>
       </div>
 
-      {/* ✅ BOTTOM 5 BUTTONS */}
+      {/* ✅ Bottom 5 Buttons (no color changes) */}
       <div className="hidden md:flex absolute bottom-10 left-0 w-full justify-center z-20">
-        <div className="flex gap-4 bg-white/10 backdrop-blur-lg p-3 rounded-xl border border-white/20 shadow-lg">
+        <div className="flex gap-4">
           {portalLinks.map((link, index) => (
             <a
               key={index}
               href={link.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-2 px-6 py-4 bg-white rounded-lg shadow hover:shadow-xl transition"
+              className="flex items-center gap-2 px-6 py-4 bg-white rounded-lg shadow hover:shadow-lg transition"
             >
-              <span className="text-yellow-500">{link.icon}</span>
-              <span className="text-sm font-medium text-gray-800">
+              <span className="text-brand-gold">{link.icon}</span>
+              <span className="text-sm font-medium">
                 {link.title}
               </span>
             </a>
